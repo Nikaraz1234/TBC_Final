@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mycomposeapp.ui.screen.splash.SplashScreen
 
 @Composable
 fun AppNavGraph(
@@ -18,11 +19,11 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.route,
+        startDestination = Screen.Splash.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(Screen.Dashboard.route) {
-
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
         }
     }
 }
