@@ -28,8 +28,8 @@ fun NavGraph() {
             onGoogleSignInClick = { /* TODO */ },
             onTermsClick = { /* TODO */ }
         )
-        loginNavGraph()
-        registerNavGraph()
+        loginNavGraph(navController = navController)
+        registerNavGraph(navController = navController)
         dashboardNavGraph()
     }
 }

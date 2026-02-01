@@ -18,6 +18,8 @@ retrofit-kotlinx = "1.0.0"
 coil = "2.7.0"
 datastore = "1.2.0"
 base-url = "https://c37108e6-8faf-4a15-a91c-7d1bc9b48d8a.mock.pstmn.io/"
+firebaseBom = "33.0.0"
+googleServices = "4.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +48,8 @@ retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "r
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -54,3 +58,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.0.21" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
