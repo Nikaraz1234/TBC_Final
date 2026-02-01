@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 data class Spacing(
     val spacing4: Dp = 4.dp,
     val spacing5: Dp = 5.dp,
+    val spacing6: Dp = 6.dp,
     val spacing8: Dp = 8.dp,
     val spacing12: Dp = 12.dp,
     val spacing16: Dp = 16.dp,

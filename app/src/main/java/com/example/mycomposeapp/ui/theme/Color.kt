@@ -39,7 +39,15 @@ data class AppColorScheme(
 
     // Social button glass colors
     val socialGlassBackground: Color = Color.White.copy(alpha = 0.15f),
-    val socialGlassBorder: Color = Color.White.copy(alpha = 0.3f)
+    val socialGlassBorder: Color = Color.White.copy(alpha = 0.3f),
+
+    // Splash screen colors
+    val splashOverlayTop: Color = Color(0xFF000000).copy(alpha = 0.35f),
+    val splashOverlayBottom: Color = Color(0xFF000000).copy(alpha = 0.55f),
+    val splashTitleGold: Color = Color(0xFFFFC83D),
+    val splashInitTitle: Color = Color(0xFFE6E6E6),
+    val splashInitSubtitle: Color = Color(0xFFB0B0B0),
+    val splashProgressTrack: Color = Color(0xFF2A2F36)
 ) {
     // Gradient brushes
     val backgroundGradient: Brush
@@ -63,6 +71,11 @@ data class AppColorScheme(
     val goldTextGradient: Brush
         get() = Brush.linearGradient(
             colors = listOf(gold1, gold2, gold3, gold4, gold5)
+        )
+
+    val splashOverlayGradient: Brush
+        get() = Brush.verticalGradient(
+            colors = listOf(splashOverlayTop, splashOverlayBottom)
         )
 }
 
