@@ -37,6 +37,14 @@ data class AppColorScheme(
     val glassWhiteDark: Color = Color.White.copy(alpha = 0.05f),
     val glassBorder: Color = Color.White.copy(alpha = 0.2f),
 
+    // Input / Dropdown surfaces (Leaderboard, filters, etc.)
+    val darkSurface: Color = Color(0xFF2A2A2E),
+    val darkSurfaceLight: Color = Color(0xFF2A2A2E).copy(alpha = 0.55f),
+    val darkSurfaceMedium: Color = Color(0xFF2A2A2E).copy(alpha = 0.70f),
+    val darkSurfaceDisabled: Color = Color(0xFF2A2A2E).copy(alpha = 0.40f),
+
+    val dropdownMenuBackground: Color = Color(0xFF1C1C1F).copy(alpha = 0.85f),
+
     // Social button glass colors
     val socialGlassBackground: Color = Color.White.copy(alpha = 0.15f),
     val socialGlassBorder: Color = Color.White.copy(alpha = 0.3f),
@@ -78,5 +86,7 @@ data class AppColorScheme(
             colors = listOf(splashOverlayTop, splashOverlayBottom)
         )
 }
+
+
 
 val LocalAppColorScheme = staticCompositionLocalOf { AppColorScheme() }

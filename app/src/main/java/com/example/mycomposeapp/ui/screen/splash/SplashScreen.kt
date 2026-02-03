@@ -84,12 +84,6 @@ fun SplashContent(
             contentScale = ContentScale.Crop
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.splashOverlayGradient)
-        )
-
         SplashForeground(
             progress = state.progress,
             modifier = Modifier.fillMaxSize()
