@@ -1,11 +1,11 @@
 package com.example.mycomposeapp.ui.screen.splash
 
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.domain.keys.PreferenceKeys
-import com.example.mycomposeapp.domain.usecase.datastore.GetPreferenceUseCase
-import com.example.mycomposeapp.ui.common.BaseViewModel
+import com.example.domain.datastore.GetPreferenceUseCase
+import com.example.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.ui.screen.dashboard.navigation.DashboardRoute
 import com.example.mycomposeapp.ui.screen.welcome.navigation.WelcomeRoute
+import com.example.ui.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

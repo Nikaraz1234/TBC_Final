@@ -10,7 +10,6 @@ import com.example.mycomposeapp.ui.screen.register.navigation.RegisterRoute
 import com.example.mycomposeapp.ui.screen.register.navigation.registerNavGraph
 import com.example.mycomposeapp.ui.screen.splash.navigation.SplashRoute
 import com.example.mycomposeapp.ui.screen.splash.navigation.splashNavGraph
-import com.example.mycomposeapp.ui.screen.welcome.navigation.WelcomeRoute
 import com.example.mycomposeapp.ui.screen.welcome.navigation.welcomeNavGraph
 
 @Composable

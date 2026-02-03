@@ -18,7 +18,13 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "MyComposeApp"
 include(":app")
- 
+include(":core")
+include(":core:ui")
+include(":core:data")
+include(":core:domain")
+include(":feature")
+include(":feature:splash")
