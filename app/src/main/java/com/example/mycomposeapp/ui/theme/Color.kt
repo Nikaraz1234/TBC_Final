@@ -55,7 +55,20 @@ data class AppColorScheme(
     val splashTitleGold: Color = Color(0xFFFFC83D),
     val splashInitTitle: Color = Color(0xFFE6E6E6),
     val splashInitSubtitle: Color = Color(0xFFB0B0B0),
-    val splashProgressTrack: Color = Color(0xFF2A2F36)
+    val splashProgressTrack: Color = Color(0xFF2A2F36),
+
+    val gold: Color = Color(0xFFD4AF37),
+    val goldLight: Color = Color(0xFFFFE08A),
+    val goldDark: Color = Color(0xFF8A6A2A),
+
+    val silver : Color = Color(0xFFC0C0C0),
+    val silverLight : Color = Color(0xFFE6E6E6),
+    val silverDark : Color = Color(0xFF8A8A8A),
+
+    val bronze: Color = Color(0xFFCD7F32),
+    val bronzeLight: Color = Color(0xFFE3A86B),
+    val bronzeDark: Color = Color(0xFF8C4A1F),
+
 ) {
     // Gradient brushes
     val backgroundGradient: Brush
