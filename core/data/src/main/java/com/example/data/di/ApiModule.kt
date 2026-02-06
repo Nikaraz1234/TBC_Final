@@ -13,6 +13,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import com.example.data.BuildConfig
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -21,7 +21,4 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization)
-
-
-    implementation(projects.core.domain)
 }
