@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyComposeApp</string>
+
+    <string name="splash_tagline">UNFOLDING REALITY</string>
+
+    <string name="splash_title_guess">AxisSolve</string>
+
+    <string name="splash_init_title">MATRIX INITIALIZATION</string>
+    <string name="splash_init_subtitle">Assembling logical constructs…</string>
+
+    <string name="splash_progress_percent">%1$d%%</string>
+</resources>

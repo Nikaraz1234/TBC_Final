@@ -80,4 +80,9 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
+    implementation(projects.core.presentation)
+    implementation(projects.coreUi)
+    implementation(projects.feature.splash.presentation)
+    implementation(projects.feature.welcome)
+
 }
