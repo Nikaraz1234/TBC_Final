@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mycomposeapp.ui.theme.AppTheme
+import com.example.mycomposeapp.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.ui.theme.MyComposeAppTheme
 
 @Composable
@@ -51,7 +52,8 @@ fun ButtonSmall(
                     .clip(shape)
                     .background(brush = colors.glassGradient, shape = shape)
                     .border(1.dp, colors.goldenYellow, shape)
-                    .clickable(enabled = enabled, onClick = onClick),
+                    .clickable(enabled = enabled, onClick = onClick)
+                    .padding(horizontal = spacing.spacing8),
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContentSmall(
@@ -69,7 +71,8 @@ fun ButtonSmall(
                     .clip(shape)
                     .background(colors.transparent)
                     .border(1.dp, colors.goldenYellow, shape)
-                    .clickable(enabled = enabled, onClick = onClick),
+                    .clickable(enabled = enabled, onClick = onClick)
+                    .padding(horizontal = spacing.spacing8),
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContentSmall(
@@ -87,7 +90,9 @@ fun ButtonSmall(
                     .clip(shape)
                     .background(brush = colors.socialGlassGradient, shape = shape)
                     .border(1.dp, colors.socialGlassBorder, shape)
-                    .clickable(enabled = enabled, onClick = onClick),
+                    .clickable(enabled = enabled, onClick = onClick)
+                    .padding(horizontal = spacing.spacing8),
+
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContentSmall(

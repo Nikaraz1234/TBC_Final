@@ -1,7 +1,6 @@
 package com.example.mycomposeapp.ui.screen.leaderboard
 
 import com.example.mycomposeapp.ui.common.BaseViewModel
-import com.example.mycomposeapp.ui.screen.splash.SplashContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -17,5 +16,20 @@ class LeaderboardViewModel @Inject constructor(
         ){
 
     fun onEvent(event: LeaderboardContract.Event){
+        when(event){
+            is LeaderboardContract.Event.CategoryChanged -> categoryChanged(event.category)
+            LeaderboardContract.Event.LoadLeaderboard -> TODO()
+            is LeaderboardContract.Event.ModeChanged -> modeChanged(event.mode)
+        }
     }
+
+    private fun categoryChanged(category: String){
+        setState { copy(selectedCategory = category) }
+    }
+
+    private fun modeChanged(mode: String){
+        setState { copy(selectedMode = mode) }
+    }
+
+
 }
