@@ -173,7 +173,7 @@ private fun SplashForeground(
         }
 
         Image(
-            painter = painterResource(id = CoreUiR.drawable.ic_launcher_foreground),
+            painter = painterResource(id = CoreUiR.drawable.app_logo),
             contentDescription = null,
             modifier = Modifier
                 .size(180.dp)

@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -32,3 +33,5 @@ include(":feature:splash:domain")
 include(":feature:splash:presentation")
 include(":feature:splash:data")
 include(":feature:welcome")
+include(":feature:login")
+include(":feature:register")

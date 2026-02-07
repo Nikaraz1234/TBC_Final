@@ -3,16 +3,16 @@ package com.example.mycomposeapp.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.mycomposeapp.feature.login.navigation.LoginRoute
+import com.example.mycomposeapp.feature.login.navigation.loginNavGraph
+import com.example.mycomposeapp.feature.register.navigation.RegisterRoute
+import com.example.mycomposeapp.feature.register.navigation.registerNavGraph
 import com.example.mycomposeapp.feature.splash.presentation.navigation.SplashRoute
 import com.example.mycomposeapp.feature.splash.presentation.navigation.splashNavGraph
 import com.example.mycomposeapp.feature.welcome.navigation.WelcomeRoute
 import com.example.mycomposeapp.feature.welcome.navigation.welcomeNavGraph
 import com.example.mycomposeapp.ui.screen.dashboard.navigation.DashboardRoute
 import com.example.mycomposeapp.ui.screen.dashboard.navigation.dashboardNavGraph
-import com.example.mycomposeapp.ui.screen.login.navigation.LoginRoute
-import com.example.mycomposeapp.ui.screen.login.navigation.loginNavGraph
-import com.example.mycomposeapp.ui.screen.register.navigation.RegisterRoute
-import com.example.mycomposeapp.ui.screen.register.navigation.registerNavGraph
 
 @Composable
 fun NavGraph() {
@@ -43,8 +43,29 @@ fun NavGraph() {
             onGoogleSignInClick = { /* TODO */ },
             onTermsClick = { /* TODO */ }
         )
-        loginNavGraph(navController = navController)
-        registerNavGraph(navController = navController)
+
+        loginNavGraph(
+            onNavigateToDashboard = {
+                navController.navigate(DashboardRoute) {
+                    popUpTo(0) { inclusive = true }
+                }
+            },
+            onNavigateToRegister = {
+                navController.navigate(RegisterRoute)
+            }
+        )
+
+        registerNavGraph(
+            onNavigateToDashboard = {
+                navController.navigate(DashboardRoute) {
+                    popUpTo(0) { inclusive = true }
+                }
+            },
+            onNavigateToLogin = {
+                navController.popBackStack()
+            }
+        )
+
         dashboardNavGraph()
     }
 }
