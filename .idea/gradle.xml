@@ -32,12 +32,25 @@
             <option value="$PROJECT_DIR$/core/presentation" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/login" />
+            <option value="$PROJECT_DIR$/feature/login/data" />
+            <option value="$PROJECT_DIR$/feature/login/domain" />
+            <option value="$PROJECT_DIR$/feature/login/presentation" />
+            <option value="$PROJECT_DIR$/feature/main" />
+            <option value="$PROJECT_DIR$/feature/main/data" />
+            <option value="$PROJECT_DIR$/feature/main/domain" />
+            <option value="$PROJECT_DIR$/feature/main/presentation" />
             <option value="$PROJECT_DIR$/feature/register" />
+            <option value="$PROJECT_DIR$/feature/register/data" />
+            <option value="$PROJECT_DIR$/feature/register/domain" />
+            <option value="$PROJECT_DIR$/feature/register/presentation" />
             <option value="$PROJECT_DIR$/feature/splash" />
             <option value="$PROJECT_DIR$/feature/splash/data" />
             <option value="$PROJECT_DIR$/feature/splash/domain" />
             <option value="$PROJECT_DIR$/feature/splash/presentation" />
             <option value="$PROJECT_DIR$/feature/welcome" />
+            <option value="$PROJECT_DIR$/feature/welcome/data" />
+            <option value="$PROJECT_DIR$/feature/welcome/domain" />
+            <option value="$PROJECT_DIR$/feature/welcome/presentation" />
           </set>
         </option>
       </GradleProjectSettings>

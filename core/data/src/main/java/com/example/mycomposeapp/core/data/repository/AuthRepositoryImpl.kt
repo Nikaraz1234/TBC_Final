@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -52,6 +53,19 @@ class AuthRepositoryImpl @Inject constructor(
             AuthResult.Error("Invalid email format")
         } catch (e: Exception) {
             AuthResult.Error(e.message ?: "Registration failed. Please try again.")
+        }
+    }
+
+    override suspend fun signInWithGoogle(idToken: String): AuthResult {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            result.user?.let { AuthResult.Success(it.uid) }
+                ?: AuthResult.Error("Google sign-in failed")
+        } catch (e: FirebaseAuthUserCollisionException) {
+            AuthResult.Error("An account already exists with this email")
+        } catch (e: Exception) {
+            AuthResult.Error(e.message ?: "Google sign-in failed")
         }
     }
 

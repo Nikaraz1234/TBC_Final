@@ -12,6 +12,5 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.coreUi)
 
-    implementation("androidx.compose.foundation:foundation")
     implementation(libs.datastore.preferences)
 }

@@ -20,6 +20,7 @@ internal fun Project.configureAndroidCompose(
         add("implementation", libs.findLibraryOrThrow("androidx-ui-graphics"))
         add("implementation", libs.findLibraryOrThrow("androidx-ui-tooling-preview"))
         add("implementation", libs.findLibraryOrThrow("androidx-material3"))
+        add("implementation", libs.findLibraryOrThrow("androidx-compose-foundation"))
         add("debugImplementation", libs.findLibraryOrThrow("androidx-ui-tooling"))
     }
 }

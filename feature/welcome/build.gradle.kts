@@ -1,16 +1,13 @@
 plugins {
-    id("mycomposeapp.android.feature")
+    id("java-library")
+    alias(libs.plugins.jetbrains.kotlin.jvm)
 }
-
-android {
-    namespace = "com.example.mycomposeapp.feature.welcome"
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
-
-dependencies {
-    implementation(projects.core.presentation)
-    implementation(projects.core.domain)
-    implementation(projects.core.data)
-    implementation(projects.coreUi)
-
-    implementation("androidx.compose.foundation:foundation")
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
 }
