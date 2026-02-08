@@ -1,0 +1,216 @@
+package com.example.mycomposeapp.feature.main.presentation
+
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mycomposeapp.core.ui.components.Loader
+import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.feature.main.presentation.components.CategoryCard
+import com.example.mycomposeapp.feature.main.presentation.components.DailyChallengeCard
+import com.example.mycomposeapp.feature.main.presentation.components.GameModeSection
+import com.example.mycomposeapp.feature.main.presentation.components.QuickPlayButton
+import com.example.mycomposeapp.feature.main.presentation.components.TipsSection
+import com.example.mycomposeapp.feature.main.presentation.components.TodaysGoalsCard
+import com.example.mycomposeapp.feature.main.presentation.components.UserTopBar
+
+@Composable
+fun MainScreen(
+    onNavigateToGame: (gameModeId: String, categoryType: String) -> Unit,
+    onNavigateToProfile: () -> Unit,
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is MainContract.SideEffect.NavigateToGame -> {
+                    onNavigateToGame(effect.gameModeId, effect.categoryType)
+                }
+                is MainContract.SideEffect.NavigateToProfile -> {
+                    onNavigateToProfile()
+                }
+                is MainContract.SideEffect.ShowSnackbar -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    MainContent(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+private fun MainContent(
+    state: MainContract.State,
+    onEvent: (MainContract.Event) -> Unit
+) {
+    val colors = AppTheme.colors
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(state.selectedCategory) {
+        scrollState.scrollTo(0)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(brush = colors.backgroundGradient)
+    ) {
+        if (state.isLoading) {
+            Loader()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+            ) {
+                UserTopBar(
+                    user = state.user,
+                    onProfileClick = { onEvent(MainContract.Event.OnProfileClicked) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                AnimatedContent(
+                    targetState = state.selectedCategory,
+                    transitionSpec = {
+                        val isForward = targetState != null
+                        val slideDuration = 350
+                        val fadeDuration = 175
+
+                        val enterSlide = slideInHorizontally(
+                            animationSpec = tween(slideDuration),
+                            initialOffsetX = { fullWidth ->
+                                if (isForward) fullWidth / 3 else -fullWidth / 3
+                            }
+                        )
+                        val enterFade = fadeIn(animationSpec = tween(slideDuration))
+
+                        val exitSlide = slideOutHorizontally(
+                            animationSpec = tween(slideDuration),
+                            targetOffsetX = { fullWidth ->
+                                if (isForward) -fullWidth / 3 else fullWidth / 3
+                            }
+                        )
+                        val exitFade = fadeOut(animationSpec = tween(fadeDuration))
+
+                        (enterSlide + enterFade) togetherWith (exitSlide + exitFade) using
+                                SizeTransform(clip = false)
+                    },
+                    label = "CategoryTransition"
+                ) { selectedCategory ->
+                    if (selectedCategory == null) {
+                        Column {
+                            QuickPlayButton(
+                                onClick = { onEvent(MainContract.Event.OnQuickPlayClicked) }
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            if (state.dailyChallenge != null) {
+                                DailyChallengeCard(
+                                    challenge = state.dailyChallenge,
+                                    onClick = { onEvent(MainContract.Event.OnDailyChallengeClicked) }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+
+                            if (state.dailyGoals != null) {
+                                TodaysGoalsCard(goalsProgress = state.dailyGoals)
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+
+                            CategoriesSection(
+                                categories = state.categories,
+                                onCategoryClick = { category ->
+                                    onEvent(MainContract.Event.OnCategoryClicked(category))
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+                            TipsSection(startIndex = state.tipStartIndex)
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
+                    } else {
+                        GameModeSection(
+                            category = selectedCategory,
+                            onBackClick = { onEvent(MainContract.Event.OnBackFromGameModes) },
+                            onGameModeClick = { gameMode ->
+                                onEvent(MainContract.Event.OnGameModeClicked(gameMode))
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoriesSection(
+    categories: List<com.example.mycomposeapp.feature.main.presentation.model.Category>,
+    onCategoryClick: (com.example.mycomposeapp.feature.main.presentation.model.Category) -> Unit
+) {
+    val colors = AppTheme.colors
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "CATEGORIES",
+            color = colors.textMuted,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(categories) { category ->
+                CategoryCard(
+                    category = category,
+                    onClick = { onCategoryClick(category) }
+                )
+            }
+        }
+    }
+}
