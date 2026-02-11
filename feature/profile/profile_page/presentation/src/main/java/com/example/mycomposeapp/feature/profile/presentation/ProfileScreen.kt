@@ -1,9 +1,10 @@
-package com.example.mycomposeapp.feature.profile.presentation.screen.profile
+package com.example.mycomposeapp.feature.profile.presentation
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +23,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomSheetDefaults
@@ -51,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -73,15 +70,19 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    onEditClick: () -> Unit
 ){
     val state by viewModel.uiState.collectAsState()
+
+    var showSettingsSheet by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                ProfileContract.SideEffect.ShowSettings -> TODO()
-                ProfileContract.SideEffect.GoBack -> TODO()
-                ProfileContract.SideEffect.GoToEditProfile -> TODO()
+                ProfileContract.SideEffect.ShowSettings -> showSettingsSheet = true
+                ProfileContract.SideEffect.GoBack -> Unit
+                ProfileContract.SideEffect.GoToEditProfile -> onEditClick()
             }
         }
     }
@@ -89,7 +90,9 @@ fun ProfileScreen(
     ProfileContent(
         state = state,
         onEvent = viewModel::onEvent,
-        modifier = Modifier.fillMaxSize( )
+        modifier = Modifier.fillMaxSize(),
+        showSettingsSheet = showSettingsSheet,
+        onDismissSettings = { showSettingsSheet = false },
     )
 }
 
@@ -98,11 +101,10 @@ fun ProfileScreen(
 private fun ProfileContent(
     state: ProfileContract.State,
     onEvent: (ProfileContract.Event) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showSettingsSheet: Boolean,
+    onDismissSettings: () -> Unit,
 ){
-    var showSettingsSheet by rememberSaveable { mutableStateOf(false) }
-
-
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -142,7 +144,7 @@ private fun ProfileContent(
         }
         ProfileBottomSheet(
             visible = showSettingsSheet,
-            onClose = { showSettingsSheet = false },
+            onClose = onDismissSettings,
             onEvent = onEvent,
             isDarkTheme = state.isDarkTheme
         )
@@ -432,6 +434,8 @@ fun ProfileBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onClose,
         sheetState = sheetState,
+        containerColor = colors.backgroundDark,
+        tonalElevation = 0.dp,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         modifier = Modifier.fillMaxSize()
     ) {
@@ -458,7 +462,9 @@ private fun ProfileBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxHeight)
+            .background(colors.backgroundDark)
             .padding(horizontal = 16.dp, vertical = 8.dp),
+
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -468,10 +474,14 @@ private fun ProfileBottomSheetContent(
             Text(
                 text = "Settings",
                 fontSize = 18.sp,
+                color = colors.white,
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
+                Icon(Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = colors.white
+                )
             }
         }
 
@@ -509,42 +519,45 @@ private fun SheetRow(
     onClick: () -> Unit,
     trailing: @Composable (() -> Unit)? = null,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 1.dp,
-        onClick = onClick
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .background(colors.backgroundDark)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(icon, contentDescription = null,
-                modifier = Modifier.size(20.dp))
+                modifier = Modifier.size(20.dp),
+                tint = colors.white
+            )
             Spacer(Modifier.width(12.dp))
+
             Text(
                 text = title,
                 fontSize = 18.sp,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                color = colors.white
             )
-//            if (trailing != null) trailing() else {
-//                Icon(Icons.Default.ChevronRight, contentDescription = null)
-//            }
+
+            if (trailing != null) trailing()
         }
     }
 }
-@Preview(showBackground = true)
+@Preview(name = "Sheet closed", showBackground = true)
 @Composable
-private fun ProfileContentPreview() {
-
-    val fakeState = ProfileContract.State()
-
+private fun ProfileContentPreview_SheetClosed() {
     ProfileContent(
-        state = fakeState,
-        onEvent = {}
+        state = ProfileContract.State(),
+        onEvent = {},
+        showSettingsSheet = false,
+        onDismissSettings = {}
     )
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun ProfileBottomSheetContentPreview() {

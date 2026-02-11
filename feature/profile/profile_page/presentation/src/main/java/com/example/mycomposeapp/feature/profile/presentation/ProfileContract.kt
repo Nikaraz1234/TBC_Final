@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.profile.presentation.screen.profile
+package com.example.mycomposeapp.feature.profile.presentation
 
 object ProfileContract {
     data class State(

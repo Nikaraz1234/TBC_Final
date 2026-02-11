@@ -1,15 +1,24 @@
+# IntelliJ / Android Studio
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
 .DS_Store
-/build
-/captures
+
+# Gradle
+.gradle/
+**/build/
+**/.transforms/
+**/.cxx/
+**/.kotlin/
+
+# Local config
+local.properties
+
+# Native build
 .externalNativeBuild
 .cxx
-local.properties
+
+# Captures
+/captures
+
+# Firebase (optional if private)
+app/google-services.json

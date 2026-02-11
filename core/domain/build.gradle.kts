@@ -1,22 +1,11 @@
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    id("mycomposeapp.kotlin.jvm")
 }
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
-    }
-}
+
 dependencies {
     implementation(libs.datastore.preferences)
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.javax.inject)
 
     testImplementation(kotlin("test"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-
 }

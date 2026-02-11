@@ -1,7 +1,6 @@
-package com.example.mycomposeapp.feature.profile.presentation.screen.profile
+package com.example.mycomposeapp.feature.profile.presentation
 
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
-
 class ProfileViewModel : BaseViewModel<ProfileContract.State, ProfileContract.SideEffect, ProfileContract.Event>(
     initialState = ProfileContract.State()
 ) {
