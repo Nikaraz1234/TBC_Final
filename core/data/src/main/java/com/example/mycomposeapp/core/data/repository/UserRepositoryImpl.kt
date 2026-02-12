@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.core.data.repository
 
+import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.domain.model.UserStats
 import com.example.mycomposeapp.core.domain.repository.UserRepository
@@ -8,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -86,6 +88,27 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
             docRef.set(defaultUserData).await()
+        }
+    }
+
+    override fun changeUsername(newUsername: String): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            emit(Resource.Error("Not authenticated"))
+            return@flow
+        }
+
+        try {
+            firestore.collection("users")
+                .document(firebaseUser.uid)
+                .update("username", newUsername.trim())
+                .await()
+
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to change username"))
         }
     }
 

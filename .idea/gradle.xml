@@ -39,6 +39,15 @@
             <option value="$PROJECT_DIR$/feature/main/data" />
             <option value="$PROJECT_DIR$/feature/main/domain" />
             <option value="$PROJECT_DIR$/feature/main/presentation" />
+            <option value="$PROJECT_DIR$/feature/profile" />
+            <option value="$PROJECT_DIR$/feature/profile/edit_profile" />
+            <option value="$PROJECT_DIR$/feature/profile/edit_profile/data" />
+            <option value="$PROJECT_DIR$/feature/profile/edit_profile/domain" />
+            <option value="$PROJECT_DIR$/feature/profile/edit_profile/presentation" />
+            <option value="$PROJECT_DIR$/feature/profile/profile_page" />
+            <option value="$PROJECT_DIR$/feature/profile/profile_page/data" />
+            <option value="$PROJECT_DIR$/feature/profile/profile_page/domain" />
+            <option value="$PROJECT_DIR$/feature/profile/profile_page/presentation" />
             <option value="$PROJECT_DIR$/feature/register" />
             <option value="$PROJECT_DIR$/feature/register/data" />
             <option value="$PROJECT_DIR$/feature/register/domain" />

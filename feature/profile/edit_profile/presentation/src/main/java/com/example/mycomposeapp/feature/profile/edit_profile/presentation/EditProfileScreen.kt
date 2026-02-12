@@ -2,6 +2,7 @@ package com.example.mycomposeapp.feature.profile.edit_profile.presentation
 
 import android.Manifest
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -63,6 +64,11 @@ import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import kotlinx.coroutines.flow.collectLatest
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import android.provider.Settings
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.text.style.TextAlign
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.domain.model.User
+import com.example.mycomposeapp.core.domain.model.UserStats
 
 @Composable
 fun EditProfileScreen(
@@ -78,6 +84,9 @@ fun EditProfileScreen(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(EditProfileContract.Event.OnScreenOpened)
+    }
 
     EditProfileContent(
         state = state,
@@ -85,26 +94,66 @@ fun EditProfileScreen(
     )
 }
 private fun Context.findActivity(): ComponentActivity? =
-    generateSequence(this) { (it as? android.content.ContextWrapper)?.baseContext }
+    generateSequence(this) { (it as? ContextWrapper)?.baseContext }
         .filterIsInstance<ComponentActivity>()
         .firstOrNull()
 @Composable
 private fun EditProfileContent(
     state: EditProfileContract.State,
     onEvent: (EditProfileContract.Event) -> Unit
-){
+) {
     val context = LocalContext.current
     val activity = remember { context.findActivity() }
 
     var showSettingsDialog by remember { mutableStateOf(false) }
 
+    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val takePictureLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                pendingCameraUri?.let { uri ->
+                    onEvent(EditProfileContract.Event.OnPhotoSelected(uri.toString()))
+                }
+            } else {
+                pendingCameraUri = null
+            }
+        }
+
+    fun createTempImageUri(): Uri? {
+        return try {
+            val imagesDir = java.io.File(context.cacheDir, "images").apply { mkdirs() }
+            val file = java.io.File.createTempFile("avatar_", ".jpg", imagesDir)
+
+            androidx.core.content.FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun startCameraFlow() {
+        val uri = createTempImageUri()
+        if (uri == null) {
+            return
+        }
+        pendingCameraUri = uri
+        takePictureLauncher.launch(uri)
+    }
+
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
-                onEvent(EditProfileContract.Event.OnChangePhotoClicked)
+                startCameraFlow()
             } else {
                 val shouldShowRationale = activity?.let {
-                    ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.CAMERA)
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        it,
+                        Manifest.permission.CAMERA
+                    )
                 } ?: true
 
                 if (!shouldShowRationale) showSettingsDialog = true
@@ -118,7 +167,7 @@ private fun EditProfileContent(
         ) == PackageManager.PERMISSION_GRANTED
 
         if (granted) {
-            onEvent(EditProfileContract.Event.OnChangePhotoClicked)
+            startCameraFlow()
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
@@ -145,20 +194,21 @@ private fun EditProfileContent(
             }
         )
     }
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(CoreUiR.drawable.app_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .padding(horizontal = spacing.spacing16)) {
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(horizontal = spacing.spacing16)
+        ) {
             ProfileTopBar(
                 onBackClick = { onEvent(EditProfileContract.Event.OnBackClick) }
             )
@@ -166,44 +216,74 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ProfileAvatarCard(
-                onChangePhotoClick = { handleAvatarClick() }
+                onChangePhotoClick = { handleAvatarClick() },
+                photoUrl = state.user?.photoUrl
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            Text(
+                text = state.email,
+                color = colors.white,
+                fontSize = 20.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing32))
 
             EditField(
                 title = "Username",
-                value = state.user.username,
-                onValueChange = {},
-                error = null,
-            )
-            Spacer(modifier = Modifier.height(spacing.spacing16))
-
-            EditField(
-                title = "Email",
-                value = "Nikaraz@gmail.com",
-                onValueChange = {},
-                error = null,
-            )
-
-            Spacer(modifier = Modifier.height(spacing.spacing16))
-
-            PasswordTextField(
-                label = "Password",
-                value = "nikanika",
-                onValueChange = {},
-                error = null,
+                value = state.username,
+                onValueChange = { onEvent(EditProfileContract.Event.OnUsernameChanged(it)) },
+                error = null
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonMedium(
-                text = "Save Changes",
-                onClick = { onEvent(EditProfileContract.Event.OnSaveClicked) },
+                text = "Change Username",
+                onClick = { onEvent(EditProfileContract.Event.OnChangeUsernameClicked) },
                 style = ButtonStyle.Filled,
                 enabled = true,
-                modifier = Modifier
-                    .padding(vertical = spacing.spacing16)
+                modifier = Modifier.padding(vertical = spacing.spacing16)
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            PasswordTextField(
+                label = "Current Password",
+                value = state.currentPassword,
+                onValueChange = { onEvent(EditProfileContract.Event.OnCurrentPasswordChanged(it)) },
+                error = null
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            PasswordTextField(
+                label = "New Password",
+                value = state.newPassword,
+                onValueChange = { onEvent(EditProfileContract.Event.OnNewPasswordChanged(it)) },
+                error = null
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            PasswordTextField(
+                label = "Confirm New Password",
+                value = state.confirmPassword,
+                onValueChange = { onEvent(EditProfileContract.Event.OnConfirmPasswordChanged(it)) },
+                error = null
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            ButtonMedium(
+                text = "Change Password",
+                onClick = { onEvent(EditProfileContract.Event.OnChangePasswordClicked) },
+                style = ButtonStyle.Filled,
+                enabled = true,
+                modifier = Modifier.padding(vertical = spacing.spacing16)
             )
         }
     }
@@ -282,6 +362,7 @@ private fun ProfileTopBar(
 @Composable
 private fun ProfileAvatarCard(
     modifier: Modifier = Modifier,
+    photoUrl: String?,
     onChangePhotoClick: () -> Unit = {},
 ) {
     Column(
@@ -304,12 +385,26 @@ private fun ProfileAvatarCard(
                     .clickable { onChangePhotoClick() }
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = CoreUiR.drawable.app_logo),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    val hasPhoto = !photoUrl.isNullOrBlank()
+
+                    if (hasPhoto) {
+                        AsyncImage(
+                            model = photoUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            placeholder = painterResource(CoreUiR.drawable.app_logo),
+                            error = painterResource(CoreUiR.drawable.app_logo)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(CoreUiR.drawable.app_logo),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
 
                     Box(
                         modifier = Modifier
@@ -345,7 +440,15 @@ private fun ProfileAvatarCard(
 private fun EditProfileContentPreview() {
     MyComposeAppTheme {
         EditProfileContent(
-            state = EditProfileContract.State(),
+            state = EditProfileContract.State(
+                isLoading = false,
+                user = User(
+                    userId = "1",
+                    username = "Nika",
+                    photoUrl = "",
+                    stats = UserStats()
+                )
+            ),
             onEvent = {}
         )
     }

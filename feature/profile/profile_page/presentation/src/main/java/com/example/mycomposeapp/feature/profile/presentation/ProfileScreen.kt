@@ -71,7 +71,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onLogout: () -> Unit
 ){
     val state by viewModel.uiState.collectAsState()
 
@@ -83,8 +84,13 @@ fun ProfileScreen(
                 ProfileContract.SideEffect.ShowSettings -> showSettingsSheet = true
                 ProfileContract.SideEffect.GoBack -> Unit
                 ProfileContract.SideEffect.GoToEditProfile -> onEditClick()
+                ProfileContract.SideEffect.GoToWelcomeScreen -> onLogout()
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(ProfileContract.Event.Load)
     }
 
     ProfileContent(

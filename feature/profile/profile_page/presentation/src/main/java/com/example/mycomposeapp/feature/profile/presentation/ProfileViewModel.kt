@@ -1,20 +1,58 @@
 package com.example.mycomposeapp.feature.profile.presentation
 
+import androidx.lifecycle.viewModelScope
+import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
+import com.example.mycomposeapp.core.domain.usecase.datastore.RemovePreferenceUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
-class ProfileViewModel : BaseViewModel<ProfileContract.State, ProfileContract.SideEffect, ProfileContract.Event>(
+import com.example.mycomposeapp.feature.profile.presentation.ProfileContract.Event.*
+import kotlinx.coroutines.launch
+
+class ProfileViewModel(
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val removePreferenceUseCase: RemovePreferenceUseCase
+) : BaseViewModel<ProfileContract.State, ProfileContract.SideEffect, ProfileContract.Event>(
     initialState = ProfileContract.State()
 ) {
 
 
     fun onEvent(event: ProfileContract.Event){
         when(event) {
-            ProfileContract.Event.OnSettingsClicked -> TODO()
-            ProfileContract.Event.OnBackButtonClicked -> TODO()
-            ProfileContract.Event.OnEditProfileClicked -> TODO()
-            ProfileContract.Event.EditProfileClicked -> TODO()
-            ProfileContract.Event.LogoutClicked -> TODO()
-            ProfileContract.Event.NotificationsClicked -> TODO()
-            ProfileContract.Event.ToggleDarkTheme -> TODO()
+            OnSettingsClicked -> sendSideEffect(ProfileContract.SideEffect.ShowSettings)
+            OnBackButtonClicked -> TODO()
+            OnEditProfileClicked -> sendSideEffect(ProfileContract.SideEffect.GoToEditProfile)
+            EditProfileClicked -> TODO()
+            LogoutClicked -> TODO()
+            NotificationsClicked -> TODO()
+            ToggleDarkTheme -> TODO()
+            Load -> observeCurrentUser()
         }
+    }
+
+    private fun observeCurrentUser() {
+        viewModelScope.launch {
+            getCurrentUserUseCase()
+                .collect { user ->
+                    setState {
+                        copy(user = user)
+                    }
+                }
+        }
+    }
+
+    private fun logout() {
+        handleResponse(
+            apiCall = { logoutUseCase() },
+            onSuccess = {
+                sendSideEffect(ProfileContract.SideEffect.GoToWelcomeScreen)
+            },
+            onError = { message ->
+                setState { copy(error = message) }
+            },
+            onLoading = {
+                setState { copy(isLoading = true) }
+            }
+        )
     }
 }

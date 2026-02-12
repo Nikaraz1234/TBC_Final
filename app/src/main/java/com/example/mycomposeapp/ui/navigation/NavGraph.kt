@@ -7,6 +7,8 @@ import com.example.mycomposeapp.feature.login.presentation.navigation.LoginRoute
 import com.example.mycomposeapp.feature.login.presentation.navigation.loginNavGraph
 import com.example.mycomposeapp.feature.main.presentation.navigation.MainRoute
 import com.example.mycomposeapp.feature.main.presentation.navigation.mainNavGraph
+import com.example.mycomposeapp.feature.profile.edit_profile.presentation.navigation.EditProfileRoute
+import com.example.mycomposeapp.feature.profile.presentation.navigation.profileNavGraph
 import com.example.mycomposeapp.feature.register.presentation.navigation.RegisterRoute
 import com.example.mycomposeapp.feature.register.presentation.navigation.registerNavGraph
 import com.example.mycomposeapp.feature.splash.presentation.navigation.SplashRoute
@@ -75,6 +77,17 @@ fun NavGraph() {
             },
             onNavigateToProfile = {
                 // TODO: Navigate to profile screen
+            }
+        )
+
+        profileNavGraph(
+            onNavigateToEdit = {
+                navController.navigate(EditProfileRoute)
+            },
+            onNavigateToWelcome = {
+                navController.navigate(WelcomeRoute) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
         )
     }

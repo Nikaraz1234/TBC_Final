@@ -30,6 +30,9 @@ dependencies {
     implementation(projects.feature.login.presentation)
     implementation(projects.feature.register.presentation)
     implementation(projects.feature.main.presentation)
+    implementation(projects.feature.profile.editProfile.presentation)
+    implementation(projects.feature.profile.profilePage.presentation)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -18,12 +19,18 @@ object AuthModule {
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
     }
+    @Singleton
+    class HandleResponse @Inject constructor()
 
     @Provides
     @Singleton
     fun provideAuthRepository(
-        firebaseAuth: FirebaseAuth
+        firebaseAuth: FirebaseAuth,
+        handleResponse: com.example.mycomposeapp.core.data.common.HandleResponse
     ): AuthRepository {
-        return AuthRepositoryImpl(firebaseAuth)
+        return AuthRepositoryImpl(
+            firebaseAuth,
+            handleResponse
+        )
     }
 }
