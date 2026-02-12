@@ -25,11 +25,15 @@ object MainContract {
         data object OnProfileClicked : Event
         data object OnQuickPlayClicked : Event
         data object OnDailyChallengeClicked : Event
+        data object OnLogoutClicked : Event
+        data object OnArchiveClicked : Event
     }
 
     sealed interface SideEffect {
         data class NavigateToGame(val gameModeId: String, val categoryType: String) : SideEffect
         data object NavigateToProfile : SideEffect
         data class ShowSnackbar(val message: String) : SideEffect
+        data object NavigateToWelcome : SideEffect
+        data object NavigateToArchive : SideEffect
     }
 }

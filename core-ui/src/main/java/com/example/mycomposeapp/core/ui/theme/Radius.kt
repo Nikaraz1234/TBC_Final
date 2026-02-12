@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.dp
 
 @Immutable
 data class Radius(
+    val radius4: RoundedCornerShape = RoundedCornerShape(4.dp),
     val radius8: RoundedCornerShape = RoundedCornerShape(8.dp),
     val radius12: RoundedCornerShape = RoundedCornerShape(12.dp),
     val radius16: RoundedCornerShape = RoundedCornerShape(16.dp),

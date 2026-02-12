@@ -16,13 +16,17 @@ class UserRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : UserRepository {
 
+    companion object {
+        private const val USERS_COLLECTION = "users"
+    }
+
     override fun getCurrentUser(): Flow<User?> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             val firebaseUser = auth.currentUser
             if (firebaseUser == null) {
                 trySend(null)
             } else {
-                firestore.collection("users")
+                firestore.collection(USERS_COLLECTION)
                     .document(firebaseUser.uid)
                     .addSnapshotListener { snapshot, error ->
                         if (error != null) {
@@ -32,6 +36,14 @@ class UserRepositoryImpl @Inject constructor(
 
                         val user = if (snapshot != null && snapshot.exists()) {
                             val stats = snapshot.get("stats") as? Map<*, *>
+                            val currentStreakRaw = stats?.get("currentStreak")
+                            val highScoreRaw = stats?.get("highScore")
+                            val achievementsRaw = stats?.get("achievements")
+
+                            val currentStreak = mapToIntMap(currentStreakRaw)
+                            val highScore = mapToIntMap(highScoreRaw)
+                            val achievements = mapToStringList(achievementsRaw)
+
                             User(
                                 userId = firebaseUser.uid,
                                 username = snapshot.getString("username") ?: firebaseUser.displayName ?: "Player",
@@ -43,9 +55,10 @@ class UserRepositoryImpl @Inject constructor(
                                     gamesPlayed = (stats?.get("gamesPlayed") as? Long)?.toInt() ?: 0,
                                     correctAnswers = (stats?.get("correctAnswers") as? Long)?.toInt() ?: 0,
                                     bestStreak = (stats?.get("bestStreak") as? Long)?.toInt() ?: 0,
-                                    currentStreak = (stats?.get("currentStreak") as? Long)?.toInt() ?: 0,
-                                    highScore = (stats?.get("highScore") as? Long)?.toInt() ?: 0,
-                                    achievements = (stats?.get("achievements") as? Long)?.toInt() ?: 0
+                                    currentStreak = currentStreak,
+                                    highScore = highScore,
+                                    achievements = achievements,
+                                    lastEmojiDate = (stats?.get("lastEmojiDate") as? String) ?: ""
                                 )
                             )
                         } else {
@@ -66,11 +79,12 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun refreshUser() {
         val firebaseUser = firebaseAuth.currentUser ?: return
 
-        val docRef = firestore.collection("users").document(firebaseUser.uid)
+        val docRef = firestore.collection(USERS_COLLECTION).document(firebaseUser.uid)
         val snapshot = docRef.get().await()
 
         if (!snapshot.exists()) {
             val defaultUserData = mapOf(
+                "userId" to firebaseUser.uid,
                 "username" to (firebaseUser.displayName ?: "Player"),
                 "photoUrl" to firebaseUser.photoUrl?.toString(),
                 "stats" to mapOf(
@@ -80,13 +94,53 @@ class UserRepositoryImpl @Inject constructor(
                     "gamesPlayed" to 0,
                     "correctAnswers" to 0,
                     "bestStreak" to 0,
-                    "currentStreak" to 0,
-                    "highScore" to 0,
-                    "achievements" to 0
+                    "currentStreak" to emptyMap<String, Int>(),
+                    "highScore" to emptyMap<String, Int>(),
+                    "achievements" to emptyList<String>()
                 )
             )
             docRef.set(defaultUserData).await()
         }
+    }
+
+    override suspend fun updateUserStats(stats: UserStats) {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+        val statsMap = mapOf(
+            "coins" to stats.coins,
+            "level" to stats.level,
+            "points" to stats.points,
+            "gamesPlayed" to stats.gamesPlayed,
+            "correctAnswers" to stats.correctAnswers,
+            "bestStreak" to stats.bestStreak,
+            "currentStreak" to stats.currentStreak,
+            "highScore" to stats.highScore,
+            "achievements" to stats.achievements,
+            "lastEmojiDate" to stats.lastEmojiDate
+        )
+        firestore.collection(USERS_COLLECTION).document(uid)
+            .update("stats", statsMap)
+            .await()
+    }
+
+    override suspend fun updateCoins(coins: Int) {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+        firestore.collection(USERS_COLLECTION).document(uid)
+            .update("stats.coins", coins)
+            .await()
+    }
+
+    private fun mapToIntMap(raw: Any?): Map<String, Int> = when (raw) {
+        is Map<*, *> -> raw.entries.mapNotNull { (k, v) ->
+            val key = k as? String ?: return@mapNotNull null
+            val value = (v as? Long)?.toInt() ?: return@mapNotNull null
+            key to value
+        }.toMap()
+        else -> emptyMap()
+    }
+
+    private fun mapToStringList(raw: Any?): List<String> = when (raw) {
+        is List<*> -> raw.filterIsInstance<String>()
+        else -> emptyList()
     }
 
     private fun createDefaultUser(userId: String, displayName: String?, photoUrl: String?): User {

@@ -17,6 +17,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.javax.inject)
+    implementation(libs.datastore.preferences)
+    implementation(libs.bundles.google.credentials)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

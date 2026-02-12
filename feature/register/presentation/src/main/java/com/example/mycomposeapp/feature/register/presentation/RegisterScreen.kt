@@ -22,12 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -35,12 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.mycomposeapp.core.ui.R
+import com.example.mycomposeapp.core.ui.R as CoreUiR
+import com.example.mycomposeapp.feature.register.presentation.R as RegisterR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.components.input.AppTextField
@@ -58,7 +59,7 @@ fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
@@ -99,7 +100,7 @@ private fun RegisterContent(
         modifier = modifier.fillMaxSize()
     ) {
         AsyncImage(
-            model = R.drawable.app_background,
+            model = CoreUiR.drawable.app_background,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -116,15 +117,15 @@ private fun RegisterContent(
             Spacer(modifier = Modifier.height(spacing.spacing32))
 
             AsyncImage(
-                model = R.drawable.app_logo,
-                contentDescription = "App Logo",
+                model = CoreUiR.drawable.app_logo,
+                contentDescription = stringResource(RegisterR.string.app_logo_desc),
                 modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             Text(
-                text = "Create Account",
+                text = stringResource(RegisterR.string.create_account),
                 style = TextStyle(
                     brush = colors.goldTextGradient,
                     fontSize = 28.sp,
@@ -133,7 +134,7 @@ private fun RegisterContent(
             )
 
             Text(
-                text = "Sign up to get started",
+                text = stringResource(RegisterR.string.sign_up_to_get_started),
                 color = colors.textMuted,
                 fontSize = 14.sp
             )
@@ -143,7 +144,7 @@ private fun RegisterContent(
             AppTextField(
                 value = state.fullName,
                 onValueChange = { onEvent(Event.OnFullNameChanged(it)) },
-                label = "Full Name",
+                label = stringResource(RegisterR.string.label_full_name),
                 error = state.fullNameError,
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
@@ -158,7 +159,7 @@ private fun RegisterContent(
             AppTextField(
                 value = state.email,
                 onValueChange = { onEvent(Event.OnEmailChanged(it)) },
-                label = "Email",
+                label = stringResource(RegisterR.string.label_email),
                 error = state.emailError,
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
@@ -173,7 +174,7 @@ private fun RegisterContent(
             PasswordTextField(
                 value = state.password,
                 onValueChange = { onEvent(Event.OnPasswordChanged(it)) },
-                label = "Password",
+                label = stringResource(RegisterR.string.label_password),
                 error = state.passwordError,
                 imeAction = ImeAction.Next,
                 keyboardActions = KeyboardActions(
@@ -187,7 +188,7 @@ private fun RegisterContent(
             PasswordTextField(
                 value = state.confirmPassword,
                 onValueChange = { onEvent(Event.OnConfirmPasswordChanged(it)) },
-                label = "Confirm Password",
+                label = stringResource(RegisterR.string.label_confirm_password),
                 error = state.confirmPasswordError,
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(
@@ -219,7 +220,7 @@ private fun RegisterContent(
                         )
                     )
                     Text(
-                        text = "I agree to the Terms & Conditions",
+                        text = stringResource(RegisterR.string.terms_agreement),
                         color = colors.textMuted,
                         fontSize = 14.sp
                     )
@@ -227,7 +228,7 @@ private fun RegisterContent(
                 if (state.termsError != null) {
                     Text(
                         text = state.termsError,
-                        color = Color(0xFFCF6679),
+                        color = colors.error,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(start = spacing.spacing8)
                     )
@@ -239,7 +240,7 @@ private fun RegisterContent(
             if (state.generalError != null) {
                 Text(
                     text = state.generalError,
-                    color = Color(0xFFCF6679),
+                    color = colors.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = spacing.spacing16)
@@ -253,7 +254,7 @@ private fun RegisterContent(
                 )
             } else {
                 ButtonLarge(
-                    text = "Register",
+                    text = stringResource(RegisterR.string.btn_register),
                     onClick = { onEvent(Event.OnRegisterClicked) },
                     style = ButtonStyle.Filled,
                     enabled = !state.isLoading
@@ -267,12 +268,12 @@ private fun RegisterContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Already have an account? ",
+                    text = stringResource(RegisterR.string.already_have_account),
                     color = colors.textMuted,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Login",
+                    text = stringResource(RegisterR.string.btn_login),
                     color = colors.goldenYellow,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
@@ -298,7 +299,7 @@ private fun SuccessDialog(
         containerColor = colors.backgroundDark,
         title = {
             Text(
-                text = "Registration Successful!",
+                text = stringResource(RegisterR.string.registration_successful),
                 style = TextStyle(
                     brush = colors.goldTextGradient,
                     fontSize = 20.sp,
@@ -308,7 +309,7 @@ private fun SuccessDialog(
         },
         text = {
             Text(
-                text = "Your account has been created successfully. Welcome to AxisSolve!",
+                text = stringResource(RegisterR.string.registration_success_message),
                 color = colors.textLight,
                 fontSize = 14.sp
             )
@@ -316,7 +317,7 @@ private fun SuccessDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Continue",
+                    text = stringResource(RegisterR.string.btn_continue),
                     color = colors.goldenYellow,
                     fontWeight = FontWeight.Bold
                 )

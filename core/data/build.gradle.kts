@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     id("mycomposeapp.android.library")
     id("mycomposeapp.android.hilt")
     alias(libs.plugins.kotlinx.serialization)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
 }
 
 android {
@@ -11,6 +20,10 @@ android {
     }
     defaultConfig {
         buildConfigField("String", "BASE_URL", "\"${libs.versions.base.url.get()}\"")
+        buildConfigField("String", "TMDB_BASE_URL", "\"${libs.versions.tmdb.base.url.get()}\"")
+        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("TMDB_API_KEY", "")}\"")
+        buildConfigField("String", "TMDB_IMAGE_BASE_URL", "\"${libs.versions.tmdb.image.base.url.get()}\"")
+        buildConfigField("String", "REQRES_API_KEY", "\"${localProperties.getProperty("REQRES_API_KEY", "")}\"")
     }
 }
 

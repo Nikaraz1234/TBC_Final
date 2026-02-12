@@ -25,8 +25,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.domain.model.DailyChallenge
+import com.example.mycomposeapp.feature.main.presentation.R as MainR
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 
 @Composable
@@ -116,7 +118,7 @@ fun DailyChallengeCard(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "Completed!",
+                    text = stringResource(MainR.string.completed),
                     color = Color(0xFF4CAF50),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold

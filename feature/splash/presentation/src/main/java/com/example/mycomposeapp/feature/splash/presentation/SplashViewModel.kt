@@ -42,7 +42,7 @@ class SplashViewModel @Inject constructor(
                 defaultValue = ""
             ).first()
 
-            progress += 0.2f
+            progress += PROGRESS_STEPS[0]
             setState { SplashContract.State(progress = progress) }
 
             val isLoggedIn = token.isNotBlank()
@@ -52,19 +52,17 @@ class SplashViewModel @Inject constructor(
                 defaultValue = false
             ).first()
 
-            delay(300)
+            delay(STEP_DELAY_MS)
 
-            progress += 0.2f
+            progress += PROGRESS_STEPS[1]
             setState { SplashContract.State(progress = progress) }
 
-
-            delay(300)
-            progress += 0.3f
+            delay(STEP_DELAY_MS)
+            progress += PROGRESS_STEPS[2]
             setState { SplashContract.State(progress = progress) }
 
-
-            delay(300)
-            progress += 0.3f
+            delay(STEP_DELAY_MS)
+            progress += PROGRESS_STEPS[3]
             setState { SplashContract.State(progress = progress, isLoading = false) }
 
             sendSideEffect(
@@ -91,5 +89,10 @@ class SplashViewModel @Inject constructor(
         splashJob = null
 
         setState { SplashContract.State(progress = 1f, isLoading = false) }
+    }
+
+    private companion object {
+        const val STEP_DELAY_MS = 300L
+        val PROGRESS_STEPS = listOf(0.2f, 0.2f, 0.3f, 0.3f)
     }
 }

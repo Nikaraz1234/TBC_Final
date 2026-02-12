@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -16,14 +17,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 
 @Composable
-fun AppTextField(
+internal fun BaseTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -32,6 +33,7 @@ fun AppTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
@@ -42,7 +44,7 @@ fun AppTextField(
     val spacing = AppTheme.spacing
 
     val shape = radius.radius12
-    val borderColor = if (error != null) Color(0xFFCF6679) else colors.glassBorder
+    val borderColor = if (error != null) colors.error else colors.glassBorder
 
     Column(modifier = modifier) {
         TextField(
@@ -53,7 +55,7 @@ fun AppTextField(
                 .fillMaxWidth()
                 .clip(shape)
                 .background(colors.glassWhite, shape)
-                .border(1.dp, borderColor, shape),
+                .border(spacing.spacing1, borderColor, shape),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = colors.textLight,
                 unfocusedTextColor = colors.textLight,
@@ -74,6 +76,7 @@ fun AppTextField(
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
+            visualTransformation = visualTransformation,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
             enabled = enabled,
@@ -84,12 +87,43 @@ fun AppTextField(
         if (error != null) {
             Text(
                 text = error,
-                color = Color(0xFFCF6679),
-                fontSize = 12.sp,
+                color = colors.error,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = spacing.spacing8, top = spacing.spacing4)
             )
         }
     }
+}
+
+@Composable
+fun AppTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    error: String? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    singleLine: Boolean = true
+) {
+    BaseTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = label,
+        modifier = modifier,
+        error = error,
+        keyboardType = keyboardType,
+        imeAction = imeAction,
+        keyboardActions = keyboardActions,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        enabled = enabled,
+        singleLine = singleLine
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1A1A2E)

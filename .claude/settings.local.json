@@ -28,7 +28,22 @@
       "Bash(.\\\\gradlew.bat:*)",
       "Bash(cmd /c:*)",
       "Bash(D:/AndroidProjects/TBC_Final/gradlew.bat:*)",
-      "Bash(.\\\\gradlew :feature:main:compileDebugKotlin:*)"
+      "Bash(.\\\\gradlew :feature:main:compileDebugKotlin:*)",
+      "Bash(xargs:*)",
+      "Bash(gradlew.bat:*)",
+      "Bash(.\\\\gradlew.bat assembleDebug:*)",
+      "Bash(ls:*)",
+      "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\main\\\\presentation\\\\src\\\\main\\\\res\\\\drawable\\\\ic_coin.xml\")",
+      "Bash(for file in \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\login\\\\presentation\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\login\\\\presentation\\\\LoginScreen.kt\" \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\register\\\\presentation\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\register\\\\presentation\\\\RegisterScreen.kt\" \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\main\\\\presentation\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\main\\\\presentation\\\\MainScreen.kt\")",
+      "Bash(do wc -l \"$file\")",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(cd:*)",
+      "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\core\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\core\\\\domain\\\\model\\\\AuthResult.kt\")",
+      "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\core\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\core\\\\domain\\\\keys\\\\PreferenceConstants.kt\")",
+      "Bash(for dir in welcome login register main game)",
+      "Bash(do test -d \"D:/AndroidProjects/TBC_Final/feature/$dir/presentation/src/main/res\")",
+      "Bash(echo:*)"
     ]
   }
 }

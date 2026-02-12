@@ -1,15 +1,9 @@
 package com.example.mycomposeapp.feature.main.presentation.model
 
 import androidx.compose.ui.graphics.Color
+import com.example.mycomposeapp.core.domain.model.CategoryType
+import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.main.presentation.R
-
-enum class CategoryType {
-    MOVIES,
-    GAMES,
-    COMICS,
-    BOOKS,
-    SPORTS
-}
 
 data class Category(
     val type: CategoryType,
@@ -21,21 +15,21 @@ data class Category(
 object Categories {
     private val movieGameModes = listOf(
         GameMode(
-            id = "movies_cover",
+            id = GameModeIds.COVER,
             name = "By Cover",
             description = "Guess the movie from its poster",
             iconRes = R.drawable.ic_cover,
             isAvailable = true
         ),
         GameMode(
-            id = "movies_emoji",
+            id = GameModeIds.EMOJI,
             name = "By Emoji",
             description = "Decode emoji clues to find the movie",
             iconRes = R.drawable.ic_emoji,
             isAvailable = true
         ),
         GameMode(
-            id = "movies_plot",
+            id = GameModeIds.PLOT,
             name = "By Plot Summary",
             description = "Identify the movie from its plot",
             iconRes = R.drawable.ic_plot,

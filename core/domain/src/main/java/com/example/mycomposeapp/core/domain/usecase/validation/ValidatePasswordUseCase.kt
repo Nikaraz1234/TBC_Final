@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.core.domain.usecase.validation
 
+import com.example.mycomposeapp.core.domain.model.ValidationConstants
 import javax.inject.Inject
 
 class ValidatePasswordUseCase @Inject constructor() {
@@ -11,10 +12,10 @@ class ValidatePasswordUseCase @Inject constructor() {
                 errorMessage = "Password cannot be empty"
             )
         }
-        if (password.length < 8) {
+        if (password.length < ValidationConstants.PASSWORD_MIN_LENGTH) {
             return ValidationResult(
                 isValid = false,
-                errorMessage = "Password must be at least 8 characters"
+                errorMessage = "Password must be at least ${ValidationConstants.PASSWORD_MIN_LENGTH} characters"
             )
         }
         if (!password.any { it.isUpperCase() }) {

@@ -18,13 +18,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 
+private const val ICON_SIZE_RATIO = 0.6f
+
 @Composable
 fun UserAvatar(
     imageUrl: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp
+    size: Dp = AppTheme.spacing.spacing48
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
 
     if (imageUrl != null) {
         AsyncImage(
@@ -33,7 +36,7 @@ fun UserAvatar(
             modifier = modifier
                 .size(size)
                 .clip(CircleShape)
-                .border(2.dp, colors.goldenYellow, CircleShape),
+                .border(spacing.spacing2, colors.goldenYellow, CircleShape),
             contentScale = ContentScale.Crop
         )
     } else {
@@ -42,14 +45,14 @@ fun UserAvatar(
                 .size(size)
                 .clip(CircleShape)
                 .background(colors.glassWhite, CircleShape)
-                .border(2.dp, colors.goldenYellow, CircleShape),
+                .border(spacing.spacing2, colors.goldenYellow, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Default avatar",
                 tint = colors.textLight,
-                modifier = Modifier.size(size * 0.6f)
+                modifier = Modifier.size(size * ICON_SIZE_RATIO)
             )
         }
     }

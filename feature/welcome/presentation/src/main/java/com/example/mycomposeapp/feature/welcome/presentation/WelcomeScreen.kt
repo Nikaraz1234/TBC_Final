@@ -1,6 +1,5 @@
 package com.example.mycomposeapp.feature.welcome.presentation
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -31,14 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
-import com.example.mycomposeapp.core.domain.keys.GoogleAuthConstants
+import com.example.mycomposeapp.core.presentation.common.GoogleSignInLauncher
+import com.example.mycomposeapp.feature.welcome.presentation.R as WelcomeR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme
@@ -46,8 +42,6 @@ import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.welcome.presentation.WelcomeContract.Event
 import com.example.mycomposeapp.feature.welcome.presentation.WelcomeContract.SideEffect
 import com.example.mycomposeapp.feature.welcome.presentation.WelcomeContract.State
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.example.mycomposeapp.core.ui.R as CoreUiR
@@ -59,7 +53,7 @@ fun WelcomeScreen(
     onNavigateToDashboard: () -> Unit,
     viewModel: WelcomeViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -71,29 +65,13 @@ fun WelcomeScreen(
                 is SideEffect.NavigateToDashboard -> onNavigateToDashboard()
                 is SideEffect.LaunchGoogleSignIn -> {
                     coroutineScope.launch {
-                        try {
-                            val credentialManager = CredentialManager.create(context)
-                            val signInOption = GetSignInWithGoogleOption.Builder(GoogleAuthConstants.WEB_CLIENT_ID)
-                                .build()
-
-                            val request = GetCredentialRequest.Builder()
-                                .addCredentialOption(signInOption)
-                                .build()
-
-                            val result = credentialManager.getCredential(context, request)
-                            val credential = result.credential
-                            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                            val idToken = googleIdTokenCredential.idToken
-
-                            viewModel.onEvent(Event.OnGoogleSignInResult(idToken))
-                        } catch (e: GetCredentialCancellationException) {
-                            viewModel.onEvent(Event.OnGoogleSignInResult(null))
-                        } catch (e: NoCredentialException) {
-                            Log.e("WelcomeScreen", "No credentials available", e)
-                            viewModel.onEvent(Event.OnGoogleSignInFailed("Google Sign-In is not available. Please check app configuration."))
-                        } catch (e: GetCredentialException) {
-                            Log.e("WelcomeScreen", "Google sign-in failed", e)
-                            viewModel.onEvent(Event.OnGoogleSignInFailed("Google sign-in failed: ${e.message}"))
+                        when (val result = GoogleSignInLauncher.launch(context, "WelcomeScreen")) {
+                            is GoogleSignInLauncher.Result.Success ->
+                                viewModel.onEvent(Event.OnGoogleSignInResult(result.idToken))
+                            is GoogleSignInLauncher.Result.Cancelled ->
+                                viewModel.onEvent(Event.OnGoogleSignInResult(null))
+                            is GoogleSignInLauncher.Result.Error ->
+                                viewModel.onEvent(Event.OnGoogleSignInFailed(result.message))
                         }
                     }
                 }
@@ -135,12 +113,12 @@ private fun WelcomeContent(
         ) {
             AsyncImage(
                 model = CoreUiR.drawable.app_logo,
-                contentDescription = "App Logo",
+                contentDescription = stringResource(WelcomeR.string.app_logo_desc),
                 modifier = Modifier.size(150.dp)
             )
 
             Text(
-                text = "AxisSolve",
+                text = stringResource(WelcomeR.string.app_name_display),
                 style = TextStyle(
                     brush = colors.goldTextGradient,
                     fontSize = 28.sp,
@@ -151,7 +129,7 @@ private fun WelcomeContent(
             Spacer(modifier = Modifier.height(spacing.spacing48))
 
             ButtonLarge(
-                text = "Login",
+                text = stringResource(WelcomeR.string.btn_login),
                 onClick = { onEvent(Event.OnLoginClicked) },
                 style = ButtonStyle.Filled,
                 enabled = !state.isGoogleLoading
@@ -160,7 +138,7 @@ private fun WelcomeContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonLarge(
-                text = "Register",
+                text = stringResource(WelcomeR.string.btn_register),
                 onClick = { onEvent(Event.OnRegisterClicked) },
                 style = ButtonStyle.Outlined,
                 enabled = !state.isGoogleLoading
@@ -177,7 +155,7 @@ private fun WelcomeContent(
                     color = colors.textMuted
                 )
                 Text(
-                    text = "OR",
+                    text = stringResource(WelcomeR.string.or_divider),
                     color = colors.textMuted,
                     modifier = Modifier.padding(horizontal = spacing.spacing16),
                     fontSize = 14.sp
@@ -197,13 +175,13 @@ private fun WelcomeContent(
                 )
             } else {
                 ButtonLarge(
-                    text = "Continue with Google",
+                    text = stringResource(WelcomeR.string.btn_continue_with_google),
                     onClick = { onEvent(Event.OnGoogleSignInClicked) },
                     style = ButtonStyle.Social,
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = CoreUiR.drawable.ic_google),
-                            contentDescription = "Google Icon",
+                            contentDescription = stringResource(WelcomeR.string.google_icon_desc),
                             modifier = Modifier.size(20.dp),
                             tint = colors.white
                         )
@@ -215,7 +193,7 @@ private fun WelcomeContent(
                 Spacer(modifier = Modifier.height(spacing.spacing16))
                 Text(
                     text = state.generalError,
-                    color = androidx.compose.ui.graphics.Color(0xFFCF6679),
+                    color = colors.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
@@ -224,7 +202,7 @@ private fun WelcomeContent(
             Spacer(modifier = Modifier.height(spacing.spacing32))
 
             Text(
-                text = "By continuing, you agree to our Terms of Service",
+                text = stringResource(WelcomeR.string.terms_agreement),
                 color = colors.textMuted,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center
