@@ -10,7 +10,15 @@ android {
         buildConfig = true
     }
     defaultConfig {
+        val igdbClientId = providers.gradleProperty("IGDB_CLIENT_ID").orNull
+            ?: error("Missing IGDB_CLIENT_ID")
+
+        val igdbToken = providers.gradleProperty("IGDB_TOKEN").orNull
+            ?: error("Missing IGDB_TOKEN")
+
         buildConfigField("String", "BASE_URL", "\"${libs.versions.base.url.get()}\"")
+        buildConfigField("String", "IGDB_CLIENT_ID", "\"$igdbClientId\"")
+        buildConfigField("String", "IGDB_TOKEN", "\"$igdbToken\"")
     }
 }
 
