@@ -13,7 +13,10 @@ android {
         applicationId = "com.example.mycomposeapp"
         versionCode = 1
         versionName = "1.0"
+
+
         buildConfigField("String", "BASE_URL", "\"${libs.versions.base.url.get()}\"")
+
     }
 
     buildFeatures {
