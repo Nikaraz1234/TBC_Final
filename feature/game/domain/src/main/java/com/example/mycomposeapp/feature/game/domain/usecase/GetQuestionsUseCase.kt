@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetQuestionsUseCase @Inject constructor(
-    private val questionRepository: QuestionRepository
+    private val questionRepositories: Map<String, @JvmSuppressWildcards QuestionRepository>
 ) {
     operator fun invoke(config: GameConfig): Flow<Resource<List<Question>>> {
-        return questionRepository.getQuestions(config)
+        val repo = questionRepositories[config.categoryType]
+            ?: throw IllegalArgumentException("No question repository for category: ${config.categoryType}")
+        return repo.getQuestions(config)
     }
 }

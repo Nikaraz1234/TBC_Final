@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.game.presentation.delegate
+package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -9,13 +9,15 @@ import com.example.mycomposeapp.feature.game.domain.usecase.CalculateScoreUseCas
 import com.example.mycomposeapp.feature.game.domain.usecase.GetQuestionsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
+import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class PlotGameDelegate(
-    private val gameModeId: String,
+class MoviePlotDelegate(
     private val categoryType: String,
+    private val gameModeId: String,
     private val getQuestionsUseCase: GetQuestionsUseCase,
     private val calculateScoreUseCase: CalculateScoreUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase
@@ -163,7 +165,7 @@ class PlotGameDelegate(
 
         scope.coroutineScope.launch {
             try {
-                updateGameStatsUseCase(result, gameModeId, false)
+                updateGameStatsUseCase(result, gameModeId, categoryType, false)
             } catch (_: Exception) { }
         }
     }

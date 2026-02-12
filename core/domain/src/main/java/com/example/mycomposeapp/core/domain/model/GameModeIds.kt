@@ -1,7 +1,10 @@
 package com.example.mycomposeapp.core.domain.model
 
 object GameModeIds {
-    const val COVER = "movies_cover"
-    const val EMOJI = "movies_emoji"
-    const val PLOT = "movies_plot"
+    const val COVER = "cover"
+    const val EMOJI = "emoji"
+    const val PLOT = "plot"
+
+    fun statsKey(categoryType: String, gameModeId: String): String =
+        "${categoryType}_${gameModeId}"
 }

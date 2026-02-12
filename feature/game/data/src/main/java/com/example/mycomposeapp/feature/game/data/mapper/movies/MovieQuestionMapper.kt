@@ -1,10 +1,10 @@
-package com.example.mycomposeapp.feature.game.data.mapper
+package com.example.mycomposeapp.feature.game.data.mapper.movies
 
 import com.example.mycomposeapp.core.data.BuildConfig
-import com.example.mycomposeapp.feature.game.data.remote.dto.TmdbMovieDto
-import com.example.mycomposeapp.feature.game.domain.model.MovieSearchResult
+import com.example.mycomposeapp.feature.game.data.remote.movies.dto.TmdbMovieDto
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
+import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 fun TmdbMovieDto.toCoverQuestion(): Question {
     val imageUrl = posterPath?.let { "${BuildConfig.TMDB_IMAGE_BASE_URL}$it" } ?: ""
@@ -23,13 +23,13 @@ fun TmdbMovieDto.toPlotQuestion(): Question {
     )
 }
 
-fun TmdbMovieDto.toSearchResult(): MovieSearchResult {
-    val posterUrl = posterPath?.let { "${BuildConfig.TMDB_IMAGE_BASE_URL}$it" }
+fun TmdbMovieDto.toSearchResult(): SearchResult {
+    val imageUrl = posterPath?.let { "${BuildConfig.TMDB_IMAGE_BASE_URL}$it" }
     val year = releaseDate.take(4)
-    return MovieSearchResult(
-        id = id,
+    return SearchResult(
+        id = id.toString(),
         title = title,
-        releaseYear = year,
-        posterUrl = posterUrl
+        subtitle = year,
+        imageUrl = imageUrl
     )
 }

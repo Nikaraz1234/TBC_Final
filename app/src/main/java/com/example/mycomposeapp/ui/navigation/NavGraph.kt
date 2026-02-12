@@ -18,6 +18,7 @@ import com.example.mycomposeapp.feature.welcome.presentation.navigation.welcomeN
 import com.example.mycomposeapp.feature.game.archive.navigation.ArchiveHubRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.EmojiArchiveRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.archiveNavGraph
+import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
 import com.example.mycomposeapp.feature.game.presentation.navigation.gameNavGraph
@@ -107,7 +108,7 @@ fun NavGraph() {
                 navController.navigate(
                     GameRoute(
                         gameModeId = GameModeIds.EMOJI,
-                        categoryType = "movies",
+                        categoryType = CategoryType.MOVIES.name,
                         archiveDate = archiveDate
                     )
                 )

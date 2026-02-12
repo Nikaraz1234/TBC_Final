@@ -1,6 +1,7 @@
-package com.example.mycomposeapp.feature.game.presentation.delegate
+package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
 import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -9,11 +10,14 @@ import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
+import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class CoverGameDelegate(
+class MovieCoverDelegate(
+    private val categoryType: String,
     private val gameModeId: String,
     private val fetchCoverBatchUseCase: FetchCoverBatchUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
@@ -23,7 +27,7 @@ class CoverGameDelegate(
 
     private lateinit var scope: DelegateScope
     private val answerResults = mutableListOf<AnswerResult>()
-    private val seenMovieIds = mutableSetOf<Int>()
+    private val seenItemIds = mutableSetOf<String>()
     private val questionQueue = mutableListOf<com.example.mycomposeapp.feature.game.domain.model.Question>()
     private var prefetchJob: Job? = null
 
@@ -160,7 +164,7 @@ class CoverGameDelegate(
 
     override fun onRetryGame() {
         answerResults.clear()
-        seenMovieIds.clear()
+        seenItemIds.clear()
         questionQueue.clear()
         scope.updateState { GameContract.State() }
         loadGame()
@@ -205,13 +209,12 @@ class CoverGameDelegate(
 
     private suspend fun fetchCoverBatchAndStart() {
         val maxPage = calculateMaxPage(scope.currentState().correctAnswersCount)
-        fetchCoverBatchUseCase(maxPage, 5, seenMovieIds).collect { resource ->
+        fetchCoverBatchUseCase(categoryType, maxPage, 5, seenItemIds).collect { resource ->
             when (resource) {
                 is Resource.Success -> {
                     val questions = resource.data
                     questions.forEach { q ->
-                        val movieId = q.id.removePrefix("cover_").toIntOrNull()
-                        if (movieId != null) seenMovieIds.add(movieId)
+                        seenItemIds.add(q.id.removePrefix("cover_"))
                     }
                     questionQueue.addAll(questions)
                     presentNextCoverQuestion()
@@ -265,11 +268,10 @@ class CoverGameDelegate(
         if (questionQueue.size <= 2 && prefetchJob?.isActive != true) {
             prefetchJob = scope.coroutineScope.launch {
                 val maxPage = calculateMaxPage(scope.currentState().correctAnswersCount)
-                fetchCoverBatchUseCase(maxPage, 5, seenMovieIds).collect { resource ->
+                fetchCoverBatchUseCase(categoryType, maxPage, 5, seenItemIds).collect { resource ->
                     if (resource is Resource.Success) {
                         resource.data.forEach { q ->
-                            val movieId = q.id.removePrefix("cover_").toIntOrNull()
-                            if (movieId != null) seenMovieIds.add(movieId)
+                            seenItemIds.add(q.id.removePrefix("cover_"))
                         }
                         questionQueue.addAll(resource.data)
                     }
@@ -306,13 +308,14 @@ class CoverGameDelegate(
         scope.coroutineScope.launch {
             try {
                 val user = getCurrentUserUseCase().firstOrNull()
-                val actualHigh = user?.stats?.highScore?.get(gameModeId) ?: 0
+                val statsKey = GameModeIds.statsKey(categoryType, gameModeId)
+                val actualHigh = user?.stats?.highScore?.get(statsKey) ?: 0
                 if (cover.currentScore > actualHigh) {
                     scope.updateState {
                         copy(gameResult = gameResult?.copy(isNewHighScore = true))
                     }
                 }
-                updateGameStatsUseCase(result, gameModeId, false)
+                updateGameStatsUseCase(result, gameModeId, categoryType, false)
             } catch (_: Exception) { }
         }
     }

@@ -43,7 +43,10 @@
       "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\core\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\core\\\\domain\\\\keys\\\\PreferenceConstants.kt\")",
       "Bash(for dir in welcome login register main game)",
       "Bash(do test -d \"D:/AndroidProjects/TBC_Final/feature/$dir/presentation/src/main/res\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\model\\\\MovieSearchResult.kt\")",
+      "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\usecase\\\\SearchMoviesUseCase.kt\")",
+      "Bash(del:*)"
     ]
   }
 }

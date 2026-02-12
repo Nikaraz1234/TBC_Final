@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetDailyPuzzleUseCase @Inject constructor(
-    private val dailyPuzzleRepository: DailyPuzzleRepository
+    private val dailyPuzzleRepositories: Map<String, @JvmSuppressWildcards DailyPuzzleRepository>
 ) {
-    operator fun invoke(date: String): Flow<Resource<DailyPuzzle>> {
-        return dailyPuzzleRepository.getDailyPuzzle(date)
+    operator fun invoke(categoryType: String, date: String): Flow<Resource<DailyPuzzle>> {
+        val repo = dailyPuzzleRepositories[categoryType]
+            ?: throw IllegalArgumentException("No daily puzzle repository for category: $categoryType")
+        return repo.getDailyPuzzle(date)
     }
 }

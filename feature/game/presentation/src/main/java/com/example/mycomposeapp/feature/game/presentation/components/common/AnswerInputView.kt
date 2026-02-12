@@ -16,14 +16,14 @@ import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.input.AppTextField
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.feature.game.domain.model.MovieSearchResult
+import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 @Composable
 fun AnswerInputView(
     userAnswer: String,
     onAnswerChanged: (String) -> Unit,
     onSubmit: (String) -> Unit,
-    searchResults: List<MovieSearchResult>,
+    searchResults: List<SearchResult>,
     isSearching: Boolean,
     onSuggestionSelected: (String) -> Unit,
     enabled: Boolean,

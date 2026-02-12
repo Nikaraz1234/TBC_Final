@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.game.data.remote.dto
+package com.example.mycomposeapp.feature.game.data.remote.movies.dto
 
 data class EmojiPuzzleDto(
     val tmdbMovieId: Int = 0,

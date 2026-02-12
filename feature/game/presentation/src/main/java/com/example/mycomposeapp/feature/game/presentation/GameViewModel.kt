@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
-import com.example.mycomposeapp.feature.game.domain.usecase.SearchMoviesUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.SearchUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameDelegateFactory
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     gameDelegateFactory: GameDelegateFactory,
-    private val searchMoviesUseCase: SearchMoviesUseCase
+    private val searchUseCase: SearchUseCase
 ) : BaseViewModel<GameContract.State, GameContract.SideEffect, GameContract.Event>(
     GameContract.State()
 ), DelegateScope {
@@ -64,7 +64,7 @@ class GameViewModel @Inject constructor(
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
                 delay(300)
-                searchMoviesUseCase(text).collect { resource ->
+                searchUseCase(route.categoryType, text).collect { resource ->
                     when (resource) {
                         is Resource.Success -> setState {
                             copy(searchResults = resource.data, isSearching = false)

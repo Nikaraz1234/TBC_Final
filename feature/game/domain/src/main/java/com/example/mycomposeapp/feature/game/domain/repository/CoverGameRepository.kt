@@ -5,5 +5,5 @@ import com.example.mycomposeapp.feature.game.domain.model.Question
 import kotlinx.coroutines.flow.Flow
 
 interface CoverGameRepository {
-    fun fetchCoverBatch(maxPage: Int, batchSize: Int, excludeIds: Set<Int>): Flow<Resource<List<Question>>>
+    fun fetchCoverBatch(maxPage: Int, batchSize: Int, excludeIds: Set<String>): Flow<Resource<List<Question>>>
 }

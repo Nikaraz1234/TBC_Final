@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.game.presentation.delegate
+package com.example.mycomposeapp.feature.game.presentation.delegate.common
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
@@ -11,11 +11,14 @@ import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleReposi
 import com.example.mycomposeapp.feature.game.domain.usecase.GetDailyPuzzleUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
+import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class EmojiGameDelegate(
+    private val categoryType: String,
     private val gameModeId: String,
     private val archiveDate: String?,
     private val getDailyPuzzleUseCase: GetDailyPuzzleUseCase,
@@ -36,7 +39,7 @@ class EmojiGameDelegate(
     override fun loadGame() {
         val dateToLoad = archiveDate ?: LocalDate.now().toString()
         scope.coroutineScope.launch {
-            getDailyPuzzleUseCase(dateToLoad).collect { resource ->
+            getDailyPuzzleUseCase(categoryType, dateToLoad).collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
                         val puzzle = resource.data
@@ -133,7 +136,7 @@ class EmojiGameDelegate(
                             coinsEarned = coinsEarned,
                             finalCoinBalance = newCoins
                         )
-                        updateGameStatsUseCase(result, gameModeId, true)
+                        updateGameStatsUseCase(result, gameModeId, categoryType, true)
                     }
                 } catch (_: Exception) { }
             }

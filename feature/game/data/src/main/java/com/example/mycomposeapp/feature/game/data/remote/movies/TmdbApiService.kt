@@ -1,7 +1,7 @@
-package com.example.mycomposeapp.feature.game.data.remote
+package com.example.mycomposeapp.feature.game.data.remote.movies
 
-import com.example.mycomposeapp.feature.game.data.remote.dto.TmdbMovieDetailResponse
-import com.example.mycomposeapp.feature.game.data.remote.dto.TmdbMovieListResponse
+import com.example.mycomposeapp.feature.game.data.remote.movies.dto.TmdbMovieDetailResponse
+import com.example.mycomposeapp.feature.game.data.remote.movies.dto.TmdbMovieListResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

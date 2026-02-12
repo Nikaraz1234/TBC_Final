@@ -2,8 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation
 
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
-import com.example.mycomposeapp.feature.game.domain.model.MovieSearchResult
 import com.example.mycomposeapp.feature.game.domain.model.Question
+import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 object GameContract {
 
@@ -49,7 +49,7 @@ object GameContract {
         val correctAnswersCount: Int = 0,
         val currentStreak: Int = 0,
         val totalTimeSpentSeconds: Int = 0,
-        val searchResults: List<MovieSearchResult> = emptyList(),
+        val searchResults: List<SearchResult> = emptyList(),
         val isSearching: Boolean = false,
         val gameResult: GameResult? = null,
         val errorMessage: String? = null,

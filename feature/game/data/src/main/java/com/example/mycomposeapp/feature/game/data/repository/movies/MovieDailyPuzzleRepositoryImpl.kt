@@ -1,11 +1,11 @@
-package com.example.mycomposeapp.feature.game.data.repository
+package com.example.mycomposeapp.feature.game.data.repository.movies
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.example.mycomposeapp.core.domain.Resource
-import com.example.mycomposeapp.feature.game.data.remote.dto.EmojiPuzzleDto
+import com.example.mycomposeapp.feature.game.data.remote.movies.dto.EmojiPuzzleDto
 import com.example.mycomposeapp.feature.game.domain.model.DailyPuzzle
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import javax.inject.Inject
 
-class DailyPuzzleRepositoryImpl @Inject constructor(
+class MovieDailyPuzzleRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val dataStore: DataStore<Preferences>
 ) : DailyPuzzleRepository {

@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.game.data.remote.dto
+package com.example.mycomposeapp.feature.game.data.remote.movies.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

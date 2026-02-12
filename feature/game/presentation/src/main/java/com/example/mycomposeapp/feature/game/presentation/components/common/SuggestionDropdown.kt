@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.feature.game.domain.model.MovieSearchResult
+import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 @Composable
 fun SuggestionDropdown(
-    suggestions: List<MovieSearchResult>,
+    suggestions: List<SearchResult>,
     onSuggestionClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -46,17 +46,17 @@ fun SuggestionDropdown(
             .background(colors.glassWhiteLight, shape)
             .border(1.dp, colors.glassBorder, shape)
     ) {
-        suggestions.forEach { movie ->
+        suggestions.forEach { item ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onSuggestionClick(movie.title) }
+                    .clickable { onSuggestionClick(item.title) }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (movie.posterUrl != null) {
+                if (item.imageUrl != null) {
                     AsyncImage(
-                        model = movie.posterUrl,
+                        model = item.imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -68,16 +68,16 @@ fun SuggestionDropdown(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = movie.title,
+                        text = item.title,
                         color = colors.textLight,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    if (movie.releaseYear.isNotBlank()) {
+                    if (item.subtitle.isNotBlank()) {
                         Text(
-                            text = movie.releaseYear,
+                            text = item.subtitle,
                             color = colors.textMuted,
                             fontSize = 12.sp
                         )
@@ -87,4 +87,3 @@ fun SuggestionDropdown(
         }
     }
 }
-

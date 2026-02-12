@@ -1,13 +1,11 @@
-package com.example.mycomposeapp.feature.game.data.repository
+package com.example.mycomposeapp.feature.game.data.repository.movies
 
 import com.example.mycomposeapp.core.domain.Resource
-import com.example.mycomposeapp.feature.game.data.mapper.toCoverQuestion
-import com.example.mycomposeapp.feature.game.data.mapper.toPlotQuestion
-import com.example.mycomposeapp.feature.game.data.mapper.toSearchResult
-import com.example.mycomposeapp.feature.game.data.remote.TmdbApiService
+import com.example.mycomposeapp.feature.game.data.mapper.movies.toCoverQuestion
+import com.example.mycomposeapp.feature.game.data.mapper.movies.toPlotQuestion
+import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
 import com.example.mycomposeapp.feature.game.domain.model.GameConfig
 import com.example.mycomposeapp.core.domain.model.GameModeIds
-import com.example.mycomposeapp.feature.game.domain.model.MovieSearchResult
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.repository.QuestionRepository
 import kotlinx.coroutines.flow.Flow
@@ -46,17 +44,6 @@ class MovieQuestionRepositoryImpl @Inject constructor(
             emit(Resource.Success(questions))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Failed to load questions"))
-        }
-    }
-
-    override fun searchMovies(query: String): Flow<Resource<List<MovieSearchResult>>> = flow {
-        emit(Resource.Loading)
-        try {
-            val response = tmdbApiService.searchMovies(query)
-            val results = response.results.take(8).map { it.toSearchResult() }
-            emit(Resource.Success(results))
-        } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "Search failed"))
         }
     }
 }

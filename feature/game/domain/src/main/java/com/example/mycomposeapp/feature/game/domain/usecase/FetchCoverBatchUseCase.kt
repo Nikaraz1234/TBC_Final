@@ -7,9 +7,16 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class FetchCoverBatchUseCase @Inject constructor(
-    private val coverGameRepository: CoverGameRepository
+    private val coverGameRepositories: Map<String, @JvmSuppressWildcards CoverGameRepository>
 ) {
-    operator fun invoke(maxPage: Int, batchSize: Int, excludeIds: Set<Int>): Flow<Resource<List<Question>>> {
-        return coverGameRepository.fetchCoverBatch(maxPage, batchSize, excludeIds)
+    operator fun invoke(
+        categoryType: String,
+        maxPage: Int,
+        batchSize: Int,
+        excludeIds: Set<String>
+    ): Flow<Resource<List<Question>>> {
+        val repo = coverGameRepositories[categoryType]
+            ?: throw IllegalArgumentException("No cover game repository for category: $categoryType")
+        return repo.fetchCoverBatch(maxPage, batchSize, excludeIds)
     }
 }
