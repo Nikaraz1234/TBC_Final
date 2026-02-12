@@ -81,7 +81,7 @@ class AuthRepositoryImpl @Inject constructor(
         firebaseAuth.signOut()
     }
 
-    fun getCurrentUserId(): String? {
+    override fun getCurrentUserId(): String? {
         return firebaseAuth.currentUser?.uid
     }
     override fun getCurrentUserEmail(): String? {
