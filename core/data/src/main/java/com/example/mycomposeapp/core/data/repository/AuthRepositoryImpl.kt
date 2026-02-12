@@ -1,7 +1,9 @@
 package com.example.mycomposeapp.core.data.repository
 
+import com.example.mycomposeapp.core.data.common.HandleResponse
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.repository.AuthRepository
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -9,11 +11,13 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val handleResponse: HandleResponse
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): Resource<String> {
@@ -77,7 +81,39 @@ class AuthRepositoryImpl @Inject constructor(
         firebaseAuth.signOut()
     }
 
-    override fun getCurrentUserId(): String? {
+    fun getCurrentUserId(): String? {
         return firebaseAuth.currentUser?.uid
     }
+    override fun getCurrentUserEmail(): String? {
+        return firebaseAuth.currentUser?.email
+    }
+    override fun changePassword(
+        currentPassword: String,
+        newPassword: String
+    ): Flow<Resource<Unit>> =
+        handleResponse.safeApiCall {
+            val user = firebaseAuth.currentUser ?: throw Exception("Not logged in")
+            val email = user.email ?: throw Exception("No email associated with account")
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+
+            user.reauthenticate(credential).await()
+            user.updatePassword(newPassword).await()
+            Unit
+        }
+
+    override fun changeEmail(
+        currentPassword: String,
+        newEmail: String
+    ): Flow<Resource<Unit>> =
+        handleResponse.safeApiCall {
+            val user = firebaseAuth.currentUser ?: throw Exception("Not logged in")
+            val email = user.email ?: throw Exception("No email associated with account")
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+
+            user.reauthenticate(credential).await()
+            user.updateEmail(newEmail).await()
+            Unit
+        }
+
+
 }

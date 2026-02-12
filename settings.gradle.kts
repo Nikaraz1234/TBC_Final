@@ -53,3 +53,15 @@ include(":feature:game:domain")
 include(":feature:game:presentation")
 include(":feature:game:data")
 include(":feature:game:archive")
+
+//Profile
+include(":feature:profile")
+include(":feature:profile:profile_page:data")
+include(":feature:profile:profile_page:domain")
+include(":feature:profile:profile_page:presentation")
+include(":feature:profile:edit_profile")
+include(":feature:profile:profile_page")
+
+include(":feature:profile:edit_profile:data")
+include(":feature:profile:edit_profile:domain")
+include(":feature:profile:edit_profile:presentation")
