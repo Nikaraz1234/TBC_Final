@@ -1,6 +1,7 @@
 package com.example.mycomposeapp.core.data.di
 
 import com.example.mycomposeapp.core.data.BuildConfig
+import com.example.mycomposeapp.core.data.common.applyDefaultTimeouts
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -12,7 +13,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -25,7 +25,7 @@ object ApiModule {
         val newRequest = chain.request().newBuilder()
             .addHeader("Content-Type", "application/json")
             .addHeader("Accept", "application/json")
-            .addHeader("x-api-key", "reqres-free-v1")
+            .addHeader("x-api-key", BuildConfig.REQRES_API_KEY)
             .build()
         chain.proceed(newRequest)
     }
@@ -45,9 +45,7 @@ object ApiModule {
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
+        .applyDefaultTimeouts()
         .build()
 
 

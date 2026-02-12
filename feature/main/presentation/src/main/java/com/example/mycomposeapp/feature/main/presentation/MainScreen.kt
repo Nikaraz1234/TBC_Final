@@ -10,20 +10,24 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,10 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mycomposeapp.core.ui.components.Loader
+import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.main.presentation.components.CategoryCard
 import com.example.mycomposeapp.feature.main.presentation.components.DailyChallengeCard
@@ -43,11 +49,15 @@ import com.example.mycomposeapp.feature.main.presentation.components.QuickPlayBu
 import com.example.mycomposeapp.feature.main.presentation.components.TipsSection
 import com.example.mycomposeapp.feature.main.presentation.components.TodaysGoalsCard
 import com.example.mycomposeapp.feature.main.presentation.components.UserTopBar
+import androidx.compose.ui.res.stringResource
+import com.example.mycomposeapp.feature.main.presentation.R as MainR
 
 @Composable
 fun MainScreen(
     onNavigateToGame: (gameModeId: String, categoryType: String) -> Unit,
     onNavigateToProfile: () -> Unit,
+    onLogout: () -> Unit,
+    onNavigateToArchive: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,6 +74,12 @@ fun MainScreen(
                 }
                 is MainContract.SideEffect.ShowSnackbar -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
+                is MainContract.SideEffect.NavigateToWelcome -> {
+                    onLogout()
+                }
+                is MainContract.SideEffect.NavigateToArchive -> {
+                    onNavigateToArchive()
                 }
             }
         }
@@ -148,8 +164,13 @@ private fun MainContent(
                                     challenge = state.dailyChallenge,
                                     onClick = { onEvent(MainContract.Event.OnDailyChallengeClicked) }
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                             }
+
+                            ArchiveCard(
+                                onClick = { onEvent(MainContract.Event.OnArchiveClicked) }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             if (state.dailyGoals != null) {
                                 TodaysGoalsCard(goalsProgress = state.dailyGoals)
@@ -166,6 +187,17 @@ private fun MainContent(
                             Spacer(modifier = Modifier.height(24.dp))
                             TipsSection(startIndex = state.tipStartIndex)
                             Spacer(modifier = Modifier.height(24.dp))
+
+                            TextButton(
+                                onClick = { onEvent(MainContract.Event.OnLogoutClicked) },
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+                                Text(
+                                    text = stringResource(MainR.string.btn_logout),
+                                    color = colors.textMuted
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     } else {
                         GameModeSection(
@@ -191,7 +223,7 @@ private fun CategoriesSection(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "CATEGORIES",
+            text = stringResource(MainR.string.categories_header),
             color = colors.textMuted,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
@@ -209,6 +241,44 @@ private fun CategoriesSection(
                 CategoryCard(
                     category = category,
                     onClick = { onCategoryClick(category) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ArchiveCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = AppTheme.colors
+
+    GlassCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "\uD83D\uDDC3\uFE0F",
+                fontSize = 28.sp
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = stringResource(MainR.string.archive_title),
+                    color = colors.textLight,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(MainR.string.archive_subtitle),
+                    color = colors.textMuted,
+                    fontSize = 12.sp
                 )
             }
         }

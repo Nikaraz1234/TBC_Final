@@ -10,12 +10,16 @@ data object MainRoute
 
 fun NavGraphBuilder.mainNavGraph(
     onNavigateToGame: (gameModeId: String, categoryType: String) -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onLogout: () -> Unit,
+    onNavigateToArchive: () -> Unit = {}
 ) {
     composable<MainRoute> {
         MainScreen(
             onNavigateToGame = onNavigateToGame,
-            onNavigateToProfile = onNavigateToProfile
+            onNavigateToProfile = onNavigateToProfile,
+            onLogout = onLogout,
+            onNavigateToArchive = onNavigateToArchive
         )
     }
 }

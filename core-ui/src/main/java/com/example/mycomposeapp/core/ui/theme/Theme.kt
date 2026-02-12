@@ -5,19 +5,32 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
-private val DarkColorScheme = darkColorScheme()
-
 @Composable
 fun MyComposeAppTheme(
     content: @Composable () -> Unit
 ) {
+    val appColors = AppColorScheme()
+
+    val materialColorScheme = darkColorScheme(
+        primary = appColors.goldenYellow,
+        onPrimary = appColors.backgroundDark,
+        secondary = appColors.goldenYellowDark,
+        onSecondary = appColors.backgroundDark,
+        background = appColors.backgroundDark,
+        onBackground = appColors.textLight,
+        surface = appColors.backgroundDarkEnd,
+        onSurface = appColors.textLight,
+        error = appColors.error,
+        onError = appColors.white
+    )
+
     CompositionLocalProvider(
-        LocalAppColorScheme provides AppColorScheme(),
+        LocalAppColorScheme provides appColors,
         LocalSpacing provides Spacing(),
         LocalRadius provides Radius()
     ) {
         MaterialTheme(
-            colorScheme = DarkColorScheme,
+            colorScheme = materialColorScheme,
             typography = Typography,
             content = content
         )

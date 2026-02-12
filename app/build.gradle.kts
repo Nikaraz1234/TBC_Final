@@ -25,6 +25,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.domain)
     implementation(projects.core.presentation)
     implementation(projects.core.data)
     implementation(projects.coreUi)
@@ -33,16 +34,18 @@ dependencies {
     implementation(projects.feature.login.presentation)
     implementation(projects.feature.register.presentation)
     implementation(projects.feature.main.presentation)
+    implementation(projects.feature.game.presentation)
+    implementation(projects.feature.game.domain)
+    implementation(projects.feature.game.archive)
     implementation(projects.feature.profile.editProfile.presentation)
+    implementation(projects.feature.profile.editProfile.data)
     implementation(projects.feature.profile.profilePage.presentation)
-
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.bundles.networking)
-    implementation(libs.coil.compose)
     implementation(libs.datastore.preferences)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)

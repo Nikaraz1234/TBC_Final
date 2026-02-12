@@ -3,14 +3,14 @@ package com.example.mycomposeapp.feature.login.presentation
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.model.AuthResult
+import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
-import com.example.mycomposeapp.core.domain.usecase.auth.GoogleSignInUseCase
 import com.example.mycomposeapp.core.domain.usecase.auth.LoginUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidateEmailUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
+import com.example.mycomposeapp.core.presentation.common.GoogleSignInHandler
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.Event
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.SideEffect
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.State
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val googleSignInUseCase: GoogleSignInUseCase,
+    private val googleSignInHandler: GoogleSignInHandler,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
     private val dataStoreManager: DataStoreManager
@@ -86,27 +86,26 @@ class LoginViewModel @Inject constructor(
 
     private fun handleGoogleSignInResult(idToken: String?) {
         if (idToken == null) {
-            setState { copy(isGoogleLoading = false, generalError = "Google sign-in was cancelled") }
+            // User cancelled sign-in
+            setState { copy(isGoogleLoading = false) }
             return
         }
-
+        if (idToken.isBlank()) {
+            setState { copy(isGoogleLoading = false, generalError = "Google sign-in failed") }
+            return
+        }
         viewModelScope.launch {
             setState { copy(isGoogleLoading = true, generalError = null) }
 
-            when (val result = googleSignInUseCase(idToken)) {
-                is AuthResult.Success -> {
-                    dataStoreManager.setPreference(PreferenceKeys.TOKEN, result.userId)
+            when (val result = googleSignInHandler.handle(idToken)) {
+                is Resource.Success -> {
                     setState { copy(isGoogleLoading = false) }
                     sendSideEffect(SideEffect.NavigateToDashboard)
                 }
-                is AuthResult.Error -> {
-                    setState {
-                        copy(
-                            isGoogleLoading = false,
-                            generalError = result.message
-                        )
-                    }
+                is Resource.Error -> {
+                    setState { copy(isGoogleLoading = false, generalError = result.message) }
                 }
+                is Resource.Loading -> {}
             }
         }
     }
@@ -133,9 +132,9 @@ class LoginViewModel @Inject constructor(
             setState { copy(isLoading = true, generalError = null) }
 
             when (val result = loginUseCase(currentState.email, currentState.password)) {
-                is AuthResult.Success -> {
+                is Resource.Success -> {
                     if (currentState.rememberMe) {
-                        dataStoreManager.setPreference(PreferenceKeys.TOKEN, result.userId)
+                        dataStoreManager.setPreference(PreferenceKeys.TOKEN, result.data)
                         dataStoreManager.setPreference(KEY_REMEMBER_ME, true)
                         dataStoreManager.setPreference(KEY_SAVED_EMAIL, currentState.email)
                     } else {
@@ -145,7 +144,7 @@ class LoginViewModel @Inject constructor(
                     setState { copy(isLoading = false) }
                     sendSideEffect(SideEffect.NavigateToDashboard)
                 }
-                is AuthResult.Error -> {
+                is Resource.Error -> {
                     setState {
                         copy(
                             isLoading = false,
@@ -153,6 +152,7 @@ class LoginViewModel @Inject constructor(
                         )
                     }
                 }
+                is Resource.Loading -> {}
             }
         }
     }

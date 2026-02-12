@@ -48,6 +48,11 @@ include(":feature:main")
 include(":feature:main:domain")
 include(":feature:main:presentation")
 include(":feature:main:data")
+include(":feature:game")
+include(":feature:game:domain")
+include(":feature:game:presentation")
+include(":feature:game:data")
+include(":feature:game:archive")
 
 //Profile
 include(":feature:profile")
@@ -60,5 +65,3 @@ include(":feature:profile:profile_page")
 include(":feature:profile:edit_profile:data")
 include(":feature:profile:edit_profile:domain")
 include(":feature:profile:edit_profile:presentation")
-
-

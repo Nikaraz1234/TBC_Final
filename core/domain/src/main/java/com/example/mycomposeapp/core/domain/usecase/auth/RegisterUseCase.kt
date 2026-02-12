@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.core.domain.usecase.auth
 
-import com.example.mycomposeapp.core.domain.model.AuthResult
+import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.repository.AuthRepository
 import javax.inject.Inject
 
@@ -11,7 +11,7 @@ class RegisterUseCase @Inject constructor(
         email: String,
         password: String,
         displayName: String
-    ): AuthResult {
+    ): Resource<String> {
         return authRepository.register(email, password, displayName)
     }
 }

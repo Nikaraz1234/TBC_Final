@@ -1,10 +1,12 @@
 package com.example.mycomposeapp.feature.main.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.GameModeInfo
 import com.example.mycomposeapp.core.domain.usecase.daily.GetDailyChallengeUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.GetDailyGoalsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.main.presentation.MainContract.Event
 import com.example.mycomposeapp.feature.main.presentation.MainContract.SideEffect
@@ -21,6 +23,8 @@ import kotlin.math.abs
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val refreshUserUseCase: RefreshUserUseCase,
+    private val logoutUseCase: LogoutUseCase,
     private val getDailyChallengeUseCase: GetDailyChallengeUseCase,
     private val getDailyGoalsUseCase: GetDailyGoalsUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
@@ -34,8 +38,14 @@ class MainViewModel @Inject constructor(
             copy(
                 categories = Categories.all,
                 isLoading = false,
-                tipStartIndex = abs(System.currentTimeMillis().toInt()) % 8
+                tipStartIndex = generateTipStartIndex()
             )
+        }
+
+        viewModelScope.launch {
+            try {
+                refreshUserUseCase()
+            } catch (_: Exception) { }
         }
 
         getCurrentUserUseCase()
@@ -50,22 +60,25 @@ class MainViewModel @Inject constructor(
 
     private fun loadDailyChallenge() {
         viewModelScope.launch {
-            val availableModes = Categories.all.flatMap { category ->
-                category.gameModes
-                    .filter { it.isAvailable }
-                    .map { gameMode ->
-                        GameModeInfo(
-                            categoryName = category.name,
-                            categoryType = category.type.name,
-                            gameModeName = gameMode.name,
-                            gameModeId = gameMode.id
-                        )
-                    }
-            }
+            val availableModes = getAvailableGameModeInfos()
             val challenge = getDailyChallengeUseCase(availableModes)
             setState { copy(dailyChallenge = challenge) }
         }
     }
+
+    private fun getAvailableGameModeInfos(): List<GameModeInfo> =
+        Categories.all.flatMap { category ->
+            category.gameModes
+                .filter { it.isAvailable }
+                .map { gameMode ->
+                    GameModeInfo(
+                        categoryName = category.name,
+                        categoryType = category.type.name,
+                        gameModeName = gameMode.name,
+                        gameModeId = gameMode.id
+                    )
+                }
+        }
 
     private fun loadDailyGoals() {
         viewModelScope.launch {
@@ -94,6 +107,19 @@ class MainViewModel @Inject constructor(
             is Event.OnDailyChallengeClicked -> {
                 handleDailyChallengeClick()
             }
+            is Event.OnLogoutClicked -> {
+                handleLogout()
+            }
+            is Event.OnArchiveClicked -> {
+                sendSideEffect(SideEffect.NavigateToArchive)
+            }
+        }
+    }
+
+    private fun handleLogout() {
+        viewModelScope.launch {
+            logoutUseCase()
+            sendSideEffect(SideEffect.NavigateToWelcome)
         }
     }
 
@@ -108,19 +134,22 @@ class MainViewModel @Inject constructor(
     }
 
     private fun handleQuickPlay() {
+        val randomMode = selectRandomGameMode()
+        if (randomMode == null) {
+            sendSideEffect(SideEffect.ShowSnackbar("No game modes available yet!"))
+            return
+        }
+        val (category, gameMode) = randomMode
+        sendSideEffect(SideEffect.NavigateToGame(gameMode.id, category.type.name))
+    }
+
+    private fun selectRandomGameMode(): Pair<com.example.mycomposeapp.feature.main.presentation.model.Category, GameMode>? {
         val availableModes = Categories.all.flatMap { category ->
             category.gameModes
                 .filter { it.isAvailable }
                 .map { gameMode -> category to gameMode }
         }
-
-        if (availableModes.isEmpty()) {
-            sendSideEffect(SideEffect.ShowSnackbar("No game modes available yet!"))
-            return
-        }
-
-        val (category, gameMode) = availableModes.random()
-        sendSideEffect(SideEffect.NavigateToGame(gameMode.id, category.type.name))
+        return availableModes.randomOrNull()
     }
 
     private fun handleDailyChallengeClick() {
@@ -132,5 +161,12 @@ class MainViewModel @Inject constructor(
         }
 
         sendSideEffect(SideEffect.NavigateToGame(challenge.gameModeId, challenge.categoryType))
+    }
+
+    private fun generateTipStartIndex(): Int =
+        abs(System.currentTimeMillis().toInt()) % TIP_COUNT
+
+    companion object {
+        private const val TIP_COUNT = 8
     }
 }

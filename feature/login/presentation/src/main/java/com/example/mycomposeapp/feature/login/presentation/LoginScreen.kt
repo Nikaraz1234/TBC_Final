@@ -1,6 +1,5 @@
 package com.example.mycomposeapp.feature.login.presentation
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -45,15 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.mycomposeapp.core.domain.keys.GoogleAuthConstants
-import com.example.mycomposeapp.core.ui.R
+import com.example.mycomposeapp.core.presentation.common.GoogleSignInLauncher
+import com.example.mycomposeapp.core.ui.R as CoreUiR
+import com.example.mycomposeapp.feature.login.presentation.R as LoginR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.components.input.AppTextField
@@ -63,8 +59,6 @@ import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.Event
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.SideEffect
 import com.example.mycomposeapp.feature.login.presentation.LoginContract.State
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -74,7 +68,7 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -93,29 +87,13 @@ fun LoginScreen(
                 }
                 is SideEffect.LaunchGoogleSignIn -> {
                     coroutineScope.launch {
-                        try {
-                            val credentialManager = CredentialManager.create(context)
-                            val signInOption = GetSignInWithGoogleOption.Builder(GoogleAuthConstants.WEB_CLIENT_ID)
-                                .build()
-
-                            val request = GetCredentialRequest.Builder()
-                                .addCredentialOption(signInOption)
-                                .build()
-
-                            val result = credentialManager.getCredential(context, request)
-                            val credential = result.credential
-                            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                            val idToken = googleIdTokenCredential.idToken
-
-                            viewModel.onEvent(Event.OnGoogleSignInResult(idToken))
-                        } catch (e: GetCredentialCancellationException) {
-                            viewModel.onEvent(Event.OnGoogleSignInResult(null))
-                        } catch (e: NoCredentialException) {
-                            Log.e("LoginScreen", "No credentials available", e)
-                            viewModel.onEvent(Event.OnGoogleSignInFailed("Google Sign-In is not available. Please check app configuration."))
-                        } catch (e: GetCredentialException) {
-                            Log.e("LoginScreen", "Google sign-in failed", e)
-                            viewModel.onEvent(Event.OnGoogleSignInFailed("Google sign-in failed: ${e.message}"))
+                        when (val result = GoogleSignInLauncher.launch(context, "LoginScreen")) {
+                            is GoogleSignInLauncher.Result.Success ->
+                                viewModel.onEvent(Event.OnGoogleSignInResult(result.idToken))
+                            is GoogleSignInLauncher.Result.Cancelled ->
+                                viewModel.onEvent(Event.OnGoogleSignInResult(null))
+                            is GoogleSignInLauncher.Result.Error ->
+                                viewModel.onEvent(Event.OnGoogleSignInFailed(result.message))
                         }
                     }
                 }
@@ -149,7 +127,7 @@ private fun LoginContent(
         modifier = modifier.fillMaxSize()
     ) {
         AsyncImage(
-            model = R.drawable.app_background,
+            model = CoreUiR.drawable.app_background,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -164,15 +142,15 @@ private fun LoginContent(
             verticalArrangement = Arrangement.Center
         ) {
             AsyncImage(
-                model = R.drawable.app_logo,
-                contentDescription = "App Logo",
+                model = CoreUiR.drawable.app_logo,
+                contentDescription = stringResource(LoginR.string.app_logo_desc),
                 modifier = Modifier.size(150.dp)
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             Text(
-                text = "Welcome Back",
+                text = stringResource(LoginR.string.welcome_back),
                 style = TextStyle(
                     brush = colors.goldTextGradient,
                     fontSize = 28.sp,
@@ -181,7 +159,7 @@ private fun LoginContent(
             )
 
             Text(
-                text = "Sign in to continue",
+                text = stringResource(LoginR.string.sign_in_to_continue),
                 color = colors.textMuted,
                 fontSize = 14.sp
             )
@@ -191,7 +169,7 @@ private fun LoginContent(
             AppTextField(
                 value = state.email,
                 onValueChange = { onEvent(Event.OnEmailChanged(it)) },
-                label = "Email",
+                label = stringResource(LoginR.string.label_email),
                 error = state.emailError,
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
@@ -206,7 +184,7 @@ private fun LoginContent(
             PasswordTextField(
                 value = state.password,
                 onValueChange = { onEvent(Event.OnPasswordChanged(it)) },
-                label = "Password",
+                label = stringResource(LoginR.string.label_password),
                 error = state.passwordError,
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(
@@ -242,14 +220,14 @@ private fun LoginContent(
                         )
                     )
                     Text(
-                        text = "Remember me",
+                        text = stringResource(LoginR.string.remember_me),
                         color = colors.textMuted,
                         fontSize = 14.sp
                     )
                 }
 
                 Text(
-                    text = "Forgot Password?",
+                    text = stringResource(LoginR.string.forgot_password),
                     color = colors.goldenYellow,
                     fontSize = 14.sp,
                     modifier = Modifier.clickable(enabled = !state.isLoading) {
@@ -263,7 +241,7 @@ private fun LoginContent(
             if (state.generalError != null) {
                 Text(
                     text = state.generalError,
-                    color = androidx.compose.ui.graphics.Color(0xFFCF6679),
+                    color = colors.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = spacing.spacing16)
@@ -277,7 +255,7 @@ private fun LoginContent(
                 )
             } else {
                 ButtonLarge(
-                    text = "Login",
+                    text = stringResource(LoginR.string.btn_login),
                     onClick = { onEvent(Event.OnLoginClicked) },
                     style = ButtonStyle.Filled,
                     enabled = !state.isLoading && !state.isGoogleLoading
@@ -296,7 +274,7 @@ private fun LoginContent(
                     color = colors.textMuted.copy(alpha = 0.5f)
                 )
                 Text(
-                    text = "OR",
+                    text = stringResource(LoginR.string.or_divider),
                     color = colors.textMuted,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(horizontal = spacing.spacing16)
@@ -316,13 +294,13 @@ private fun LoginContent(
                 )
             } else {
                 ButtonLarge(
-                    text = "Continue with Google",
+                    text = stringResource(LoginR.string.btn_continue_with_google),
                     onClick = { onEvent(Event.OnGoogleSignInClicked) },
                     style = ButtonStyle.Social,
                     enabled = !state.isLoading && !state.isGoogleLoading,
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_google),
+                            painter = painterResource(id = CoreUiR.drawable.ic_google),
                             contentDescription = null,
                             modifier = Modifier.size(20.dp),
                             tint = colors.white
@@ -338,12 +316,12 @@ private fun LoginContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Don't have an account? ",
+                    text = stringResource(LoginR.string.no_account_prompt),
                     color = colors.textMuted,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Register",
+                    text = stringResource(LoginR.string.btn_register),
                     color = colors.goldenYellow,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,

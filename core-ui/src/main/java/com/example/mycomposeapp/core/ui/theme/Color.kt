@@ -41,6 +41,9 @@ data class AppColorScheme(
     val socialGlassBackground: Color = Color.White.copy(alpha = 0.15f),
     val socialGlassBorder: Color = Color.White.copy(alpha = 0.3f),
 
+    // Error color
+    val error: Color = Color(0xFFCF6679),
+
     // Splash screen colors
     val splashOverlayTop: Color = Color(0xFF000000).copy(alpha = 0.35f),
     val splashOverlayBottom: Color = Color(0xFF000000).copy(alpha = 0.55f),

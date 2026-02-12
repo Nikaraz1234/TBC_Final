@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name_display">AxisSolve</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="or_divider">OR</string>
+    <string name="btn_continue_with_google">Continue with Google</string>
+    <string name="google_icon_desc">Google Icon</string>
+    <string name="app_logo_desc">App Logo</string>
+    <string name="terms_agreement">By continuing, you agree to our Terms of Service</string>
+</resources>

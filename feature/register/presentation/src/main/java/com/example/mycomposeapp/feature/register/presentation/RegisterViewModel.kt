@@ -1,8 +1,9 @@
 package com.example.mycomposeapp.feature.register.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.model.AuthResult
+import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.usecase.auth.RegisterUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidateConfirmPasswordUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidateEmailUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidateNameUseCase
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
+    private val refreshUserUseCase: RefreshUserUseCase,
     private val validateNameUseCase: ValidateNameUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
@@ -93,10 +95,13 @@ class RegisterViewModel @Inject constructor(
                 password = currentState.password,
                 displayName = currentState.fullName
             )) {
-                is AuthResult.Success -> {
+                is Resource.Success -> {
+                    try {
+                        refreshUserUseCase()
+                    } catch (_: Exception) { }
                     setState { copy(isLoading = false, showSuccessDialog = true) }
                 }
-                is AuthResult.Error -> {
+                is Resource.Error -> {
                     setState {
                         copy(
                             isLoading = false,
@@ -104,6 +109,7 @@ class RegisterViewModel @Inject constructor(
                         )
                     }
                 }
+                is Resource.Loading -> {}
             }
         }
     }

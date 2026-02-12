@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.core.domain.usecase.validation
 
+import com.example.mycomposeapp.core.domain.model.ValidationConstants
 import javax.inject.Inject
 
 class ValidateNameUseCase @Inject constructor() {
@@ -11,16 +12,16 @@ class ValidateNameUseCase @Inject constructor() {
                 errorMessage = "Name cannot be empty"
             )
         }
-        if (name.length < 2) {
+        if (name.length < ValidationConstants.NAME_MIN_LENGTH) {
             return ValidationResult(
                 isValid = false,
-                errorMessage = "Name must be at least 2 characters"
+                errorMessage = "Name must be at least ${ValidationConstants.NAME_MIN_LENGTH} characters"
             )
         }
-        if (name.length > 50) {
+        if (name.length > ValidationConstants.NAME_MAX_LENGTH) {
             return ValidationResult(
                 isValid = false,
-                errorMessage = "Name cannot exceed 50 characters"
+                errorMessage = "Name cannot exceed ${ValidationConstants.NAME_MAX_LENGTH} characters"
             )
         }
         return ValidationResult(isValid = true)

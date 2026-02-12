@@ -15,6 +15,12 @@ import com.example.mycomposeapp.feature.splash.presentation.navigation.SplashRou
 import com.example.mycomposeapp.feature.splash.presentation.navigation.splashNavGraph
 import com.example.mycomposeapp.feature.welcome.presentation.navigation.WelcomeRoute
 import com.example.mycomposeapp.feature.welcome.presentation.navigation.welcomeNavGraph
+import com.example.mycomposeapp.feature.game.archive.navigation.ArchiveHubRoute
+import com.example.mycomposeapp.feature.game.archive.navigation.EmojiArchiveRoute
+import com.example.mycomposeapp.feature.game.archive.navigation.archiveNavGraph
+import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
+import com.example.mycomposeapp.feature.game.presentation.navigation.gameNavGraph
 
 @Composable
 fun NavGraph() {
@@ -73,10 +79,38 @@ fun NavGraph() {
 
         mainNavGraph(
             onNavigateToGame = { gameModeId, categoryType ->
-                // TODO: Navigate to game screen
+                navController.navigate(GameRoute(gameModeId = gameModeId, categoryType = categoryType))
             },
             onNavigateToProfile = {
                 // TODO: Navigate to profile screen
+            },
+            onLogout = {
+                navController.navigate(WelcomeRoute) {
+                    popUpTo(0) { inclusive = true }
+                }
+            },
+            onNavigateToArchive = {
+                navController.navigate(ArchiveHubRoute)
+            }
+        )
+
+        gameNavGraph(
+            onNavigateBack = { navController.popBackStack() }
+        )
+
+        archiveNavGraph(
+            onNavigateBack = { navController.popBackStack() },
+            onNavigateToEmojiArchive = {
+                navController.navigate(EmojiArchiveRoute)
+            },
+            onNavigateToEmojiGame = { archiveDate ->
+                navController.navigate(
+                    GameRoute(
+                        gameModeId = GameModeIds.EMOJI,
+                        categoryType = "movies",
+                        archiveDate = archiveDate
+                    )
+                )
             }
         )
 

@@ -13,8 +13,16 @@
 # Local config
 local.properties
 
+# IDE files
+.idea/gradle.xml
+.idea/misc.xml
+.idea/deviceManager.xml
+
+# Windows artifacts
+nul
+
 # Captures
 /captures
 
-# Firebase (optional)
+# Firebase config - replace with your own from Firebase Console
 app/google-services.json

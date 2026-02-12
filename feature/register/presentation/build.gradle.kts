@@ -5,10 +5,3 @@ plugins {
 android {
     namespace = "com.example.mycomposeapp.feature.register.presentation"
 }
-
-dependencies {
-    implementation(projects.core.presentation)
-    implementation(projects.core.domain)
-    implementation(projects.core.data)
-    implementation(projects.coreUi)
-}

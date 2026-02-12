@@ -5,6 +5,6 @@ import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import kotlinx.coroutines.flow.Flow
 
 class GetPreferenceUseCase(private val preferencesRepository: DataStoreManager) {
-    suspend operator fun <T> invoke(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
+    operator fun <T> invoke(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
         preferencesRepository.getPreference(key, defaultValue)
 }

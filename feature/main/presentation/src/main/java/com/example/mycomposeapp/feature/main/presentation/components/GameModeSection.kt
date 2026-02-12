@@ -18,8 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.feature.main.presentation.R as MainR
 import com.example.mycomposeapp.feature.main.presentation.model.Category
 import com.example.mycomposeapp.feature.main.presentation.model.GameMode
 
@@ -42,7 +44,7 @@ fun GameModeSection(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(MainR.string.btn_back_desc),
                 tint = colors.textLight,
                 modifier = Modifier.size(24.dp)
             )

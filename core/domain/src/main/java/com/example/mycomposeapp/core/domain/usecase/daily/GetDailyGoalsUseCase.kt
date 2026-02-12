@@ -2,29 +2,18 @@ package com.example.mycomposeapp.core.domain.usecase.daily
 
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.model.DailyGoal
+import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
 import com.example.mycomposeapp.core.domain.model.DailyGoalsProgress
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import kotlinx.coroutines.flow.first
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import javax.inject.Inject
 
 class GetDailyGoalsUseCase @Inject constructor(
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
+    private val resetHelper: DailyGoalsResetHelper
 ) {
     suspend operator fun invoke(): DailyGoalsProgress {
-        val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toString()
-        val savedDate = dataStoreManager
-            .getPreference(PreferenceKeys.DAILY_GOALS_DATE, "")
-            .first()
-
-        if (savedDate != today) {
-            dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_DATE, today)
-            dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_GAMES_PLAYED, 0)
-            dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_PERFECT_SCORES, 0)
-            dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_CATEGORIES_TRIED, "")
-        }
+        resetHelper.ensureTodayReset()
 
         val gamesPlayed = dataStoreManager
             .getPreference(PreferenceKeys.DAILY_GOALS_GAMES_PLAYED, 0)
@@ -44,21 +33,21 @@ class GetDailyGoalsUseCase @Inject constructor(
         val goals = listOf(
             DailyGoal(
                 id = "games_played",
-                title = "Play 3 games",
+                title = "Play ${DailyGoalsConstants.GAMES_TO_PLAY_TARGET} games",
                 currentProgress = gamesPlayed,
-                targetProgress = 3
+                targetProgress = DailyGoalsConstants.GAMES_TO_PLAY_TARGET
             ),
             DailyGoal(
                 id = "perfect_score",
                 title = "Get a perfect score",
                 currentProgress = perfectScores,
-                targetProgress = 1
+                targetProgress = DailyGoalsConstants.PERFECT_SCORES_TARGET
             ),
             DailyGoal(
                 id = "categories_tried",
-                title = "Try 2 categories",
+                title = "Try ${DailyGoalsConstants.CATEGORIES_TO_TRY_TARGET} categories",
                 currentProgress = categoriesCount,
-                targetProgress = 2
+                targetProgress = DailyGoalsConstants.CATEGORIES_TO_TRY_TARGET
             )
         )
 

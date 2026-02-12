@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_account">Create Account</string>
+    <string name="sign_up_to_get_started">Sign up to get started</string>
+    <string name="label_full_name">Full Name</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="terms_agreement">I agree to the Terms &amp; Conditions</string>
+    <string name="terms_error">You must accept the Terms &amp; Conditions</string>
+    <string name="btn_register">Register</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="btn_login">Login</string>
+    <string name="registration_successful">Registration Successful!</string>
+    <string name="registration_success_message">Your account has been created successfully. Welcome to AxisSolve!</string>
+    <string name="btn_continue">Continue</string>
+    <string name="app_logo_desc">App Logo</string>
+</resources>
