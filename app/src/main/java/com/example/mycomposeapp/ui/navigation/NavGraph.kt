@@ -1,6 +1,8 @@
 package com.example.mycomposeapp.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.mycomposeapp.feature.login.presentation.navigation.LoginRoute
@@ -21,14 +23,18 @@ import com.example.mycomposeapp.feature.game.archive.navigation.archiveNavGraph
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
 import com.example.mycomposeapp.feature.game.presentation.navigation.gameNavGraph
+import com.example.mycomposeapp.feature.profile.edit_profile.presentation.navigation.editProfileNavGraph
+import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileRoute
 
 @Composable
-fun NavGraph() {
-    val navController = rememberNavController()
-
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    modifier : Modifier = Modifier
+) {
     NavHost(
         navController = navController,
-        startDestination = SplashRoute
+        startDestination = SplashRoute,
+        modifier = modifier
     ) {
         splashNavGraph(
             onGoDashboard = {
@@ -124,5 +130,8 @@ fun NavGraph() {
                 }
             }
         )
+        editProfileNavGraph ( onBack = {
+            navController.navigate(ProfileRoute)
+        })
     }
 }

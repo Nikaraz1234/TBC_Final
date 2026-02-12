@@ -14,13 +14,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -60,6 +63,8 @@ import androidx.compose.ui.unit.dp
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
@@ -120,34 +125,46 @@ private fun ProfileContent(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier.fillMaxSize()
-            .systemBarsPadding()) {
+        Column {
             ProfileTopBar(
                 onBackClick = { onEvent(ProfileContract.Event.OnBackButtonClicked) },
                 onSettingsClicked = { onEvent(ProfileContract.Event.OnSettingsClicked) }
             )
-            Spacer(modifier= Modifier.height(spacing.spacing32))
-            ProfileAvatarCard()
+            Column(modifier = Modifier.fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+            ) {
 
-            Spacer(modifier= Modifier.height(spacing.spacing32))
-            LevelProgress(0.6f)
 
-            Spacer(modifier = Modifier.height(spacing.spacing16))
+                Spacer(modifier= Modifier.height(spacing.spacing32))
+                ProfileAvatarCard(
+                    photoUrl = state.user?.photoUrl
+                )
 
-            GlobalStats()
+                Spacer(modifier= Modifier.height(spacing.spacing32))
+                LevelProgress(0.6f)
 
-            Spacer(modifier = Modifier.height(spacing.spacing16))
+                Spacer(modifier = Modifier.height(spacing.spacing16))
 
-            ButtonMedium(
-                text = "Edit profile",
-                onClick = { onEvent(ProfileContract.Event.OnEditProfileClicked) },
-                style = ButtonStyle.Filled,
-                enabled = true,
-                modifier = Modifier
-                    .padding(horizontal = spacing.spacing16, vertical = spacing.spacing16)
-            )
+                GlobalStats(
+                    state.user
+                )
 
+                Spacer(modifier = Modifier.height(spacing.spacing16))
+
+                ButtonMedium(
+                    text = "Edit profile",
+                    onClick = { onEvent(ProfileContract.Event.OnEditProfileClicked) },
+                    style = ButtonStyle.Filled,
+                    enabled = true,
+                    modifier = Modifier
+                        .padding(horizontal = spacing.spacing16, vertical = spacing.spacing16)
+                )
+
+            }
         }
+
         ProfileBottomSheet(
             visible = showSettingsSheet,
             onClose = onDismissSettings,
@@ -220,6 +237,7 @@ private fun ProfileTopBar(
 @Composable
 private fun ProfileAvatarCard(
     modifier: Modifier = Modifier,
+    photoUrl: String?,
 ) {
     Column(
         modifier = modifier,
@@ -243,11 +261,25 @@ private fun ProfileAvatarCard(
                         shape = CircleShape
                     )
             ) {
-                Image(
-                    painter = painterResource(id = CoreUiR.drawable.app_logo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
+                val hasPhoto = !photoUrl.isNullOrBlank()
+
+                if (hasPhoto) {
+                    AsyncImage(
+                        model = photoUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = painterResource(CoreUiR.drawable.app_logo),
+                        error = painterResource(CoreUiR.drawable.app_logo)
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(CoreUiR.drawable.app_logo),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Surface(
@@ -338,49 +370,51 @@ private fun LvlProgressBar(
 }
 
 @Composable
-private fun GlobalStats(){
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text= "Global Stats",
-            color = colors.white,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(horizontal = spacing.spacing20),
-            fontWeight = FontWeight.SemiBold)
+private fun GlobalStats(user: User?){
+    if(user != null){
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(text= "Global Stats",
+                color = colors.white,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(horizontal = spacing.spacing20),
+                fontWeight = FontWeight.SemiBold)
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
-            horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
-        ) {
-            RankItem(
-                title = "Rank",
-                stat = "#1204",
-                modifier = Modifier.weight(1f)
-            )
-            RankItem(
-                title = "Games Played",
-                stat = "942",
-                modifier = Modifier.weight(1f)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
+                horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
+            ) {
+                RankItem(
+                    title = "Points",
+                    stat = user.stats.points.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                RankItem(
+                    title = "Games Played",
+                    stat = user.stats.gamesPlayed.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
+                horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
+            ) {
+                RankItem(
+                    title = "Total Guesses",
+                    stat = user.stats.correctAnswers.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                RankItem(
+                    title = "Streak",
+                    stat = user.stats.currentStreak.toString(),
+                    modifier = Modifier.weight(1f),
+
+                    )
+            }
+
+
         }
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
-            horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
-        ) {
-            RankItem(
-                title = "Total Guesses",
-                stat = "13022",
-                modifier = Modifier.weight(1f)
-            )
-            RankItem(
-                title = "Streak",
-                stat = "5",
-                modifier = Modifier.weight(1f),
-
-            )
-        }
-
-
     }
 }
 @Composable

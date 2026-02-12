@@ -39,6 +39,17 @@ class GameDelegateFactory @Inject constructor(
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase
             )
+            GameModeIds.PLOT -> PlotGameDelegate(
+                gameModeId = gameModeId,
+                categoryType = categoryType,
+                getQuestionsUseCase = getQuestionsUseCase,
+                calculateScoreUseCase = calculateScoreUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase
+            )
+
+            //GameModeIds.GAMES_SCREENSHOT -> GameScreenshotDelegate()
+
+            //GameModeIds.GAMES_DESCRIPTION -> GameDescriptionDelegate()
             else -> PlotGameDelegate(
                 gameModeId = gameModeId,
                 categoryType = categoryType,
