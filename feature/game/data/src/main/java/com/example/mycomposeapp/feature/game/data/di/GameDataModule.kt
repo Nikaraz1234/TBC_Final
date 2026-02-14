@@ -6,10 +6,12 @@ import com.example.mycomposeapp.core.data.di.TmdbRetrofit
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieCoverGameRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieDailyPuzzleRepositoryImpl
+import com.example.mycomposeapp.feature.game.data.repository.movies.MoviePlotGameRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieQuestionRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.domain.repository.CoverGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
+import com.example.mycomposeapp.feature.game.domain.repository.PlotGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.QuestionRepository
 import com.example.mycomposeapp.feature.game.domain.repository.SearchRepository
 import com.google.firebase.firestore.FirebaseFirestore
@@ -48,6 +50,15 @@ object GameDataModule {
         tmdbApiService: TmdbApiService
     ): CoverGameRepository {
         return MovieCoverGameRepositoryImpl(tmdbApiService)
+    }
+
+    @Provides
+    @IntoMap
+    @StringKey("MOVIES")
+    fun provideMoviePlotGameRepository(
+        tmdbApiService: TmdbApiService
+    ): PlotGameRepository {
+        return MoviePlotGameRepositoryImpl(tmdbApiService)
     }
 
     @Provides

@@ -46,7 +46,8 @@
       "Bash(echo:*)",
       "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\model\\\\MovieSearchResult.kt\")",
       "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\usecase\\\\SearchMoviesUseCase.kt\")",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(.\\\\gradlew :feature:game:presentation:compileDebugKotlin:*)"
     ]
   }
 }

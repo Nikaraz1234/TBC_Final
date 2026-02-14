@@ -239,7 +239,7 @@ class MovieCoverDelegate(
             return
         }
 
-        val nextQuestion = questionQueue.removeFirst()
+        val nextQuestion = questionQueue.removeAt(0)
         scope.updateState {
             val cover = coverState ?: GameContract.ModeState.Cover()
             copy(

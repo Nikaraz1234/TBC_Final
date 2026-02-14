@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.feature.game.presentation.GameContract
@@ -26,7 +25,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.cover.Cover
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
-import com.example.mycomposeapp.feature.game.presentation.components.plot.GameTopBar
+import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
 
 @Composable
@@ -60,16 +59,15 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
-            else -> {
-                val plot = state.plotState
-                GameTopBar(
-                    questionIndex = state.currentQuestionIndex,
-                    totalQuestions = state.questions.size,
-                    timeRemaining = plot?.timeRemainingSeconds ?: 0,
-                    streak = state.currentStreak,
-                    progress = state.progressFraction
+            is GameContract.ModeState.Plot -> {
+                PlotGameTopBar(
+                    guessesRemaining = mode.guessesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
                 )
             }
+            else -> {}
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -99,7 +97,16 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
-            is QuestionContent.Plot -> PlotQuestionView(content = content)
+            is QuestionContent.Plot -> {
+                val plotState = state.plotState ?: GameContract.ModeState.Plot()
+                PlotQuestionView(
+                    content = content,
+                    plotState = plotState,
+                    isRevealed = isRevealed,
+                    showInsufficientFunds = plotState.showInsufficientFundsWarning,
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -129,6 +136,7 @@ fun QuestionScreen(
             NextButton(
                 isLastQuestion = when {
                     state.isCoverMode -> false
+                    state.isPlotMode -> false
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },

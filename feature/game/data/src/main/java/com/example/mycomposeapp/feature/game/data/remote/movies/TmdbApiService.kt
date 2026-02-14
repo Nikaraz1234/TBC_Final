@@ -18,5 +18,8 @@ interface TmdbApiService {
     suspend fun searchMovies(@Query("query") query: String): TmdbMovieListResponse
 
     @GET("movie/{movie_id}")
-    suspend fun getMovieDetail(@Path("movie_id") movieId: Int): TmdbMovieDetailResponse
+    suspend fun getMovieDetail(
+        @Path("movie_id") movieId: Int,
+        @Query("append_to_response") appendToResponse: String? = null
+    ): TmdbMovieDetailResponse
 }
