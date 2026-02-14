@@ -1,29 +1,26 @@
-package com.example.mycomposeapp.feature.game.presentation.components.cover
+package com.example.mycomposeapp.feature.game.presentation.components.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.display.CoinDisplay
-import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.components.display.HeartIndicator
 import com.example.mycomposeapp.core.ui.components.display.StreakDisplay
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
+import com.example.mycomposeapp.feature.game.presentation.R as GameR
 
 @Composable
-fun CoverGameTopBar(
+fun BasicGameTopBar(
     livesRemaining: Int,
     coins: Int,
     score: Int,
@@ -51,21 +48,6 @@ fun CoverGameTopBar(
             )
 
             StreakDisplay(streak = streak)
-        }
-    }
-}
-@Preview(showBackground = true)
-@Composable
-private fun CoverGameTopBarPreview() {
-
-    MyComposeAppTheme {
-        Surface {
-            CoverGameTopBar(
-                livesRemaining = 3,
-                coins = 150,
-                score = 2450,
-                streak = 5
-            )
         }
     }
 }

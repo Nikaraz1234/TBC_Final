@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,10 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonSmall
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
+import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 
@@ -69,6 +72,27 @@ fun CoverQuestionView(
                 modifier = Modifier
                     .padding(horizontal = 80.dp)
                     .alpha(if (canAffordReveal) 1f else 0.5f)
+            )
+        }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+private fun CoverQuestionViewPreview() {
+
+    val fakeContent = QuestionContent.Cover(
+        imageUrl = "https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg"
+    )
+
+    MyComposeAppTheme {
+        Surface {
+            CoverQuestionView(
+                content = fakeContent,
+                revealedCells = setOf(1, 3, 5, 7, 9),
+                coins = 100,
+                revealCost = 10,
+                canAffordReveal = true,
+                onRevealMore = {},
             )
         }
     }

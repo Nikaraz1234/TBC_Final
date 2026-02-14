@@ -28,6 +28,7 @@ object IgdbApiModule {
                 .addHeader("Client-ID", BuildConfig.IGDB_CLIENT_ID)
                 .addHeader("Authorization", "Bearer ${BuildConfig.IGDB_TOKEN}")
                 .addHeader("Accept", "application/json")
+                .addHeader("Content-Type", "text/plain")
                 .build()
             chain.proceed(newRequest)
         }
