@@ -10,7 +10,10 @@ import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCa
 import com.example.mycomposeapp.feature.game.domain.usecase.GetDailyPuzzleUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.GetQuestionsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.common.EmojiGameDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameScreenshotDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieCoverDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
 import javax.inject.Inject
@@ -23,11 +26,14 @@ class GameDelegateFactory @Inject constructor(
     private val dailyPuzzleRepositories: Map<String, @JvmSuppressWildcards DailyPuzzleRepository>,
     private val fetchCoverBatchUseCase: FetchCoverBatchUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val updateCoinsUseCase: UpdateCoinsUseCase
+    private val updateCoinsUseCase: UpdateCoinsUseCase,
+    private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
+    private val searchGamesUseCase: SearchGamesUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
             CategoryType.MOVIES.name -> createMoviesDelegate(gameModeId, categoryType, archiveDate)
+            CategoryType.GAMES.name -> createGamesDelegate(gameModeId, categoryType, archiveDate)
             else -> throw IllegalArgumentException("Unknown category: $categoryType")
         }
     }
@@ -63,6 +69,24 @@ class GameDelegateFactory @Inject constructor(
                 getQuestionsUseCase = getQuestionsUseCase,
                 calculateScoreUseCase = calculateScoreUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase
+            )
+            else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
+        }
+    }
+    private fun createGamesDelegate(
+        gameModeId: String,
+        categoryType: String,
+        archiveDate: String?
+    ): GameModeDelegate {
+        return when (gameModeId) {
+            GameModeIds.GAME_SCREENSHOT -> GameScreenshotDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                fetchScreenshotBatchUseCase = fetchScreenshotBatchUseCase,
+                searchGamesUseCase = searchGamesUseCase
             )
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }

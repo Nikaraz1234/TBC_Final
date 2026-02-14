@@ -36,6 +36,15 @@ object GameContract {
             val blurLevel: Float = GameConstants.PLOT_INITIAL_BLUR
         ) : ModeState
 
+        data class Screenshot(
+            val guessesRemaining: Int = GameConstants.EMOJI_INITIAL_GUESSES,
+            val coins: Int = 0,
+            val currentScore: Int = 0,
+            val livesRemaining: Int = 3,
+            val bestSessionStreak: Int = 0,
+            val isFetchingMore: Boolean = false
+        ) : ModeState
+
         data object None : ModeState
     }
 
@@ -67,6 +76,10 @@ object GameContract {
         val coverState: ModeState.Cover? get() = modeState as? ModeState.Cover
         val emojiState: ModeState.Emoji? get() = modeState as? ModeState.Emoji
         val plotState: ModeState.Plot? get() = modeState as? ModeState.Plot
+
+        val screenshotState: ModeState.Screenshot?
+            get() = modeState as? ModeState.Screenshot
+
     }
 
     enum class GamePhase { Loading, Playing, AnswerRevealed, Results }

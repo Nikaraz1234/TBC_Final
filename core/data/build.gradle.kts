@@ -24,6 +24,18 @@ android {
         buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("TMDB_API_KEY", "")}\"")
         buildConfigField("String", "TMDB_IMAGE_BASE_URL", "\"${libs.versions.tmdb.image.base.url.get()}\"")
         buildConfigField("String", "REQRES_API_KEY", "\"${localProperties.getProperty("REQRES_API_KEY", "")}\"")
+        buildConfigField(
+            "String",
+            "IGDB_CLIENT_ID",
+            "\"${project.findProperty("IGDB_CLIENT_ID") ?: ""}\""
+        )
+
+        buildConfigField(
+            "String",
+            "IGDB_TOKEN",
+            "\"${project.findProperty("IGDB_TOKEN") ?: ""}\""
+        )
+
     }
 }
 

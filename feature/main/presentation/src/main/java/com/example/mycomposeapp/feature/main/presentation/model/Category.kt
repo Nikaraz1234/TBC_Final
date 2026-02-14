@@ -37,6 +37,16 @@ object Categories {
         )
     )
 
+    private val gamesCategories = listOf(
+        GameMode(
+            id = GameModeIds.GAME_SCREENSHOT,
+            name = "By Screenshot",
+            description = "Identify game from screenshot",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        )
+    )
+
     private val comingSoonGameModes = listOf(
         GameMode(
             id = "coming_soon",
@@ -58,7 +68,7 @@ object Categories {
             type = CategoryType.GAMES,
             name = "Games",
             gradientColors = listOf(Color(0xFF4CAF50), Color(0xFF2196F3)),
-            gameModes = comingSoonGameModes
+            gameModes = gamesCategories
         ),
         Category(
             type = CategoryType.COMICS,

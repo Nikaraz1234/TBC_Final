@@ -26,6 +26,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.cover.Cover
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.GameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
 
@@ -54,6 +55,14 @@ fun QuestionScreen(
             }
             is GameContract.ModeState.Cover -> {
                 CoverGameTopBar(
+                    livesRemaining = mode.livesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
+            is GameContract.ModeState.Screenshot -> {
+                BasicGameTopBar(
                     livesRemaining = mode.livesRemaining,
                     coins = mode.coins,
                     score = mode.currentScore,
@@ -100,6 +109,15 @@ fun QuestionScreen(
                 )
             }
             is QuestionContent.Plot -> PlotQuestionView(content = content)
+            is QuestionContent.Screenshot -> {
+                val screenshot = state.screenshotState
+                ScreenshotQuestionView(
+                    content = content,
+                    guessesRemaining = screenshot?.guessesRemaining ?: 0,
+                    coins = screenshot?.coins ?: 0,
+                )
+            }
+
         }
 
         Spacer(modifier = Modifier.height(20.dp))
