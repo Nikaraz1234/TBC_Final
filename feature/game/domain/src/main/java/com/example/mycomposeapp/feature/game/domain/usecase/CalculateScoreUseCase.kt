@@ -42,6 +42,7 @@ class CalculateScoreUseCase @Inject constructor() {
     }
 
     private fun calculateTimeBonus(timeLimitSeconds: Int, timeSpentSeconds: Int): Int {
+        if (timeLimitSeconds <= 0) return 0
         val remainingTime = (timeLimitSeconds - timeSpentSeconds).coerceAtLeast(0)
         return (remainingTime * GameConstants.TIME_BONUS_MAX) / timeLimitSeconds
     }
