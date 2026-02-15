@@ -32,9 +32,19 @@ object GameContract {
         }
 
         data class Plot(
-            val timeRemainingSeconds: Int = GameConstants.TIME_LIMIT_SECONDS,
-            val blurLevel: Float = GameConstants.PLOT_INITIAL_BLUR
-        ) : ModeState
+            val guessesRemaining: Int = GameConstants.PLOT_INITIAL_GUESSES,
+            val revealedHintIndices: Set<Int> = emptySet(),
+            val coins: Int = 0,
+            val currentScore: Int = 0,
+            val bestSessionStreak: Int = 0,
+            val isFetchingMore: Boolean = false,
+            val showInsufficientFundsWarning: Boolean = false
+        ) : ModeState {
+            val allHintsRevealed: Boolean
+                get() = revealedHintIndices.size >= GameConstants.PLOT_HINT_COUNT
+            val canAffordHint: Boolean
+                get() = coins >= GameConstants.PLOT_HINT_COST && !allHintsRevealed
+        }
 
         data class Screenshot(
             val guessesRemaining: Int = GameConstants.EMOJI_INITIAL_GUESSES,
@@ -94,6 +104,7 @@ object GameContract {
 
         val isCoverMode: Boolean get() = modeState is ModeState.Cover
         val isEmojiMode: Boolean get() = modeState is ModeState.Emoji
+        val isPlotMode: Boolean get() = modeState is ModeState.Plot
         val coverState: ModeState.Cover? get() = modeState as? ModeState.Cover
         val emojiState: ModeState.Emoji? get() = modeState as? ModeState.Emoji
         val plotState: ModeState.Plot? get() = modeState as? ModeState.Plot

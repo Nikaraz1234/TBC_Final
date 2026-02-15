@@ -31,10 +31,18 @@ class MovieQuestionRepositoryImpl @Inject constructor(
                     allMovies.take(config.questionCount).map { it.toCoverQuestion() }
                 }
                 GameModeIds.PLOT -> {
-                    allMovies
+                    val candidates = allMovies
                         .filter { it.overview.length >= 50 }
-                        .take(config.questionCount)
-                        .map { it.toPlotQuestion() }
+                        .take(config.questionCount * 2)
+
+                    candidates.mapNotNull { movie ->
+                        try {
+                            val detail = tmdbApiService.getMovieDetail(movie.id, "credits")
+                            detail.toPlotQuestion()
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }.take(config.questionCount)
                 }
                 else -> {
                     allMovies.take(config.questionCount).map { it.toCoverQuestion() }

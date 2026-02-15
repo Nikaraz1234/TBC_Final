@@ -24,9 +24,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.cover.Cover
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
-import com.example.mycomposeapp.feature.game.presentation.components.games.description.DescriptionQuestionView
-import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
-import com.example.mycomposeapp.feature.game.presentation.components.plot.GameTopBar
+import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
 
 @Composable
@@ -60,32 +58,15 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
-            is GameContract.ModeState.Screenshot -> {
-                BasicGameTopBar(
-                    livesRemaining = mode.livesRemaining,
+            is GameContract.ModeState.Plot -> {
+                PlotGameTopBar(
+                    guessesRemaining = mode.guessesRemaining,
                     coins = mode.coins,
                     score = mode.currentScore,
                     streak = state.currentStreak
                 )
             }
-            is GameContract.ModeState.Description -> {
-                BasicGameTopBar(
-                    livesRemaining = mode.livesRemaining,
-                    coins = mode.coins,
-                    score = mode.currentScore,
-                    streak = state.currentStreak
-                )
-            }
-            else -> {
-                val plot = state.plotState
-                GameTopBar(
-                    questionIndex = state.currentQuestionIndex,
-                    totalQuestions = state.questions.size,
-                    timeRemaining = plot?.timeRemainingSeconds ?: 0,
-                    streak = state.currentStreak,
-                    progress = state.progressFraction
-                )
-            }
+            else -> {}
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -115,38 +96,16 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
-            is QuestionContent.Plot -> PlotQuestionView(content = content)
-            is QuestionContent.Screenshot -> {
-                val screenshot = state.screenshotState!!
-                ScreenshotQuestionView(
-                    content = state.currentQuestion!!.content as QuestionContent.Screenshot,
-                    coins = screenshot.coins,
-                    hintCost = screenshot.hintCost,
-                    hintStep = screenshot.hintStep,
-                    studioHint = screenshot.studioHint,
-                    genreHint = screenshot.genreHint,
-                    yearHint = screenshot.yearHint,
+            is QuestionContent.Plot -> {
+                val plotState = state.plotState ?: GameContract.ModeState.Plot()
+                PlotQuestionView(
+                    content = content,
+                    plotState = plotState,
+                    isRevealed = isRevealed,
+                    showInsufficientFunds = plotState.showInsufficientFundsWarning,
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
-
-            is QuestionContent.Description -> {
-                val d = state.descriptionState
-                if (d != null) {
-                    DescriptionQuestionView(
-                        content = content,
-                        guessesRemaining = d.livesRemaining,
-                        coins = d.coins,
-                        hintStep = d.hintStep,
-                        hintCost = d.hintCost,
-                        onUseHint = { onEvent(GameContract.Event.OnUseHint) },
-                        studioHint = d.studioHint,
-                        genreHint = d.genreHint,
-                        yearHint = d.yearHint
-                    )
-                }
-            }
-
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -176,6 +135,7 @@ fun QuestionScreen(
             NextButton(
                 isLastQuestion = when {
                     state.isCoverMode -> false
+                    state.isPlotMode -> false
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },

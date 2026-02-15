@@ -23,7 +23,10 @@ object GameConstants {
     const val EMOJI_DAILY_COINS_REWARD = 15
 
     // Plot mode
-    const val PLOT_QUESTION_COUNT = 10
-    const val PLOT_INITIAL_BLUR = 25f
-    const val PLOT_BLUR_STEP = 5f
+    const val PLOT_INITIAL_GUESSES = 3
+    const val PLOT_HINT_COUNT = 6
+    const val PLOT_HINT_COST = 20
+    const val PLOT_BASE_POINTS = 100
+    const val PLOT_STREAK_BONUS = 50
+    const val PLOT_COINS_PER_CORRECT = 1
 }
