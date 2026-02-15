@@ -102,7 +102,12 @@ class GameScreenshotDelegate(
         val q = state.currentQuestion?.content as? QuestionContent.Screenshot ?: return
 
         if (screenshot.hintStep >= 3) return
-        if (screenshot.coins < screenshot.hintCost) return
+        if (screenshot.coins < screenshot.hintCost) {
+            scope.updateState {
+                copy(modeState = screenshot.copy(showInsufficientFundsWarning = true))
+            }
+            return
+        }
 
         val nextStep = screenshot.hintStep + 1
 
@@ -120,7 +125,8 @@ class GameScreenshotDelegate(
         }.copy(
             coins = screenshot.coins - screenshot.hintCost,
             hintCost = screenshot.hintCost * 2,
-            hintStep = nextStep
+            hintStep = nextStep,
+            showInsufficientFundsWarning = false
         )
 
         scope.updateState { copy(modeState = updated) }
@@ -274,7 +280,8 @@ class GameScreenshotDelegate(
                         hintCost = GameConstants.EMOJI_HINT_COST,
                         studioHint = "",
                         genreHint = "",
-                        yearHint = ""
+                        yearHint = "",
+                        showInsufficientFundsWarning = false
                     )
                 )
             }
@@ -308,7 +315,8 @@ class GameScreenshotDelegate(
                     hintCost = GameConstants.EMOJI_HINT_COST,
                     studioHint = "",
                     genreHint = "",
-                    yearHint = ""
+                    yearHint = "",
+                    showInsufficientFundsWarning = false
                 )
             )
         }

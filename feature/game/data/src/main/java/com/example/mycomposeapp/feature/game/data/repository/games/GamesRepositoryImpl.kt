@@ -46,44 +46,60 @@ class GamesRepositoryImpl @Inject constructor(
             }
     }
     override fun getRandomGuessGame(): Flow<Resource<GameScreenshot>> {
-        val offset = (0..500).random()
+        val offset = (0..300).random()
         val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
         val body = igdbQueryBody(query)
 
         return handleResponse.safeApiCall { remote.searchGames(body) }
             .map { res ->
-                res.asResource { dtoList ->
-                    val candidates = dtoList
-                        .map { it.toGameScreenshot() }
-                        .filter { it.screenshotUrls.isNotEmpty() }
+                when (res) {
+                    is Resource.Success -> {
+                        val candidates = res.data
+                            .map { it.toGameScreenshot() }
+                            .filter { it.screenshotUrls.isNotEmpty() }
 
-                    candidates.random()
+                        val picked = candidates.randomOrNull()
+                        if (picked != null) {
+                            Resource.Success(picked)
+                        } else {
+                            Resource.Error("No games with screenshots found")
+                        }
+                    }
+                    is Resource.Error -> Resource.Error(res.message)
+                    Resource.Loading -> Resource.Loading
                 }
             }
     }
 
     override fun getRandomScreenshotQuestion(): Flow<Resource<Question>> {
-        val offset = (0..500).random()
+        val offset = (0..300).random()
         val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
         val body = igdbQueryBody(query)
 
         return handleResponse.safeApiCall { remote.searchGames(body) }
             .map { res ->
-                res.asResource { dtoList ->
-                    val candidates = dtoList
-                        .map { it.toGameScreenshot() }
-                        .filter { it.screenshotUrls.isNotEmpty() }
+                when (res) {
+                    is Resource.Success -> {
+                        val candidates = res.data
+                            .map { it.toGameScreenshot() }
+                            .filter { it.screenshotUrls.isNotEmpty() }
 
-                    val picked = candidates.randomOrNull()
-                        ?: throw IllegalStateException("No games with screenshots found")
-
-                    val imageUrl = picked.screenshotUrls.random()
-
-                    Question(
-                        id = "screenshot_${picked.id}",
-                        correctAnswer = picked.name,
-                        content = QuestionContent.Screenshot(imageUrl = imageUrl)
-                    )
+                        val picked = candidates.randomOrNull()
+                        if (picked != null) {
+                            val imageUrl = picked.screenshotUrls.random()
+                            Resource.Success(
+                                Question(
+                                    id = "screenshot_${picked.id}",
+                                    correctAnswer = picked.name,
+                                    content = QuestionContent.Screenshot(imageUrl = imageUrl)
+                                )
+                            )
+                        } else {
+                            Resource.Error("No games with screenshots found")
+                        }
+                    }
+                    is Resource.Error -> Resource.Error(res.message)
+                    Resource.Loading -> Resource.Loading
                 }
             }
     }
@@ -91,40 +107,44 @@ class GamesRepositoryImpl @Inject constructor(
         batchSize: Int,
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>> {
-        val offset = (0..500).random()
+        val offset = (0..300).random()
         val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 10, offset = offset)
         val body = igdbQueryBody(query)
 
         return handleResponse
             .safeApiCall { remote.searchGames(body) }
             .map { res ->
-                res.asResource { dtoList ->
-                    val questions = dtoList
-                        .map { it.toGameScreenshot() }
-                        .filter { game ->
-                            game.screenshotUrls.isNotEmpty() &&
-                                    game.id.toString() !in seenIds
-                        }
-                        .shuffled()
-                        .take(batchSize)
-                        .map { game ->
-                            Question(
-                                id = "screenshot_${game.id}",
-                                correctAnswer = game.name,
-                                content = QuestionContent.Screenshot(
-                                    imageUrl = game.screenshotUrls.random(),
-                                    studio = game.studio,
-                                    genres = game.genres,
-                                    releaseYear = game.releaseYear
+                when (res) {
+                    is Resource.Success -> {
+                        val questions = res.data
+                            .map { it.toGameScreenshot() }
+                            .filter { game ->
+                                game.screenshotUrls.isNotEmpty() &&
+                                        game.id.toString() !in seenIds
+                            }
+                            .shuffled()
+                            .take(batchSize)
+                            .map { game ->
+                                Question(
+                                    id = "screenshot_${game.id}",
+                                    correctAnswer = game.name,
+                                    content = QuestionContent.Screenshot(
+                                        imageUrl = game.screenshotUrls.random(),
+                                        studio = game.studio,
+                                        genres = game.genres,
+                                        releaseYear = game.releaseYear
+                                    )
                                 )
-                            )
+                            }
+
+                        if (questions.isEmpty()) {
+                            Resource.Error("No screenshot questions available (maybe all were seen or missing screenshots).")
+                        } else {
+                            Resource.Success(questions)
                         }
-
-                    if (questions.isEmpty()) {
-                        throw IllegalStateException("No screenshot questions available (maybe all were seen or missing screenshots).")
                     }
-
-                    questions
+                    is Resource.Error -> Resource.Error(res.message)
+                    Resource.Loading -> Resource.Loading
                 }
             }
     }
@@ -203,35 +223,41 @@ class GamesRepositoryImpl @Inject constructor(
 
             questions.toList()
         }
+    }
+
     override fun getDescriptionQuestionBatch(
         batchSize: Int,
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>> {
-        val offset = (0..500).random()
+        val offset = (0..300).random()
         val query = GamesQueryBuilder.popularGamesWithDescription(limit = 10, offset = offset)
         val body = igdbQueryBody(query)
 
         return handleResponse
             .safeApiCall { remote.fetchGamesByDescription(body) }
             .map { res ->
-                res.asResource { dtoList ->
-                    val questions = dtoList
-                        .map { it.toGameDescription() }
-                        .filter { game ->
-                            game.description.isNotBlank() &&
-                                    "description_${game.id}" !in seenIds
-                        }
-                        .shuffled()
-                        .take(batchSize)
-                        .map { game ->
-                            game.toDescriptionQuestion()
-                        }
+                when (res) {
+                    is Resource.Success -> {
+                        val questions = res.data
+                            .map { it.toGameDescription() }
+                            .filter { game ->
+                                game.description.isNotBlank() &&
+                                        "description_${game.id}" !in seenIds
+                            }
+                            .shuffled()
+                            .take(batchSize)
+                            .map { game ->
+                                game.toDescriptionQuestion()
+                            }
 
-                    if (questions.isEmpty()) {
-                        throw IllegalStateException("No description questions available (maybe all were seen or missing description).")
+                        if (questions.isEmpty()) {
+                            Resource.Error("No description questions available (maybe all were seen or missing description).")
+                        } else {
+                            Resource.Success(questions)
+                        }
                     }
-
-                    questions
+                    is Resource.Error -> Resource.Error(res.message)
+                    Resource.Loading -> Resource.Loading
                 }
             }
     }

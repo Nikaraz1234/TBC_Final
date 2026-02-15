@@ -47,6 +47,7 @@ fun DescriptionQuestionView(
     studioHint: String = "",
     genreHint: String = "",
     yearHint: String = "",
+    showInsufficientFunds: Boolean = false,
 ) {
     val colors = AppTheme.colors
 
@@ -78,6 +79,7 @@ fun DescriptionQuestionView(
 
                 Text(
                     text = textToShow,
+                    color = colors.textLight,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     modifier = Modifier
@@ -109,7 +111,7 @@ fun DescriptionQuestionView(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            if (!canBuyHint) {
+            if (showInsufficientFunds) {
                 Text(
                     text = stringResource(GameR.string.not_enough_coins),
                     color = colors.error,

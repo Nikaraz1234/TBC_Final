@@ -50,6 +50,9 @@ object Categories {
             name = "By Achievements",
             description = "Guess the game from its achievements",
             iconRes = R.drawable.ic_achievement,
+            isAvailable = true
+        ),
+        GameMode(
             id = GameModeIds.GAME_DESCRIPTION,
             name = "By Description",
             description = "Identify game from description",

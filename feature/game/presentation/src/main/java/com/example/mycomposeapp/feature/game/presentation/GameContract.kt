@@ -58,6 +58,7 @@ object GameContract {
             val studioHint: String = "",
             val genreHint: String = "",
             val yearHint: String = "",
+            val showInsufficientFundsWarning: Boolean = false,
         ) : ModeState {
             val canAffordHint: Boolean get() = coins >= hintCost && hintStep < 3
             val isHintUsed: Boolean get() = hintStep > 0
@@ -74,6 +75,7 @@ object GameContract {
             val livesRemaining: Int = 3,
             val currentScore: Int = 0,
             val bestSessionStreak: Int = 0,
+            val showInsufficientFundsWarning: Boolean = false,
         ) : ModeState
 
         data class Achievement(

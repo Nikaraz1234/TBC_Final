@@ -45,7 +45,7 @@ fun ScreenshotQuestionView(
     studioHint: String = "",
     genreHint: String = "",
     yearHint: String = "",
-
+    showInsufficientFunds: Boolean = false,
     ) {
     val colors = AppTheme.colors
 
@@ -96,7 +96,7 @@ fun ScreenshotQuestionView(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            if (!canBuyHint) {
+            if (showInsufficientFunds) {
                 Text(
                     text = stringResource(GameR.string.not_enough_coins),
                     color = colors.error,

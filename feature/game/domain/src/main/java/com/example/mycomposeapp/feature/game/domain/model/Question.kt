@@ -7,11 +7,6 @@ data class Question(
     val correctAnswer: String,
     val content: QuestionContent
 )
-    data class Question(
-        val id: String,
-        val correctAnswer: String,
-        val content: QuestionContent
-    )
 
 sealed interface QuestionContent {
     data class Cover(val imageUrl: String) : QuestionContent
@@ -21,7 +16,18 @@ sealed interface QuestionContent {
         val imageUrl: String = "",
         val hints: List<PlotHint> = emptyList()
     ) : QuestionContent
-    data class Screenshot(val imageUrl: String) : QuestionContent
+    data class Screenshot(
+        val imageUrl: String,
+        val studio: String? = null,
+        val genres: List<String> = emptyList(),
+        val releaseYear: Int? = null
+    ) : QuestionContent
+    data class Description(
+        val text: String,
+        val studio: String? = null,
+        val genres: List<String> = emptyList(),
+        val releaseYear: Int? = null
+    ) : QuestionContent
     data class Achievements(
         val achievements: List<Achievement>,
         val coverImageUrl: String = ""

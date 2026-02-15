@@ -27,6 +27,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.emoji.Emoji
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.games.achievement.AchievementGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.games.achievement.AchievementQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.games.description.DescriptionQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
@@ -86,6 +87,14 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+            is GameContract.ModeState.Description -> {
+                CoverGameTopBar(
+                    livesRemaining = mode.livesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
             else -> {}
         }
 
@@ -127,7 +136,33 @@ fun QuestionScreen(
                 )
             }
             is QuestionContent.Screenshot -> {
-                ScreenshotQuestionView(content = content)
+                val ssState = state.screenshotState ?: GameContract.ModeState.Screenshot()
+                ScreenshotQuestionView(
+                    content = content,
+                    coins = ssState.coins,
+                    hintStep = ssState.hintStep,
+                    hintCost = ssState.hintCost,
+                    studioHint = ssState.studioHint,
+                    genreHint = ssState.genreHint,
+                    yearHint = ssState.yearHint,
+                    showInsufficientFunds = ssState.showInsufficientFundsWarning,
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
+                )
+            }
+            is QuestionContent.Description -> {
+                val descState = state.descriptionState ?: GameContract.ModeState.Description()
+                DescriptionQuestionView(
+                    content = content,
+                    guessesRemaining = descState.guessesRemaining,
+                    coins = descState.coins,
+                    hintStep = descState.hintStep,
+                    hintCost = descState.hintCost,
+                    studioHint = descState.studioHint,
+                    genreHint = descState.genreHint,
+                    yearHint = descState.yearHint,
+                    showInsufficientFunds = descState.showInsufficientFundsWarning,
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
+                )
             }
             is QuestionContent.Achievements -> {
                 val achState = state.achievementState ?: GameContract.ModeState.Achievement()
@@ -170,6 +205,7 @@ fun QuestionScreen(
                     state.isPlotMode -> false
                     state.isAchievementMode -> false
                     state.screenshotState != null -> false
+                    state.descriptionState != null -> false
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },

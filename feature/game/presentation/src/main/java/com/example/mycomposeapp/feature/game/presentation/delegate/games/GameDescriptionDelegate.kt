@@ -99,7 +99,12 @@ class GameDescriptionDelegate(
         val q = state.currentQuestion?.content as? QuestionContent.Description ?: return
 
         if (mode.hintStep >= 3) return
-        if (mode.coins < mode.hintCost) return
+        if (mode.coins < mode.hintCost) {
+            scope.updateState {
+                copy(modeState = mode.copy(showInsufficientFundsWarning = true))
+            }
+            return
+        }
 
         val nextStep = mode.hintStep + 1
 
@@ -114,7 +119,8 @@ class GameDescriptionDelegate(
         }.copy(
             coins = mode.coins - mode.hintCost,
             hintCost = mode.hintCost * 2,
-            hintStep = nextStep
+            hintStep = nextStep,
+            showInsufficientFundsWarning = false
         )
 
         scope.updateState { copy(modeState = updated) }
@@ -231,7 +237,8 @@ class GameDescriptionDelegate(
                         hintCost = GameConstants.EMOJI_HINT_COST,
                         studioHint = "",
                         genreHint = "",
-                        yearHint = ""
+                        yearHint = "",
+                        showInsufficientFundsWarning = false
                     )
                 )
             }
@@ -266,7 +273,8 @@ class GameDescriptionDelegate(
                     hintCost = GameConstants.EMOJI_HINT_COST,
                     studioHint = "",
                     genreHint = "",
-                    yearHint = ""
+                    yearHint = "",
+                    showInsufficientFundsWarning = false
                 )
             )
         }
