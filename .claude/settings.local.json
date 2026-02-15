@@ -51,7 +51,8 @@
       "WebFetch(domain:steamwebapi.azurewebsites.net)",
       "WebFetch(domain:wiki.teamfortress.com)",
       "WebFetch(domain:nik-davis.github.io)",
-      "WebFetch(domain:store.steampowered.com)"
+      "WebFetch(domain:store.steampowered.com)",
+      "Bash(git show:*)"
     ]
   }
 }
