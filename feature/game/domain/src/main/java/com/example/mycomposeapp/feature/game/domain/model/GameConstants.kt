@@ -43,4 +43,12 @@ object GameConstants {
     const val ACHIEVEMENT_INITIAL_PAGE_LIMIT = 3
     const val ACHIEVEMENT_PAGE_EXPAND_STEP = 3
     const val ACHIEVEMENT_PAGE_SIZE = 20
+
+    // Guess the rating mode
+
+    const val MANGA_RATING_COINS_PER_CORRECT = 1
+
+    const val MANGA_RATING_BATCH_SIZE = 10
+
+    const val MANGA_RATING_PREFETCH_THRESHOLD = 2
 }

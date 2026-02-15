@@ -62,6 +62,16 @@ object Categories {
 
     )
 
+    private val comicsGameModes = listOf(
+        GameMode(
+            id = GameModeIds.MANGA_RATING,
+            name = "By Rating",
+            description = "Guess which manga is rated higher",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        )
+    )
+
     private val comingSoonGameModes = listOf(
         GameMode(
             id = "coming_soon",
@@ -89,7 +99,7 @@ object Categories {
             type = CategoryType.COMICS,
             name = "Comics",
             gradientColors = listOf(Color(0xFFFF9800), Color(0xFFFF5722)),
-            gameModes = comingSoonGameModes
+            gameModes = comicsGameModes
         ),
         Category(
             type = CategoryType.BOOKS,

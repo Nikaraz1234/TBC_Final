@@ -36,16 +36,21 @@ fun ResultsView(
     onExit: () -> Unit,
     isCoverMode: Boolean = false,
     isAchievementMode: Boolean = false,
+    isMangaRatingMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val result = gameResult ?: return
 
-    if (isCoverMode || isAchievementMode) {
+    if (isCoverMode || isAchievementMode || isMangaRatingMode) {
         CoverResultsContent(
             result = result,
             onPlayAgain = onPlayAgain,
             onExit = onExit,
-            guessedLabel = if (isAchievementMode) stringResource(GameR.string.games_guessed) else stringResource(GameR.string.movies_guessed),
+            guessedLabel = when {
+                isAchievementMode -> stringResource(GameR.string.games_guessed)
+                isMangaRatingMode -> "Correct Guesses"
+                else -> stringResource(GameR.string.movies_guessed)
+            },
             modifier = modifier
         )
     } else {

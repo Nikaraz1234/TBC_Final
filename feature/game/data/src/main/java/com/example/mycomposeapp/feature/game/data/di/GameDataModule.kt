@@ -5,10 +5,14 @@ import androidx.datastore.preferences.core.Preferences
 import com.example.mycomposeapp.core.data.common.HandleResponse
 import com.example.mycomposeapp.core.data.di.AuthModule
 import com.example.mycomposeapp.core.data.di.IgdbRetrofit
+import com.example.mycomposeapp.core.data.di.MalRetrofit
 import com.example.mycomposeapp.core.data.di.SteamRetrofit
 import com.example.mycomposeapp.core.data.di.SteamStoreRetrofit
 import com.example.mycomposeapp.core.data.di.TmdbRetrofit
+import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesService
+import com.example.mycomposeapp.feature.game.data.repository.comics.MangaRatingRepositoryImpl
+import com.example.mycomposeapp.feature.game.domain.repository.MangaRatingRepository
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
@@ -131,4 +135,16 @@ object GameDataModule {
     fun provideGameSearchRepository(
         repo: GameSearchRepositoryImpl
     ): SearchRepository = repo
+
+    @Provides
+    @Singleton
+    fun provideMalApiService(
+        @MalRetrofit retrofit: Retrofit
+    ): MalApiService = retrofit.create(MalApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMangaRatingRepository(
+        malApiService: MalApiService
+    ): MangaRatingRepository = MangaRatingRepositoryImpl(malApiService)
 }

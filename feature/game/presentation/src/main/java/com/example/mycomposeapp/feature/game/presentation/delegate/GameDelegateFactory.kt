@@ -15,10 +15,12 @@ import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUse
 import com.example.mycomposeapp.feature.game.presentation.delegate.common.EmojiGameDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchDescriptionBatchUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameAchievementDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.comics.MangaRatingDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameDescriptionDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameScreenshotDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieCoverDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
+import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
 import javax.inject.Inject
 
 class GameDelegateFactory @Inject constructor(
@@ -32,12 +34,14 @@ class GameDelegateFactory @Inject constructor(
     private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
     private val searchGamesUseCase: SearchGamesUseCase,
     private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase,
-    private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase
+    private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
+    private val fetchMangaPairsUseCase: FetchMangaPairsUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
             CategoryType.MOVIES.name -> createMoviesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.GAMES.name -> createGamesDelegate(gameModeId, categoryType, archiveDate)
+            CategoryType.COMICS.name -> createComicsDelegate(gameModeId, categoryType)
             else -> throw IllegalArgumentException("Unknown category: $categoryType")
         }
     }
@@ -111,6 +115,23 @@ class GameDelegateFactory @Inject constructor(
                 searchGamesUseCase = searchGamesUseCase
             )
 
+            else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
+        }
+    }
+
+    private fun createComicsDelegate(
+        gameModeId: String,
+        categoryType: String
+    ): GameModeDelegate {
+        return when (gameModeId) {
+            GameModeIds.MANGA_RATING -> MangaRatingDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                fetchMangaPairsUseCase = fetchMangaPairsUseCase,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase
+            )
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
     }

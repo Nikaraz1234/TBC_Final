@@ -2,6 +2,7 @@ package com.example.mycomposeapp.feature.game.presentation
 
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
+import com.example.mycomposeapp.feature.game.domain.model.MangaPair
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
@@ -42,8 +43,6 @@ object GameContract {
         ) : ModeState {
             val allHintsRevealed: Boolean
                 get() = revealedHintIndices.size >= GameConstants.PLOT_HINT_COUNT
-            val canAffordHint: Boolean
-                get() = coins >= GameConstants.PLOT_HINT_COST && !allHintsRevealed
         }
 
         data class Screenshot(
@@ -60,8 +59,6 @@ object GameContract {
             val yearHint: String = "",
             val showInsufficientFundsWarning: Boolean = false,
         ) : ModeState {
-            val canAffordHint: Boolean get() = coins >= hintCost && hintStep < 3
-            val isHintUsed: Boolean get() = hintStep > 0
         }
         data class Description(
             val guessesRemaining: Int = 3,
@@ -95,6 +92,16 @@ object GameContract {
                 get() = (visibleAchievementCount + GameConstants.ACHIEVEMENT_REVEAL_STEP)
                     .coerceAtMost(GameConstants.ACHIEVEMENT_MAX_VISIBLE)
         }
+
+        data class MangaRating(
+            val currentStreak: Int = 0,
+            val coins: Int = 0,
+            val currentPair: MangaPair? = null,
+            val isFetchingMore: Boolean = false,
+            val bestSessionStreak: Int = 0,
+            val isAnswerCorrect: Boolean = false,
+            val selectedId: Long? = null
+        ) : ModeState
 
         data object None : ModeState
     }
@@ -137,6 +144,8 @@ object GameContract {
             get() = modeState as? ModeState.Achievement
         val descriptionState: ModeState.Description? get() = modeState as? ModeState.Description
 
+        val isMangaRatingMode: Boolean get() = modeState is ModeState.MangaRating
+        val mangaRatingState: ModeState.MangaRating? get() = modeState as? ModeState.MangaRating
     }
 
     enum class GamePhase { Loading, Playing, AnswerRevealed, Results }
@@ -148,6 +157,7 @@ object GameContract {
         data object OnNextQuestion : Event
         data object OnRetryGame : Event
         data object OnExitGame : Event
+        data class OnMangaSelected(val selectedId: Long) : Event
         data object OnRevealMore : Event
         data object OnUseHint : Event
     }
