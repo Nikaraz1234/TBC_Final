@@ -10,9 +10,11 @@ import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCa
 import com.example.mycomposeapp.feature.game.domain.usecase.GetDailyPuzzleUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.GetQuestionsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchDescriptionBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.common.EmojiGameDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameDescriptionDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameScreenshotDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieCoverDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
@@ -28,7 +30,8 @@ class GameDelegateFactory @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
-    private val searchGamesUseCase: SearchGamesUseCase
+    private val searchGamesUseCase: SearchGamesUseCase,
+    private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
@@ -88,6 +91,16 @@ class GameDelegateFactory @Inject constructor(
                 fetchScreenshotBatchUseCase = fetchScreenshotBatchUseCase,
                 searchGamesUseCase = searchGamesUseCase
             )
+            GameModeIds.GAME_DESCRIPTION -> GameDescriptionDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                fetchDescriptionBatchUseCase = fetchDescriptionBatchUseCase,
+                searchGamesUseCase = searchGamesUseCase
+            )
+
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
     }

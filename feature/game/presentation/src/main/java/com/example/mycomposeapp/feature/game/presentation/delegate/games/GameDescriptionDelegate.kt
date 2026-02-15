@@ -9,7 +9,7 @@ import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
-import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchDescriptionBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
@@ -18,24 +18,25 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class GameScreenshotDelegate(
+class GameDescriptionDelegate(
     private val categoryType: String,
     private val gameModeId: String,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
-    private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
+    private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
     private val searchGamesUseCase: SearchGamesUseCase
 ) : GameModeDelegate {
+
     private lateinit var scope: DelegateScope
     private val answerResults = mutableListOf<AnswerResult>()
 
     private val seenIds = mutableSetOf<String>()
     private val questionQueue =
         mutableListOf<com.example.mycomposeapp.feature.game.domain.model.Question>()
+
     private var prefetchJob: Job? = null
     private var searchJob: Job? = null
-
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -46,7 +47,7 @@ class GameScreenshotDelegate(
             scope.updateState {
                 copy(
                     phase = GameContract.GamePhase.Loading,
-                    modeState = GameContract.ModeState.Screenshot()
+                    modeState = GameContract.ModeState.Description()
                 )
             }
 
@@ -57,26 +58,22 @@ class GameScreenshotDelegate(
                 copy(
                     currentStreak = 0,
                     correctAnswersCount = 0,
-                    modeState = GameContract.ModeState.Screenshot(
+                    modeState = GameContract.ModeState.Description(
                         coins = initialCoins,
                         isFetchingMore = false
                     )
                 )
             }
 
-            fetchScreenshotBatchAndStart()
+            fetchDescriptionBatchAndStart()
         }
     }
 
     override fun onNextQuestion() {
-        val screenshot = scope.currentState().screenshotState ?: return
-        if (screenshot.livesRemaining <= 0) {
-            finishScreenshotGame()
-        } else {
-            presentNextScreenshotQuestion()
-        }
+        val description = scope.currentState().descriptionState ?: return
+        if (description.livesRemaining <= 0) finishDescriptionGame()
+        else presentNextDescriptionQuestion()
     }
-
 
     override fun onRetryGame() {
         answerResults.clear()
@@ -88,38 +85,35 @@ class GameScreenshotDelegate(
 
     override fun onExitGame() {
         scope.coroutineScope.launch {
-            val screenshot = scope.currentState().screenshotState
+            val description = scope.currentState().descriptionState
             try {
-                if (screenshot != null) updateCoinsUseCase(screenshot.coins)
-            } catch (_: Exception) {
-            }
+                if (description != null) updateCoinsUseCase(description.coins)
+            } catch (_: Exception) {}
             scope.emitSideEffect(GameContract.SideEffect.NavigateBack)
         }
     }
+
     override fun onUseHint() {
         val state = scope.currentState()
-        val screenshot = state.screenshotState ?: return
-        val q = state.currentQuestion?.content as? QuestionContent.Screenshot ?: return
+        val mode = state.descriptionState ?: return
+        val q = state.currentQuestion?.content as? QuestionContent.Description ?: return
 
-        if (screenshot.hintStep >= 3) return
-        if (screenshot.coins < screenshot.hintCost) return
+        if (mode.hintStep >= 3) return
+        if (mode.coins < mode.hintCost) return
 
-        val nextStep = screenshot.hintStep + 1
+        val nextStep = mode.hintStep + 1
 
         val updated = when (nextStep) {
-            1 -> screenshot.copy(
-                studioHint = q.studio ?: "Unknown studio"
+            1 -> mode.copy(studioHint = q.studio ?: "Unknown studio")
+            2 -> mode.copy(
+                genreHint = q.genres.takeIf { it.isNotEmpty() }?.joinToString(", ")
+                    ?: "Unknown genre"
             )
-            2 -> screenshot.copy(
-                genreHint = q.genres.takeIf { it.isNotEmpty() }?.joinToString(", ") ?: "Unknown genre"
-            )
-            3 -> screenshot.copy(
-                yearHint = q.releaseYear?.toString() ?: "Unknown year"
-            )
-            else -> screenshot
+            3 -> mode.copy(yearHint = q.releaseYear?.toString() ?: "Unknown year")
+            else -> mode
         }.copy(
-            coins = screenshot.coins - screenshot.hintCost,
-            hintCost = screenshot.hintCost * 2,
+            coins = mode.coins - mode.hintCost,
+            hintCost = mode.hintCost * 2,
             hintStep = nextStep
         )
 
@@ -130,15 +124,15 @@ class GameScreenshotDelegate(
         }
     }
 
-
-
-
     override fun getAnswerResults(): List<AnswerResult> = answerResults.toList()
 
     override fun onCleared() {
         prefetchJob?.cancel()
         searchJob?.cancel()
+    }
 
+    fun onAnswerChanged(text: String) {
+        handleAnswerChanged(text)
     }
 
     private fun handleAnswerChanged(text: String) {
@@ -155,16 +149,13 @@ class GameScreenshotDelegate(
 
         searchJob?.cancel()
         searchJob = scope.coroutineScope.launch {
-            kotlinx.coroutines.delay(300)
 
             searchGamesUseCase(query).collect { res ->
                 when (res) {
-                    is Resource.Loading -> {
-                        scope.updateState { copy(isSearching = true) }
-                    }
+                    is Resource.Loading -> scope.updateState { copy(isSearching = true) }
 
-                    is Resource.Error -> {
-                        scope.updateState { copy(isSearching = false, searchResults = emptyList()) }
+                    is Resource.Error -> scope.updateState {
+                        copy(isSearching = false, searchResults = emptyList())
                     }
 
                     is Resource.Success -> {
@@ -172,7 +163,7 @@ class GameScreenshotDelegate(
                             SearchResult(
                                 title = gs.name,
                                 id = gs.id.toString(),
-                                subtitle =  "",
+                                subtitle = "",
                                 imageUrl = gs.screenshotUrls.firstOrNull()
                             )
                         }
@@ -188,39 +179,8 @@ class GameScreenshotDelegate(
         }
     }
 
-    private fun finishScreenshotGame() {
-        val state = scope.currentState()
-        val screenshot = state.screenshotState ?: return
-
-        val result = GameResult(
-            totalQuestions = answerResults.size,
-            correctAnswers = state.correctAnswersCount,
-            totalScore = screenshot.currentScore,
-            timeTakenSeconds = state.totalTimeSpentSeconds,
-            bestStreak = screenshot.bestSessionStreak,
-            answers = answerResults.toList(),
-            isNewHighScore = false,
-            coinsEarned = screenshot.coins,
-            finalCoinBalance = screenshot.coins
-        )
-
-        scope.updateState {
-            copy(
-                phase = GameContract.GamePhase.Results,
-                gameResult = result
-            )
-        }
-
-        scope.coroutineScope.launch {
-            try {
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-            } catch (_: Exception) {}
-        }
-    }
-
-
-    private suspend fun fetchScreenshotBatchAndStart() {
-        fetchScreenshotBatchUseCase(
+    private suspend fun fetchDescriptionBatchAndStart() {
+        fetchDescriptionBatchUseCase(
             batchSize = 10,
             seenIds = seenIds
         ).collect { resource ->
@@ -230,11 +190,11 @@ class GameScreenshotDelegate(
 
                     if (fresh.isEmpty()) {
                         scope.updateState {
-                            val screenshot = screenshotState ?: GameContract.ModeState.Screenshot()
+                            val mode = descriptionState ?: GameContract.ModeState.Description()
                             copy(
                                 phase = GameContract.GamePhase.Loading,
-                                errorMessage = "No more screenshot questions available.",
-                                modeState = screenshot.copy(isFetchingMore = false)
+                                errorMessage = "No more description questions available.",
+                                modeState = mode.copy(isFetchingMore = false)
                             )
                         }
                         return@collect
@@ -243,9 +203,8 @@ class GameScreenshotDelegate(
                     fresh.forEach { q -> seenIds.add(q.id) }
                     questionQueue.addAll(fresh)
 
-                    presentNextScreenshotQuestion()
+                    presentNextDescriptionQuestion()
                 }
-
 
                 is Resource.Error -> {
                     scope.updateState {
@@ -256,19 +215,17 @@ class GameScreenshotDelegate(
                     }
                 }
 
-                is Resource.Loading -> {
-                    scope.updateState { copy(phase = GameContract.GamePhase.Loading) }
-                }
+                is Resource.Loading -> scope.updateState { copy(phase = GameContract.GamePhase.Loading) }
             }
         }
     }
 
-    private fun presentNextScreenshotQuestion() {
+    private fun presentNextDescriptionQuestion() {
         if (questionQueue.isEmpty()) {
             scope.updateState {
-                val screenshot = screenshotState ?: GameContract.ModeState.Screenshot()
+                val mode = descriptionState ?: GameContract.ModeState.Description()
                 copy(
-                    modeState = screenshot.copy(
+                    modeState = mode.copy(
                         isFetchingMore = true,
                         hintStep = 0,
                         hintCost = GameConstants.EMOJI_HINT_COST,
@@ -278,15 +235,17 @@ class GameScreenshotDelegate(
                     )
                 )
             }
-            scope.coroutineScope.launch { fetchScreenshotBatchAndStart() }
+            scope.coroutineScope.launch { fetchDescriptionBatchAndStart() }
             return
         }
 
         val current = questionQueue.removeAt(0)
+
+        // 👇 buffer the next question so questions.size >= 2 (so isLastQuestion becomes false)
         val bufferedNext = questionQueue.firstOrNull()
 
         scope.updateState {
-            val screenshot = screenshotState ?: GameContract.ModeState.Screenshot()
+            val mode = descriptionState ?: GameContract.ModeState.Description()
 
             val listForUi = buildList {
                 add(current)
@@ -295,14 +254,13 @@ class GameScreenshotDelegate(
 
             copy(
                 questions = listForUi,
-                currentQuestionIndex = 0,
+                currentQuestionIndex = 0, // always pointing at `current`
                 phase = GameContract.GamePhase.Playing,
                 userAnswer = "",
                 isAnswerRevealed = false,
                 isAnswerCorrect = false,
                 errorMessage = null,
-
-                modeState = screenshot.copy(
+                modeState = mode.copy(
                     isFetchingMore = false,
                     hintStep = 0,
                     hintCost = GameConstants.EMOJI_HINT_COST,
@@ -316,10 +274,11 @@ class GameScreenshotDelegate(
         prefetchIfNeeded()
     }
 
+
     private fun prefetchIfNeeded() {
         if (questionQueue.size <= 2 && prefetchJob?.isActive != true) {
             prefetchJob = scope.coroutineScope.launch {
-                fetchScreenshotBatchUseCase(
+                fetchDescriptionBatchUseCase(
                     batchSize = 10,
                     seenIds = seenIds
                 ).collect { resource ->
@@ -336,20 +295,20 @@ class GameScreenshotDelegate(
     override fun onAnswerSubmitted(answer: String) {
         val state = scope.currentState()
         val currentQuestion = state.currentQuestion ?: return
-        val screenshot = state.screenshotState ?: return
+        val mode = state.descriptionState ?: return
 
         val isCorrect = answer.trim()
             .equals(currentQuestion.correctAnswer.trim(), ignoreCase = true)
 
         if (isCorrect) {
             val newStreak = state.currentStreak + 1
-            val newBestStreak = maxOf(screenshot.bestSessionStreak, newStreak)
+            val newBestStreak = maxOf(mode.bestSessionStreak, newStreak)
 
             val scoreGain =
                 GameConstants.BASE_POINTS + GameConstants.STREAK_BONUS_MULTIPLIER * newStreak
-            val newScore = screenshot.currentScore + scoreGain
+            val newScore = mode.currentScore + scoreGain
 
-            val newCoins = screenshot.coins + GameConstants.COVER_COINS_PER_CORRECT
+            val newCoins = mode.coins + GameConstants.COVER_COINS_PER_CORRECT
             val newCorrect = state.correctAnswersCount + 1
 
             answerResults.add(
@@ -363,6 +322,7 @@ class GameScreenshotDelegate(
             )
 
             scope.updateState {
+                val currentMode = descriptionState ?: mode
                 copy(
                     phase = GameContract.GamePhase.AnswerRevealed,
                     isAnswerRevealed = true,
@@ -371,7 +331,7 @@ class GameScreenshotDelegate(
                     correctAnswersCount = newCorrect,
                     userAnswer = answer,
                     searchResults = emptyList(),
-                    modeState = screenshot.copy(
+                    modeState = mode.copy(
                         bestSessionStreak = newBestStreak,
                         currentScore = newScore,
                         coins = newCoins
@@ -384,7 +344,7 @@ class GameScreenshotDelegate(
             }
 
         } else {
-            val newLives = (screenshot.livesRemaining - 1).coerceAtLeast(0)
+            val newLives = (mode.livesRemaining - 1).coerceAtLeast(0)
 
             if (newLives > 0) {
                 scope.updateState {
@@ -395,7 +355,7 @@ class GameScreenshotDelegate(
                         currentStreak = 0,
                         userAnswer = "",
                         searchResults = emptyList(),
-                        modeState = screenshot.copy(livesRemaining = newLives)
+                        modeState = mode.copy(livesRemaining = newLives)
                     )
                 }
 
@@ -423,12 +383,42 @@ class GameScreenshotDelegate(
                     currentStreak = 0,
                     userAnswer = answer,
                     searchResults = emptyList(),
+                    modeState = mode.copy(livesRemaining = 0),
                     questions = listOf(currentQuestion),
                     currentQuestionIndex = 0,
-                    modeState = screenshot.copy(livesRemaining = 0)
+
                 )
             }
         }
     }
 
+    private fun finishDescriptionGame() {
+        val state = scope.currentState()
+        val mode = state.descriptionState ?: return
+
+        val result = GameResult(
+            totalQuestions = answerResults.size,
+            correctAnswers = state.correctAnswersCount,
+            totalScore = mode.currentScore,
+            timeTakenSeconds = state.totalTimeSpentSeconds,
+            bestStreak = mode.bestSessionStreak,
+            answers = answerResults.toList(),
+            isNewHighScore = false,
+            coinsEarned = mode.coins,
+            finalCoinBalance = mode.coins
+        )
+
+        scope.updateState {
+            copy(
+                phase = GameContract.GamePhase.Results,
+                gameResult = result
+            )
+        }
+
+        scope.coroutineScope.launch {
+            try {
+                updateGameStatsUseCase(result, gameModeId, categoryType, false)
+            } catch (_: Exception) {}
+        }
+    }
 }

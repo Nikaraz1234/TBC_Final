@@ -17,4 +17,5 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 }

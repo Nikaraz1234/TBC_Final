@@ -44,7 +44,15 @@ object Categories {
             description = "Identify game from screenshot",
             iconRes = R.drawable.ic_cover,
             isAvailable = true
+        ),
+        GameMode(
+            id = GameModeIds.GAME_DESCRIPTION,
+            name = "By Description",
+            description = "Identify game from description",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
         )
+
     )
 
     private val comingSoonGameModes = listOf(

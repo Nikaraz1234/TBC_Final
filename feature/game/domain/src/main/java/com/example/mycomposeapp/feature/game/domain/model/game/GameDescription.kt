@@ -1,9 +1,9 @@
 package com.example.mycomposeapp.feature.game.domain.model.game
 
-data class GameScreenshot(
+data class GameDescription(
     val id: Long,
     val name: String,
-    val screenshotUrls: List<String>,
+    val description: String,
     val studio: String?,
     val genres: List<String>,
     val releaseYear: Int?

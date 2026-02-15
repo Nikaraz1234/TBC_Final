@@ -1,24 +1,28 @@
-package com.example.mycomposeapp.feature.game.presentation.components.games.screenshot
+package com.example.mycomposeapp.feature.game.presentation.components.games.description
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
@@ -26,33 +30,25 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
-import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.components.common.HintRow
 import com.example.mycomposeapp.feature.game.presentation.components.common.HintsCard
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
+import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 
 @Composable
-fun ScreenshotQuestionView(
+fun DescriptionQuestionView(
     modifier: Modifier = Modifier,
-    content: QuestionContent.Screenshot,
+    content: QuestionContent.Description,
     guessesRemaining: Int = 3,
-    isHintUsed: Boolean = false,
     coins: Int = 0,
-    canAffordHint: Boolean = false,
     hintStep: Int = 0,
     hintCost: Int = GameConstants.EMOJI_HINT_COST,
     onUseHint: () -> Unit = {},
     studioHint: String = "",
     genreHint: String = "",
     yearHint: String = "",
-
-    ) {
+) {
     val colors = AppTheme.colors
-
-    val hasRevealedHint =
-        studioHint.isNotBlank() ||
-                genreHint.isNotBlank() ||
-                yearHint.isNotBlank()
 
     val canShowHintButton = hintStep < 3
     val canBuyHint = coins >= hintCost
@@ -64,18 +60,36 @@ fun ScreenshotQuestionView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AsyncImage(
-            model = content.imageUrl,
-            contentDescription = "Screen",
+        GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop
-        )
+                .wrapContentHeight()
+                .padding(horizontal = spacing.spacing16, vertical = spacing.spacing16)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(spacing.spacing16),
+                verticalArrangement = Arrangement.Center
+            ) {
 
-        Spacer(modifier = Modifier.height(spacing.spacing16))
+                val textToShow = content.text.takeIf { it.isNotBlank() }
+                    ?: ""
+
+                Text(
+                    text = textToShow,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 120.dp, max = 240.dp)
+                        .verticalScroll(rememberScrollState())
+                        .clip(RoundedCornerShape(16.dp)),
+                    overflow = TextOverflow.Clip
+                )
+            }
+        }
+
         HintsCard(
             rows = buildList {
                 if (hintStep >= 1) add(HintRow("Studio", studioHint))
@@ -83,7 +97,6 @@ fun ScreenshotQuestionView(
                 if (hintStep >= 3) add(HintRow("Release Year", yearHint))
             }
         )
-
 
         if (canShowHintButton) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -106,20 +119,22 @@ fun ScreenshotQuestionView(
             }
         }
     }
-
 }
+
 @Preview(showBackground = true)
 @Composable
-private fun ScreenshotQuestionViewPreview() {
+private fun DescriptionQuestionViewPreview() {
     MyComposeAppTheme {
-        ScreenshotQuestionView(
-            content = QuestionContent.Screenshot(
-                imageUrl = "https://images.igdb.com/igdb/image/upload/t_1080p/co1r7f.jpg",
+        DescriptionQuestionView(
+            content = QuestionContent.Description(
+                text = "A lone hero travels across a cursed land to recover the ancient artifact before it falls into the wrong hands...",
+                studio = null,
+                genres = emptyList(),
+                releaseYear = null
             ),
-            guessesRemaining = 2,
-            isHintUsed = false,
             coins = 5,
-            canAffordHint = true,
+            hintStep = 0,
+            hintCost = 2,
             onUseHint = {}
         )
     }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -18,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.feature.game.presentation.GameContract
@@ -26,6 +24,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.cover.Cover
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.games.description.DescriptionQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.GameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
@@ -62,6 +61,14 @@ fun QuestionScreen(
                 )
             }
             is GameContract.ModeState.Screenshot -> {
+                BasicGameTopBar(
+                    livesRemaining = mode.livesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
+            is GameContract.ModeState.Description -> {
                 BasicGameTopBar(
                     livesRemaining = mode.livesRemaining,
                     coins = mode.coins,
@@ -110,12 +117,34 @@ fun QuestionScreen(
             }
             is QuestionContent.Plot -> PlotQuestionView(content = content)
             is QuestionContent.Screenshot -> {
-                val screenshot = state.screenshotState
+                val screenshot = state.screenshotState!!
                 ScreenshotQuestionView(
-                    content = content,
-                    guessesRemaining = screenshot?.guessesRemaining ?: 0,
-                    coins = screenshot?.coins ?: 0,
+                    content = state.currentQuestion!!.content as QuestionContent.Screenshot,
+                    coins = screenshot.coins,
+                    hintCost = screenshot.hintCost,
+                    hintStep = screenshot.hintStep,
+                    studioHint = screenshot.studioHint,
+                    genreHint = screenshot.genreHint,
+                    yearHint = screenshot.yearHint,
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
+            }
+
+            is QuestionContent.Description -> {
+                val d = state.descriptionState
+                if (d != null) {
+                    DescriptionQuestionView(
+                        content = content,
+                        guessesRemaining = d.livesRemaining,
+                        coins = d.coins,
+                        hintStep = d.hintStep,
+                        hintCost = d.hintCost,
+                        onUseHint = { onEvent(GameContract.Event.OnUseHint) },
+                        studioHint = d.studioHint,
+                        genreHint = d.genreHint,
+                        yearHint = d.yearHint
+                    )
+                }
             }
 
         }
