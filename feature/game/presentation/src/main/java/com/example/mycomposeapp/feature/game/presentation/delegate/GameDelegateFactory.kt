@@ -41,7 +41,7 @@ class GameDelegateFactory @Inject constructor(
         return when (categoryType) {
             CategoryType.MOVIES.name -> createMoviesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.GAMES.name -> createGamesDelegate(gameModeId, categoryType, archiveDate)
-            CategoryType.COMICS.name -> createComicsDelegate(gameModeId, categoryType)
+            CategoryType.COMICS.name -> createComicsDelegate(gameModeId, categoryType, archiveDate)
             else -> throw IllegalArgumentException("Unknown category: $categoryType")
         }
     }
@@ -121,7 +121,8 @@ class GameDelegateFactory @Inject constructor(
 
     private fun createComicsDelegate(
         gameModeId: String,
-        categoryType: String
+        categoryType: String,
+        archiveDate: String?
     ): GameModeDelegate {
         return when (gameModeId) {
             GameModeIds.MANGA_RATING -> MangaRatingDelegate(
@@ -132,6 +133,18 @@ class GameDelegateFactory @Inject constructor(
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase
             )
+            GameModeIds.EMOJI -> EmojiGameDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                archiveDate = archiveDate,
+                getDailyPuzzleUseCase = getDailyPuzzleUseCase,
+                dailyPuzzleRepository = dailyPuzzleRepositories[categoryType]
+                    ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType"),
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase
+            )
+
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
     }

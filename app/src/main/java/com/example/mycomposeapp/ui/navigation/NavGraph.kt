@@ -101,14 +101,16 @@ fun NavGraph() {
 
         archiveNavGraph(
             onNavigateBack = { navController.popBackStack() },
-            onNavigateToEmojiArchive = {
-                navController.navigate(EmojiArchiveRoute)
+
+            onNavigateToEmojiArchive = { categoryType ->
+                navController.navigate(EmojiArchiveRoute(categoryType = categoryType))
             },
-            onNavigateToEmojiGame = { archiveDate ->
+
+            onNavigateToEmojiGame = { categoryType, archiveDate ->
                 navController.navigate(
                     GameRoute(
                         gameModeId = GameModeIds.EMOJI,
-                        categoryType = CategoryType.MOVIES.name,
+                        categoryType = categoryType,
                         archiveDate = archiveDate
                     )
                 )

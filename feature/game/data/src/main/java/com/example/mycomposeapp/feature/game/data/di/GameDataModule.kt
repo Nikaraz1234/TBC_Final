@@ -9,6 +9,7 @@ import com.example.mycomposeapp.core.data.di.MalRetrofit
 import com.example.mycomposeapp.core.data.di.SteamRetrofit
 import com.example.mycomposeapp.core.data.di.SteamStoreRetrofit
 import com.example.mycomposeapp.core.data.di.TmdbRetrofit
+import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesService
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaRatingRepositoryImpl
@@ -16,6 +17,8 @@ import com.example.mycomposeapp.feature.game.domain.repository.MangaRatingReposi
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
+import com.example.mycomposeapp.feature.game.data.repository.comics.MangaEmojiRepositoryImpl
+import com.example.mycomposeapp.feature.game.data.repository.comics.MangaSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.games.GameSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.games.GamesRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieCoverGameRepositoryImpl
@@ -25,6 +28,7 @@ import com.example.mycomposeapp.feature.game.data.repository.movies.MovieQuestio
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.domain.repository.CoverGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
+import com.example.mycomposeapp.feature.game.domain.repository.MangaEmojiRepository
 import com.example.mycomposeapp.feature.game.domain.repository.PlotGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.QuestionRepository
 import com.example.mycomposeapp.feature.game.domain.repository.SearchRepository
@@ -147,4 +151,18 @@ object GameDataModule {
     fun provideMangaRatingRepository(
         malApiService: MalApiService
     ): MangaRatingRepository = MangaRatingRepositoryImpl(malApiService)
+
+    @Provides
+    @IntoMap
+    @StringKey("COMICS")
+    fun provideComicsDailyPuzzleRepository(
+        repo: MangaEmojiRepositoryImpl
+    ): DailyPuzzleRepository = repo
+
+    @Provides
+    @IntoMap
+    @StringKey("COMICS")
+    fun provideMangaSearchRepository(
+        repo: MangaSearchRepositoryImpl
+    ): SearchRepository = repo
 }

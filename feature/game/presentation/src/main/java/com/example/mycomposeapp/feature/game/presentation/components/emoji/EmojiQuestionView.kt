@@ -30,6 +30,7 @@ fun EmojiQuestionView(
     guessesRemaining: Int = 3,
     isHintUsed: Boolean = false,
     hintText: String = "",
+    hintLabel: String = "",
     coins: Int = 0,
     canAffordHint: Boolean = false,
     isFromArchive: Boolean = false,
@@ -105,7 +106,7 @@ fun EmojiQuestionView(
                 if (isHintUsed && hintText.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(GameR.string.lead_actor_label),
+                        text = hintLabel,
                         color = colors.textMuted,
                         fontSize = 12.sp
                     )

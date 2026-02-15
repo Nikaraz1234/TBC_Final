@@ -27,7 +27,8 @@ object GameContract {
             val isHintUsed: Boolean = false,
             val hintText: String = "",
             val coins: Int = 0,
-            val isFromArchive: Boolean = false
+            val isFromArchive: Boolean = false,
+            val hintLabel: String = ""
         ) : ModeState {
             val canAffordHint: Boolean get() = coins >= GameConstants.EMOJI_HINT_COST && !isHintUsed
         }

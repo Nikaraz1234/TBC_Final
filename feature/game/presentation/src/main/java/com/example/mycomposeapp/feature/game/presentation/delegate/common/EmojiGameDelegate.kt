@@ -1,6 +1,7 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.common
 
 import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -71,7 +72,9 @@ class EmojiGameDelegate(
                                     hintText = emojiContent?.hintText ?: "",
                                     isHintUsed = false,
                                     coins = userCoins,
-                                    isFromArchive = this@EmojiGameDelegate.isFromArchive
+                                    isFromArchive = this@EmojiGameDelegate.isFromArchive,
+                                    hintLabel = if (categoryType == CategoryType.COMICS.name) "Main Character" else "Lead Actor"
+
                                 )
                             )
                         }
