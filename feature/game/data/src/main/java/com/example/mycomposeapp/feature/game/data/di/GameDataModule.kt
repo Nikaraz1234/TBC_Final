@@ -124,6 +124,7 @@ object GameDataModule {
             steamStoreService = steamStoreService
         )
     }
+
     @Provides
     @IntoMap
     @StringKey("GAMES")

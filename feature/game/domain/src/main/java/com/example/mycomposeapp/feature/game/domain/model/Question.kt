@@ -7,6 +7,11 @@ data class Question(
     val correctAnswer: String,
     val content: QuestionContent
 )
+    data class Question(
+        val id: String,
+        val correctAnswer: String,
+        val content: QuestionContent
+    )
 
 sealed interface QuestionContent {
     data class Cover(val imageUrl: String) : QuestionContent

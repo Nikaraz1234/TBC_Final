@@ -7,6 +7,8 @@ import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.feature.game.data.mapper.games.mergePercentages
 import com.example.mycomposeapp.feature.game.data.mapper.games.steamCoverUrl
 import com.example.mycomposeapp.feature.game.data.mapper.games.toAchievement
+import com.example.mycomposeapp.feature.game.data.mapper.games.toDescriptionQuestion
+import com.example.mycomposeapp.feature.game.data.mapper.games.toGameDescription
 import com.example.mycomposeapp.feature.game.data.mapper.games.toGameScreenshot
 import com.example.mycomposeapp.feature.game.data.remote.games.helper.igdbQueryBody
 import com.example.mycomposeapp.feature.game.data.remote.games.query.GamesQueryBuilder
@@ -90,7 +92,7 @@ class GamesRepositoryImpl @Inject constructor(
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>> {
         val offset = (0..500).random()
-        val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
+        val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 10, offset = offset)
         val body = igdbQueryBody(query)
 
         return handleResponse
@@ -110,7 +112,10 @@ class GamesRepositoryImpl @Inject constructor(
                                 id = "screenshot_${game.id}",
                                 correctAnswer = game.name,
                                 content = QuestionContent.Screenshot(
-                                    imageUrl = game.screenshotUrls.random()
+                                    imageUrl = game.screenshotUrls.random(),
+                                    studio = game.studio,
+                                    genres = game.genres,
+                                    releaseYear = game.releaseYear
                                 )
                             )
                         }
@@ -198,5 +203,36 @@ class GamesRepositoryImpl @Inject constructor(
 
             questions.toList()
         }
+    override fun getDescriptionQuestionBatch(
+        batchSize: Int,
+        seenIds: Set<String>
+    ): Flow<Resource<List<Question>>> {
+        val offset = (0..500).random()
+        val query = GamesQueryBuilder.popularGamesWithDescription(limit = 10, offset = offset)
+        val body = igdbQueryBody(query)
+
+        return handleResponse
+            .safeApiCall { remote.fetchGamesByDescription(body) }
+            .map { res ->
+                res.asResource { dtoList ->
+                    val questions = dtoList
+                        .map { it.toGameDescription() }
+                        .filter { game ->
+                            game.description.isNotBlank() &&
+                                    "description_${game.id}" !in seenIds
+                        }
+                        .shuffled()
+                        .take(batchSize)
+                        .map { game ->
+                            game.toDescriptionQuestion()
+                        }
+
+                    if (questions.isEmpty()) {
+                        throw IllegalStateException("No description questions available (maybe all were seen or missing description).")
+                    }
+
+                    questions
+                }
+            }
     }
 }

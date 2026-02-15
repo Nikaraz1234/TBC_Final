@@ -52,7 +52,28 @@ object GameContract {
             val currentScore: Int = 0,
             val livesRemaining: Int = 3,
             val bestSessionStreak: Int = 0,
-            val isFetchingMore: Boolean = false
+            val isFetchingMore: Boolean = false,
+            val hintStep: Int = 0,
+            val hintCost: Int = GameConstants.EMOJI_HINT_COST,
+            val studioHint: String = "",
+            val genreHint: String = "",
+            val yearHint: String = "",
+        ) : ModeState {
+            val canAffordHint: Boolean get() = coins >= hintCost && hintStep < 3
+            val isHintUsed: Boolean get() = hintStep > 0
+        }
+        data class Description(
+            val guessesRemaining: Int = 3,
+            val coins: Int = 0,
+            val hintStep: Int = 0,
+            val hintCost: Int = GameConstants.EMOJI_HINT_COST,
+            val studioHint: String = "",
+            val genreHint: String = "",
+            val yearHint: String = "",
+            val isFetchingMore: Boolean = false,
+            val livesRemaining: Int = 3,
+            val currentScore: Int = 0,
+            val bestSessionStreak: Int = 0,
         ) : ModeState
 
         data class Achievement(
@@ -112,6 +133,8 @@ object GameContract {
         val isAchievementMode: Boolean get() = modeState is ModeState.Achievement
         val achievementState: ModeState.Achievement?
             get() = modeState as? ModeState.Achievement
+        val descriptionState: ModeState.Description? get() = modeState as? ModeState.Description
+
     }
 
     enum class GamePhase { Loading, Playing, AnswerRevealed, Results }

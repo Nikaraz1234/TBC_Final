@@ -11,14 +11,47 @@ object GamesQueryBuilder {
         limit: Int = 50,
         offset: Int = 0
     ): String = """
-    fields name, screenshots.image_id, rating_count, total_rating_count, first_release_date;
-    where screenshots != null
-      & total_rating_count != null
-      & total_rating_count > 100
+        fields 
+            name,
+            screenshots.image_id,
+            rating_count,
+            total_rating_count,
+            first_release_date,
+            genres.name,
+            involved_companies.company.name,
+            involved_companies.developer;
+        where screenshots != null
+          & total_rating_count != null
+          & total_rating_count > 500
+          & first_release_date != null
+          & first_release_date < ${System.currentTimeMillis() / 1000};
+        sort total_rating_count desc;
+        limit $limit;
+        offset $offset;
+    """
+
+    fun popularGamesWithDescription(
+        limit: Int = 50,
+        offset: Int = 0
+    ): String = """
+    fields
+        id,
+        name,
+        summary,
+        storyline,
+        total_rating_count,
+        first_release_date,
+        genres.name,
+        involved_companies.company.name,
+        involved_companies.developer;
+    where ((summary != null & summary != "") | (storyline != null & storyline != ""))
       & first_release_date != null
-      & first_release_date < ${System.currentTimeMillis() / 1000};
+      & first_release_date < ${System.currentTimeMillis() / 1000}
+      & total_rating_count != null
+      & total_rating_count > 500;
     sort total_rating_count desc;
     limit $limit;
     offset $offset;
-"""
+""".trimIndent()
+
 }

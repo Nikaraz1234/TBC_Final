@@ -20,4 +20,9 @@ interface GamesRepository {
         seenIds: Set<String>,
         maxPages: Int
     ): Flow<Resource<List<Question>>>
+    fun getDescriptionQuestionBatch(
+        batchSize: Int,
+        seenIds: Set<String>
+    ): Flow<Resource<List<Question>>>
+
 }
