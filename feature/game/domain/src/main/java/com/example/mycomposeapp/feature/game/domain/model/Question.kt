@@ -1,5 +1,12 @@
 package com.example.mycomposeapp.feature.game.domain.model
 
+import com.example.mycomposeapp.feature.game.domain.model.game.Achievement
+
+data class Question(
+    val id: String,
+    val correctAnswer: String,
+    val content: QuestionContent
+)
     data class Question(
         val id: String,
         val correctAnswer: String,
@@ -13,6 +20,11 @@ sealed interface QuestionContent {
         val plotSummary: String,
         val imageUrl: String = "",
         val hints: List<PlotHint> = emptyList()
+    ) : QuestionContent
+    data class Screenshot(val imageUrl: String) : QuestionContent
+    data class Achievements(
+        val achievements: List<Achievement>,
+        val coverImageUrl: String = ""
     ) : QuestionContent
 }
 

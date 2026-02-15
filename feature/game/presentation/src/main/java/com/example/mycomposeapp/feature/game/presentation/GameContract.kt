@@ -76,6 +76,24 @@ object GameContract {
             val bestSessionStreak: Int = 0,
         ) : ModeState
 
+        data class Achievement(
+            val livesRemaining: Int = GameConstants.ACHIEVEMENT_INITIAL_LIVES,
+            val coins: Int = 0,
+            val currentScore: Int = 0,
+            val bestSessionStreak: Int = 0,
+            val visibleAchievementCount: Int = GameConstants.ACHIEVEMENT_INITIAL_VISIBLE,
+            val revealCost: Int = GameConstants.ACHIEVEMENT_HINT_COST,
+            val showInsufficientFundsWarning: Boolean = false,
+            val isFetchingMore: Boolean = false
+        ) : ModeState {
+            val canRevealMore: Boolean
+                get() = visibleAchievementCount < GameConstants.ACHIEVEMENT_MAX_VISIBLE
+                        && coins >= revealCost
+            val nextRevealCount: Int
+                get() = (visibleAchievementCount + GameConstants.ACHIEVEMENT_REVEAL_STEP)
+                    .coerceAtMost(GameConstants.ACHIEVEMENT_MAX_VISIBLE)
+        }
+
         data object None : ModeState
     }
 
@@ -112,6 +130,9 @@ object GameContract {
         val screenshotState: ModeState.Screenshot?
             get() = modeState as? ModeState.Screenshot
 
+        val isAchievementMode: Boolean get() = modeState is ModeState.Achievement
+        val achievementState: ModeState.Achievement?
+            get() = modeState as? ModeState.Achievement
         val descriptionState: ModeState.Description? get() = modeState as? ModeState.Description
 
     }

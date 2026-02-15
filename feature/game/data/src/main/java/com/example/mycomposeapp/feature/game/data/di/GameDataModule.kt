@@ -5,8 +5,12 @@ import androidx.datastore.preferences.core.Preferences
 import com.example.mycomposeapp.core.data.common.HandleResponse
 import com.example.mycomposeapp.core.data.di.AuthModule
 import com.example.mycomposeapp.core.data.di.IgdbRetrofit
+import com.example.mycomposeapp.core.data.di.SteamRetrofit
+import com.example.mycomposeapp.core.data.di.SteamStoreRetrofit
 import com.example.mycomposeapp.core.data.di.TmdbRetrofit
 import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesService
+import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
+import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
 import com.example.mycomposeapp.feature.game.data.repository.games.GameSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.games.GamesRepositoryImpl
@@ -95,13 +99,29 @@ object GameDataModule {
 
     @Provides
     @Singleton
+    fun provideSteamService(
+        @SteamRetrofit retrofit: Retrofit
+    ): SteamService = retrofit.create(SteamService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSteamStoreService(
+        @SteamStoreRetrofit retrofit: Retrofit
+    ): SteamStoreService = retrofit.create(SteamStoreService::class.java)
+
+    @Provides
+    @Singleton
     fun provideGamesRepository(
         remote: GamesService,
-        handleResponse: HandleResponse
+        handleResponse: HandleResponse,
+        steamService: SteamService,
+        steamStoreService: SteamStoreService
     ): GamesRepository {
         return GamesRepositoryImpl(
             remote = remote,
-            handleResponse = handleResponse
+            handleResponse = handleResponse,
+            steamService = steamService,
+            steamStoreService = steamStoreService
         )
     }
 

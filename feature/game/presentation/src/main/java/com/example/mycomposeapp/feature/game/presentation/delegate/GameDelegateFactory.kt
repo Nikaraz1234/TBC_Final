@@ -9,6 +9,11 @@ import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCa
 import com.example.mycomposeapp.feature.game.domain.usecase.FetchPlotBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.GetDailyPuzzleUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchAchievementBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
+import com.example.mycomposeapp.feature.game.presentation.delegate.common.EmojiGameDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameAchievementDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchDescriptionBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
@@ -29,6 +34,7 @@ class GameDelegateFactory @Inject constructor(
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
     private val searchGamesUseCase: SearchGamesUseCase,
+    private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase
     private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
@@ -90,12 +96,15 @@ class GameDelegateFactory @Inject constructor(
                 fetchScreenshotBatchUseCase = fetchScreenshotBatchUseCase,
                 searchGamesUseCase = searchGamesUseCase
             )
+            GameModeIds.GAME_ACHIEVEMENT -> GameAchievementDelegate(
             GameModeIds.GAME_DESCRIPTION -> GameDescriptionDelegate(
                 categoryType = categoryType,
                 gameModeId = gameModeId,
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
+                fetchAchievementBatchUseCase = fetchAchievementBatchUseCase
+            )
                 fetchDescriptionBatchUseCase = fetchDescriptionBatchUseCase,
                 searchGamesUseCase = searchGamesUseCase
             )

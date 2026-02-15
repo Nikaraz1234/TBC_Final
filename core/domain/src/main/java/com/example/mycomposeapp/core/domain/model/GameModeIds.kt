@@ -7,6 +7,7 @@ object GameModeIds {
 
     const val GAME_SCREENSHOT = "games_screenshot"
     const val GAME_DESCRIPTION = "games_description"
+    const val GAME_ACHIEVEMENT = "games_achievement"
 
     fun statsKey(categoryType: String, gameModeId: String): String =
         "${categoryType}_${gameModeId}"
