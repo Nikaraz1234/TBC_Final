@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.feature.game.presentation.GameContract
@@ -25,6 +26,9 @@ import com.example.mycomposeapp.feature.game.presentation.components.cover.Cover
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.emoji.EmojiQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.games.achievement.AchievementGameTopBar
+import com.example.mycomposeapp.feature.game.presentation.components.games.achievement.AchievementQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
 
@@ -62,6 +66,22 @@ fun QuestionScreen(
             is GameContract.ModeState.Plot -> {
                 PlotGameTopBar(
                     guessesRemaining = mode.guessesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
+            is GameContract.ModeState.Screenshot -> {
+                CoverGameTopBar(
+                    livesRemaining = mode.livesRemaining,
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
+            is GameContract.ModeState.Achievement -> {
+                AchievementGameTopBar(
+                    livesRemaining = mode.livesRemaining,
                     coins = mode.coins,
                     score = mode.currentScore,
                     streak = state.currentStreak
@@ -107,6 +127,18 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+            is QuestionContent.Screenshot -> {
+                ScreenshotQuestionView(content = content)
+            }
+            is QuestionContent.Achievements -> {
+                val achState = state.achievementState ?: GameContract.ModeState.Achievement()
+                AchievementQuestionView(
+                    content = content,
+                    achievementState = achState,
+                    isRevealed = isRevealed,
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -137,6 +169,8 @@ fun QuestionScreen(
                 isLastQuestion = when {
                     state.isCoverMode -> false
                     state.isPlotMode -> false
+                    state.isAchievementMode -> false
+                    state.screenshotState != null -> false
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },
@@ -144,7 +178,23 @@ fun QuestionScreen(
                 onClick = { onEvent(GameContract.Event.OnNextQuestion) }
             )
         } else {
-            // Show lives warning for cover mode when lives lost
+            // Show lives warning for cover/achievement mode when lives lost
+            val achievementMode = state.achievementState
+            if (achievementMode != null && achievementMode.livesRemaining < GameConstants.ACHIEVEMENT_INITIAL_LIVES) {
+                Text(
+                    text = stringResource(
+                        GameR.string.lives_remaining_format,
+                        achievementMode.livesRemaining,
+                        stringResource(if (achievementMode.livesRemaining == 1) GameR.string.life_singular else GameR.string.lives_plural)
+                    ),
+                    color = Color(0xFFF44336),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+            }
+
             val cover = state.coverState
             if (cover != null && cover.livesRemaining < 3) {
                 Text(

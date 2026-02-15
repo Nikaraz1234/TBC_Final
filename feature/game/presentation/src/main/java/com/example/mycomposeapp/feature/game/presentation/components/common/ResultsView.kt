@@ -35,12 +35,19 @@ fun ResultsView(
     onPlayAgain: () -> Unit,
     onExit: () -> Unit,
     isCoverMode: Boolean = false,
+    isAchievementMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val result = gameResult ?: return
 
-    if (isCoverMode) {
-        CoverResultsContent(result = result, onPlayAgain = onPlayAgain, onExit = onExit, modifier = modifier)
+    if (isCoverMode || isAchievementMode) {
+        CoverResultsContent(
+            result = result,
+            onPlayAgain = onPlayAgain,
+            onExit = onExit,
+            guessedLabel = if (isAchievementMode) stringResource(GameR.string.games_guessed) else stringResource(GameR.string.movies_guessed),
+            modifier = modifier
+        )
     } else {
         RegularResultsContent(result = result, onPlayAgain = onPlayAgain, onExit = onExit, modifier = modifier)
     }
@@ -150,8 +157,10 @@ private fun CoverResultsContent(
     result: GameResult,
     onPlayAgain: () -> Unit,
     onExit: () -> Unit,
+    guessedLabel: String = "",
     modifier: Modifier = Modifier
 ) {
+    val label = guessedLabel.ifEmpty { stringResource(GameR.string.movies_guessed) }
     ResultsLayout(modifier = modifier) {
         ResultsHeader(
             emoji = "\uD83C\uDFAC",
@@ -162,7 +171,7 @@ private fun CoverResultsContent(
 
         ResultsStats(
             stats = listOf(
-                stringResource(GameR.string.movies_guessed) to "${result.correctAnswers}",
+                label to "${result.correctAnswers}",
                 stringResource(GameR.string.best_streak) to "${result.bestStreak}",
                 stringResource(GameR.string.final_score) to "${result.totalScore}",
                 stringResource(GameR.string.coins_label) to "${result.finalCoinBalance}"

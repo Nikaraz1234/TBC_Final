@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
@@ -104,11 +105,10 @@ fun LoginScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = AppTheme.colors.transparent
-    ) { paddingValues ->
+    ) { _ ->
         LoginContent(
             state = state,
-            onEvent = viewModel::onEvent,
-            modifier = Modifier.padding(paddingValues)
+            onEvent = viewModel::onEvent
         )
     }
 }
@@ -124,7 +124,7 @@ private fun LoginContent(
     val focusManager = LocalFocusManager.current
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AsyncImage(
             model = CoreUiR.drawable.app_background,
@@ -136,6 +136,7 @@ private fun LoginContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .systemBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.spacing24),
             horizontalAlignment = Alignment.CenterHorizontally,

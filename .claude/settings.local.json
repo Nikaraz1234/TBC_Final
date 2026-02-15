@@ -47,7 +47,11 @@
       "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\model\\\\MovieSearchResult.kt\")",
       "Bash(del \"D:\\\\AndroidProjects\\\\TBC_Final\\\\feature\\\\game\\\\domain\\\\src\\\\main\\\\java\\\\com\\\\example\\\\mycomposeapp\\\\feature\\\\game\\\\domain\\\\usecase\\\\SearchMoviesUseCase.kt\")",
       "Bash(del:*)",
-      "Bash(.\\\\gradlew :feature:game:presentation:compileDebugKotlin:*)"
+      "Bash(.\\\\gradlew :feature:game:presentation:compileDebugKotlin:*)",
+      "WebFetch(domain:steamwebapi.azurewebsites.net)",
+      "WebFetch(domain:wiki.teamfortress.com)",
+      "WebFetch(domain:nik-davis.github.io)",
+      "WebFetch(domain:store.steampowered.com)"
     ]
   }
 }

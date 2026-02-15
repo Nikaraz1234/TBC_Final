@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ fun GameplayScreen(
             .fillMaxSize()
             .background(brush = colors.backgroundGradient)
     ) {
+        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
         when {
             state.phase == GameContract.GamePhase.Loading && state.errorMessage != null -> {
                 GameErrorView(
@@ -60,7 +62,8 @@ fun GameplayScreen(
                     gameResult = state.gameResult,
                     onPlayAgain = { viewModel.onEvent(GameContract.Event.OnRetryGame) },
                     onExit = { viewModel.onEvent(GameContract.Event.OnExitGame) },
-                    isCoverMode = state.isCoverMode
+                    isCoverMode = state.isCoverMode,
+                    isAchievementMode = state.isAchievementMode
                 )
             }
             else -> {
@@ -69,6 +72,7 @@ fun GameplayScreen(
                     onEvent = viewModel::onEvent
                 )
             }
+        }
         }
     }
 }

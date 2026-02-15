@@ -29,4 +29,18 @@ object GameConstants {
     const val PLOT_BASE_POINTS = 100
     const val PLOT_STREAK_BONUS = 50
     const val PLOT_COINS_PER_CORRECT = 1
+
+    // Achievement mode
+    const val ACHIEVEMENT_INITIAL_LIVES = 3
+    const val ACHIEVEMENT_INITIAL_VISIBLE = 3
+    const val ACHIEVEMENT_REVEAL_STEP = 3
+    const val ACHIEVEMENT_MAX_VISIBLE = 9
+    const val ACHIEVEMENT_COINS_PER_CORRECT = 1
+    const val ACHIEVEMENT_BASE_POINTS = 100
+    const val ACHIEVEMENT_STREAK_BONUS = 50
+    const val ACHIEVEMENT_HINT_COST = 20
+    const val ACHIEVEMENT_BATCH_SIZE = 10
+    const val ACHIEVEMENT_INITIAL_PAGE_LIMIT = 3
+    const val ACHIEVEMENT_PAGE_EXPAND_STEP = 3
+    const val ACHIEVEMENT_PAGE_SIZE = 20
 }
