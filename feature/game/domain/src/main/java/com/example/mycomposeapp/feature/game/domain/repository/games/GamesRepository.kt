@@ -14,4 +14,10 @@ interface GamesRepository {
         batchSize: Int,
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>>
+
+    fun getDescriptionQuestionBatch(
+        batchSize: Int,
+        seenIds: Set<String>
+    ): Flow<Resource<List<Question>>>
+
 }

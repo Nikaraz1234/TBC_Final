@@ -104,6 +104,7 @@ object GameDataModule {
             handleResponse = handleResponse
         )
     }
+
     @Provides
     @IntoMap
     @StringKey("GAMES")
