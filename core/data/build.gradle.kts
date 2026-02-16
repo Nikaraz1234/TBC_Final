@@ -27,6 +27,7 @@ android {
         buildConfigField("String", "IGDB_CLIENT_ID", "\"${localProperties.getProperty("IGDB_CLIENT_ID", "")}\"")
         buildConfigField("String", "IGDB_TOKEN", "\"${localProperties.getProperty("IGDB_TOKEN", "")}\"")
         buildConfigField("String", "STEAM_API_KEY", "\"${localProperties.getProperty("STEAM_API_KEY", "")}\"")
+        buildConfigField("String", "MAL_CLIENT_ID", "\"${localProperties.getProperty("MAL_CLIENT_ID")}\"")
     }
 }
 

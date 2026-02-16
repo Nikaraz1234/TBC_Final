@@ -49,6 +49,7 @@ class GameViewModel @Inject constructor(
         when (event) {
             is GameContract.Event.OnAnswerTextChanged -> onAnswerTextChanged(event.text)
             is GameContract.Event.OnAnswerSubmitted -> delegate.onAnswerSubmitted(event.answer)
+            is GameContract.Event.OnMangaSelected -> delegate.onAnswerSubmitted(event.selectedId.toString())
             is GameContract.Event.OnSuggestionSelected -> onSuggestionSelected(event.title)
             is GameContract.Event.OnNextQuestion -> delegate.onNextQuestion()
             is GameContract.Event.OnRetryGame -> delegate.onRetryGame()
