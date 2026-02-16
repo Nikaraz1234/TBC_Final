@@ -27,11 +27,12 @@ import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.feature.game.archive.R as ArchiveR
 import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 
 @Composable
 fun ArchiveHubScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToEmojiArchive: () -> Unit
+    onNavigateToEmojiArchive: (categoryType: String) -> Unit
 ) {
     val colors = AppTheme.colors
 
@@ -62,14 +63,22 @@ fun ArchiveHubScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing8))
 
         ArchiveCategoryCard(
             emoji = "\uD83C\uDFAC",
-            title = stringResource(ArchiveR.string.emoji_puzzles_title),
+            title = "Movie",
             description = stringResource(ArchiveR.string.emoji_puzzles_desc),
-            onClick = onNavigateToEmojiArchive,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            onClick = { onNavigateToEmojiArchive("MOVIES") },
+            modifier = Modifier.padding(horizontal = spacing.spacing16)
+        )
+        Spacer(modifier = Modifier.height(spacing.spacing16))
+        ArchiveCategoryCard(
+            emoji = "\uD83C\uDFAC",
+            title = "Manga",
+            description = stringResource(ArchiveR.string.emoji_puzzles_desc_manga),
+            onClick = { onNavigateToEmojiArchive("COMICS") },
+            modifier = Modifier.padding(horizontal = spacing.spacing16)
         )
     }
 }

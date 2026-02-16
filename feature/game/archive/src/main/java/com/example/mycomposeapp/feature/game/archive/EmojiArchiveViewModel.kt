@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.feature.game.archive
 
+import androidx.lifecycle.SavedStateHandle
 import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
@@ -8,13 +9,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EmojiArchiveViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val dailyPuzzleRepositories: Map<String, @JvmSuppressWildcards DailyPuzzleRepository>
 ) : BaseViewModel<EmojiArchiveContract.State, EmojiArchiveContract.SideEffect, EmojiArchiveContract.Event>(
     EmojiArchiveContract.State()
 ) {
 
-    private val dailyPuzzleRepository = dailyPuzzleRepositories[CategoryType.MOVIES.name]
-        ?: error("No daily puzzle repository for MOVIES")
+    private val categoryType: String =
+        savedStateHandle["categoryType"] ?: CategoryType.MOVIES.name
+
+    private val dailyPuzzleRepository = dailyPuzzleRepositories[categoryType]
+        ?: error("No daily puzzle repository for $categoryType")
 
     init {
         loadArchive()
@@ -34,4 +39,5 @@ class EmojiArchiveViewModel @Inject constructor(
             }
         )
     }
+
 }
