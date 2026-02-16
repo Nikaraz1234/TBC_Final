@@ -74,7 +74,9 @@ object Categories {
             id = GameModeIds.EMOJI,
             name = "By Emoji",
             description = "Decode emoji clues to find the manga",
-
+            iconRes = R.drawable.ic_emoji,
+            isAvailable = true
+        ),
         GameMode(
             id = GameModeIds.RANKLE,
             name = "Guess the rating",

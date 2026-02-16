@@ -131,9 +131,9 @@ object GameDataModule {
 
     @Provides
     @Singleton
-    fun provideMangaRatingRepository(
-        malApiService: MalApiService
-    ): MangaRatingRepository = MangaRatingRepositoryImpl(malApiService)
+    fun provideRankleRepository(
+        impl: RankleRepositoryImpl
+    ): RankleRepository = impl
 
     @Provides
     @IntoMap
@@ -148,8 +148,4 @@ object GameDataModule {
     fun provideMangaSearchRepository(
         repo: MangaSearchRepositoryImpl
     ): SearchRepository = repo
-}
-    fun provideRankleRepository(
-        impl: RankleRepositoryImpl
-    ): RankleRepository = impl
 }
