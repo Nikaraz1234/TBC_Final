@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +55,7 @@ fun PlotQuestionView(
                 modifier = Modifier
                     .size(width = 140.dp, height = 200.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF1A1A2E)),
+                    .background(colors.backgroundDark),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(

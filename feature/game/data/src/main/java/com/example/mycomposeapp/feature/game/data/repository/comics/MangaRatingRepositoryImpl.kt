@@ -11,14 +11,25 @@ class MangaRatingRepositoryImpl @Inject constructor(
 ) : MangaRatingRepository {
 
     override suspend fun fetchRandomMangaPairs(count: Int, excludeIds: Set<Long>): List<MangaPair> {
-        val offset = (0..500).random()
-        val response = malApiService.getMangaRanking(limit = count * 4, offset = offset)
+        val basePoolSize = 100
+        val currentPoolSize = (basePoolSize + (excludeIds.size * 3)).coerceAtMost(4000)
+
+        val offset = (0..currentPoolSize).random()
+
+        val response = malApiService.getMangaRanking(
+            rankingType = "bypopularity",
+            limit = count * 6,
+            offset = offset
+        )
 
         val valid = response.data.map { it.node }
             .filter { it.mean != null && it.mean > 0 && !excludeIds.contains(it.id) }
             .map { MangaItem(it.id, it.title, it.mainPicture?.large ?: "", it.mean ?: 0.0) }
 
-        if (valid.size < 2) throw Exception("Not enough manga")
+        if (valid.size < 2) {
+            if (offset > 50) return fetchRandomMangaPairs(count, excludeIds)
+            throw Exception("Not enough manga found")
+        }
 
         val shuffled = valid.shuffled()
         return (0 until minOf(count, shuffled.size / 2)).map { i ->

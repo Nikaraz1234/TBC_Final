@@ -65,7 +65,7 @@ object Categories {
     private val comicsGameModes = listOf(
         GameMode(
             id = GameModeIds.MANGA_RATING,
-            name = "By Rating",
+            name = "Compare the Rating",
             description = "Guess which manga is rated higher",
             iconRes = R.drawable.ic_cover,
             isAvailable = true
@@ -74,6 +74,11 @@ object Categories {
             id = GameModeIds.EMOJI,
             name = "By Emoji",
             description = "Decode emoji clues to find the manga",
+
+        GameMode(
+            id = GameModeIds.RANKLE,
+            name = "Guess the rating",
+            description = "Guess the close approximation of the rating",
             iconRes = R.drawable.ic_cover,
             isAvailable = true
         )

@@ -31,6 +31,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.games.descr
 import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.rankle.RankleQuestionView
 
 @Composable
 fun QuestionScreen(
@@ -55,6 +56,7 @@ fun QuestionScreen(
                     isFromArchive = mode.isFromArchive
                 )
             }
+
             is GameContract.ModeState.Cover -> {
                 CoverGameTopBar(
                     livesRemaining = mode.livesRemaining,
@@ -63,6 +65,7 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+
             is GameContract.ModeState.Plot -> {
                 PlotGameTopBar(
                     guessesRemaining = mode.guessesRemaining,
@@ -71,6 +74,7 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+
             is GameContract.ModeState.Screenshot -> {
                 CoverGameTopBar(
                     livesRemaining = mode.livesRemaining,
@@ -79,6 +83,7 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+
             is GameContract.ModeState.Achievement -> {
                 AchievementGameTopBar(
                     livesRemaining = mode.livesRemaining,
@@ -87,6 +92,7 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+
             is GameContract.ModeState.Description -> {
                 CoverGameTopBar(
                     livesRemaining = mode.livesRemaining,
@@ -95,6 +101,16 @@ fun QuestionScreen(
                     streak = state.currentStreak
                 )
             }
+
+            is GameContract.ModeState.Rankle -> {
+                CoverGameTopBar(
+                    livesRemaining = mode.attemptsLeft,
+                    coins = mode.coins,
+                    score = 0,
+                    streak = 0
+                )
+            }
+
             else -> {}
         }
 
@@ -105,13 +121,15 @@ fun QuestionScreen(
                 val cover = state.coverState
                 CoverQuestionView(
                     content = content,
-                    revealedCells = if (isRevealed) (0..8).toSet() else cover?.revealedCells ?: emptySet(),
+                    revealedCells = if (isRevealed) (0..8).toSet() else cover?.revealedCells
+                        ?: emptySet(),
                     coins = cover?.coins ?: 0,
                     revealCost = cover?.revealCost ?: 0,
                     canAffordReveal = cover?.canAffordReveal == true && !isRevealed,
                     onRevealMore = { onEvent(GameContract.Event.OnRevealMore) }
                 )
             }
+
             is QuestionContent.Emoji -> {
                 val emoji = state.emojiState
                 EmojiQuestionView(
@@ -125,6 +143,7 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+
             is QuestionContent.Plot -> {
                 val plotState = state.plotState ?: GameContract.ModeState.Plot()
                 PlotQuestionView(
@@ -135,6 +154,7 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+
             is QuestionContent.Screenshot -> {
                 val ssState = state.screenshotState ?: GameContract.ModeState.Screenshot()
                 ScreenshotQuestionView(
@@ -149,6 +169,7 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+
             is QuestionContent.Description -> {
                 val descState = state.descriptionState ?: GameContract.ModeState.Description()
                 DescriptionQuestionView(
@@ -164,6 +185,7 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+
             is QuestionContent.Achievements -> {
                 val achState = state.achievementState ?: GameContract.ModeState.Achievement()
                 AchievementQuestionView(
@@ -173,16 +195,31 @@ fun QuestionScreen(
                     onUseHint = { onEvent(GameContract.Event.OnUseHint) }
                 )
             }
+
+            is QuestionContent.Rankle -> {
+                val rankleState = state.rankleState ?: GameContract.ModeState.Rankle()
+                RankleQuestionView(
+                    content = content,
+                    rankleState = rankleState,
+                    isRevealed = isRevealed,
+                    onAnswerSubmit = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        val isRankleMode = state.rankleState != null
+
         if (isRevealed) {
-            AnswerFeedbackView(
-                isCorrect = state.isAnswerCorrect,
-                correctAnswer = question.correctAnswer,
-                userAnswer = state.userAnswer
-            )
+            // Don't show AnswerFeedbackView for Rankle — it has its own result card
+            if (!isRankleMode) {
+                AnswerFeedbackView(
+                    isCorrect = state.isAnswerCorrect,
+                    correctAnswer = question.correctAnswer,
+                    userAnswer = state.userAnswer
+                )
+            }
 
             // Show coin reward for emoji mode daily
             if (state.isEmojiMode && state.isAnswerCorrect && state.emojiState?.isFromArchive != true) {
@@ -206,14 +243,15 @@ fun QuestionScreen(
                     state.isAchievementMode -> false
                     state.screenshotState != null -> false
                     state.descriptionState != null -> false
+                    isRankleMode -> false
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },
                 buttonText = if (state.isEmojiMode) stringResource(GameR.string.btn_done) else null,
                 onClick = { onEvent(GameContract.Event.OnNextQuestion) }
             )
-        } else {
-            // Show lives warning for cover/achievement mode when lives lost
+        } else if (!isRankleMode) {
+            // Rankle has its own input — skip shared AnswerInputView
             val achievementMode = state.achievementState
             if (achievementMode != null && achievementMode.livesRemaining < GameConstants.ACHIEVEMENT_INITIAL_LIVES) {
                 Text(
@@ -226,7 +264,9 @@ fun QuestionScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 )
             }
 
@@ -242,7 +282,9 @@ fun QuestionScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 )
             }
 
@@ -253,7 +295,7 @@ fun QuestionScreen(
                 searchResults = state.searchResults,
                 isSearching = state.isSearching,
                 onSuggestionSelected = { onEvent(GameContract.Event.OnSuggestionSelected(it)) },
-                enabled = !isRevealed
+                enabled = true
             )
         }
 

@@ -21,6 +21,8 @@ import com.example.mycomposeapp.feature.game.presentation.delegate.games.GameScr
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieCoverDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.comics.GetRankleMangaUseCase
+import com.example.mycomposeapp.feature.game.presentation.delegate.comics.RankleDelegate
 import javax.inject.Inject
 
 class GameDelegateFactory @Inject constructor(
@@ -35,7 +37,8 @@ class GameDelegateFactory @Inject constructor(
     private val searchGamesUseCase: SearchGamesUseCase,
     private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase,
     private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
-    private val fetchMangaPairsUseCase: FetchMangaPairsUseCase
+    private val fetchMangaPairsUseCase: FetchMangaPairsUseCase,
+    private val getRankleMangaUseCase: GetRankleMangaUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
@@ -145,6 +148,15 @@ class GameDelegateFactory @Inject constructor(
                 updateGameStatsUseCase = updateGameStatsUseCase
             )
 
+
+            GameModeIds.RANKLE -> RankleDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                getRankleMangaUseCase = getRankleMangaUseCase
+            )
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
     }
