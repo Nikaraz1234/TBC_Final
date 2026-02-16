@@ -46,11 +46,16 @@ class GamesRepositoryImpl @Inject constructor(
             }
     }
     override fun getRandomGuessGame(): Flow<Resource<GameScreenshot>> {
-        val offset = (0..300).random()
-        val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
-        val body = igdbQueryBody(query)
-
-        return handleResponse.safeApiCall { remote.searchGames(body) }
+        return handleResponse.safeApiCall {
+            val offset = (0..300).random()
+            val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
+            var result = remote.searchGames(igdbQueryBody(query))
+            if (result.isEmpty()) {
+                val retryQuery = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = (0..50).random())
+                result = remote.searchGames(igdbQueryBody(retryQuery))
+            }
+            result
+        }
             .map { res ->
                 when (res) {
                     is Resource.Success -> {
@@ -72,11 +77,16 @@ class GamesRepositoryImpl @Inject constructor(
     }
 
     override fun getRandomScreenshotQuestion(): Flow<Resource<Question>> {
-        val offset = (0..300).random()
-        val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
-        val body = igdbQueryBody(query)
-
-        return handleResponse.safeApiCall { remote.searchGames(body) }
+        return handleResponse.safeApiCall {
+            val offset = (0..300).random()
+            val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = offset)
+            var result = remote.searchGames(igdbQueryBody(query))
+            if (result.isEmpty()) {
+                val retryQuery = GamesQueryBuilder.popularGamesWithScreenshots(limit = 50, offset = (0..50).random())
+                result = remote.searchGames(igdbQueryBody(retryQuery))
+            }
+            result
+        }
             .map { res ->
                 when (res) {
                     is Resource.Success -> {
@@ -107,12 +117,17 @@ class GamesRepositoryImpl @Inject constructor(
         batchSize: Int,
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>> {
-        val offset = (0..300).random()
-        val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 10, offset = offset)
-        val body = igdbQueryBody(query)
-
         return handleResponse
-            .safeApiCall { remote.searchGames(body) }
+            .safeApiCall {
+                val offset = (0..300).random()
+                val query = GamesQueryBuilder.popularGamesWithScreenshots(limit = 10, offset = offset)
+                var result = remote.searchGames(igdbQueryBody(query))
+                if (result.isEmpty()) {
+                    val retryQuery = GamesQueryBuilder.popularGamesWithScreenshots(limit = 10, offset = (0..50).random())
+                    result = remote.searchGames(igdbQueryBody(retryQuery))
+                }
+                result
+            }
             .map { res ->
                 when (res) {
                     is Resource.Success -> {
@@ -229,12 +244,17 @@ class GamesRepositoryImpl @Inject constructor(
         batchSize: Int,
         seenIds: Set<String>
     ): Flow<Resource<List<Question>>> {
-        val offset = (0..300).random()
-        val query = GamesQueryBuilder.popularGamesWithDescription(limit = 10, offset = offset)
-        val body = igdbQueryBody(query)
-
         return handleResponse
-            .safeApiCall { remote.fetchGamesByDescription(body) }
+            .safeApiCall {
+                val offset = (0..300).random()
+                val query = GamesQueryBuilder.popularGamesWithDescription(limit = 10, offset = offset)
+                var result = remote.fetchGamesByDescription(igdbQueryBody(query))
+                if (result.isEmpty()) {
+                    val retryQuery = GamesQueryBuilder.popularGamesWithDescription(limit = 10, offset = (0..50).random())
+                    result = remote.fetchGamesByDescription(igdbQueryBody(retryQuery))
+                }
+                result
+            }
             .map { res ->
                 when (res) {
                     is Resource.Success -> {
