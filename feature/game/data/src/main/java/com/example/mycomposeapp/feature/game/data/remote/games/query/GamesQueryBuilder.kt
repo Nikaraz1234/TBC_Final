@@ -22,7 +22,7 @@ object GamesQueryBuilder {
             involved_companies.developer;
         where screenshots != null
           & total_rating_count != null
-          & total_rating_count > 500
+          & total_rating_count > 350
           & first_release_date != null
           & first_release_date < ${System.currentTimeMillis() / 1000};
         sort total_rating_count desc;

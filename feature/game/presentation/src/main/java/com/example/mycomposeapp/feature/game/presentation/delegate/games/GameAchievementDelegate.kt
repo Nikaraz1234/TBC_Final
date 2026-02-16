@@ -65,8 +65,8 @@ class GameAchievementDelegate(
         val currentQuestion = state.currentQuestion ?: return
         val achievement = state.achievementState ?: return
 
-        val isCorrect = answer.trim()
-            .equals(currentQuestion.correctAnswer.trim(), ignoreCase = true)
+        // FIX: Use normalization to ignore symbols (™, ®), punctuation, and casing
+        val isCorrect = answer.normalize() == currentQuestion.correctAnswer.normalize()
 
         if (isCorrect) {
             correctAnswersTotal++
@@ -95,7 +95,7 @@ class GameAchievementDelegate(
                     isAnswerCorrect = true,
                     currentStreak = newStreak,
                     correctAnswersCount = newCorrect,
-                    userAnswer = answer,
+                    userAnswer = answer, // You might want to display the "clean" answer the user picked
                     searchResults = emptyList(),
                     modeState = achievement.copy(
                         bestSessionStreak = newBestStreak,
@@ -160,6 +160,11 @@ class GameAchievementDelegate(
                 )
             }
         }
+    }
+
+    // Helper function to handle cross-source string matching (Steam vs IGDB)
+    private fun String.normalize(): String {
+        return this.filter { it.isLetterOrDigit() }.lowercase()
     }
 
     override fun onNextQuestion() {
