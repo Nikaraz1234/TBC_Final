@@ -31,13 +31,14 @@ import com.example.mycomposeapp.feature.game.domain.model.GameResult
 
 @Composable
 fun ResultsView(
+    modifier: Modifier = Modifier,
     gameResult: GameResult?,
     onPlayAgain: () -> Unit,
     onExit: () -> Unit,
     isCoverMode: Boolean = false,
     isAchievementMode: Boolean = false,
-    isMangaRatingMode: Boolean = false,
-    modifier: Modifier = Modifier
+    isMangaRatingMode: Boolean = false
+
 ) {
     val result = gameResult ?: return
 
@@ -159,11 +160,11 @@ private fun ResultsLayout(
 
 @Composable
 private fun CoverResultsContent(
+    modifier: Modifier = Modifier,
     result: GameResult,
     onPlayAgain: () -> Unit,
     onExit: () -> Unit,
-    guessedLabel: String = "",
-    modifier: Modifier = Modifier
+    guessedLabel: String = ""
 ) {
     val label = guessedLabel.ifEmpty { stringResource(GameR.string.movies_guessed) }
     ResultsLayout(modifier = modifier) {

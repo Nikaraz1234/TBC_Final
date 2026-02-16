@@ -54,6 +54,7 @@
     <string name="movie_poster_desc">Movie poster</string>
     <string name="reveal_cost_format">Reveal (%d coins)</string>
     <string name="games_guessed">Games Guessed</string>
+    <string name="Manga">Manga</string>
 <string name="achievement_count_format">Showing %1$d of %2$d achievements</string>
 <string name="achievement_unlock_format">%1$.1f%% of players</string>
 </resources>

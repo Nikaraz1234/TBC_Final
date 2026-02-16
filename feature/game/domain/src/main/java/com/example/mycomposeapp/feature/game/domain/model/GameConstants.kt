@@ -1,9 +1,6 @@
 package com.example.mycomposeapp.feature.game.domain.model
 
 object GameConstants {
-    // Timer
-    const val TIME_LIMIT_SECONDS = 30
-
     // Cover mode
     const val COVER_INITIAL_LIVES = 3
     const val COVER_INITIAL_REVEAL_COST = 10
@@ -42,13 +39,15 @@ object GameConstants {
     const val ACHIEVEMENT_BATCH_SIZE = 10
     const val ACHIEVEMENT_INITIAL_PAGE_LIMIT = 3
     const val ACHIEVEMENT_PAGE_EXPAND_STEP = 3
-    const val ACHIEVEMENT_PAGE_SIZE = 20
 
     // Guess the rating mode
-
+    const val MANGA_RATING_PREFETCH_THRESHOLD = 2
     const val MANGA_RATING_COINS_PER_CORRECT = 1
-
     const val MANGA_RATING_BATCH_SIZE = 10
 
-    const val MANGA_RATING_PREFETCH_THRESHOLD = 2
+    // Rankle
+    const val WIN_THRESHOLD = 0.05
+    const val RANKLE_INITIAL_ATTEMPTS = 5
+    const val RANKLE_COINS_WIN = 5
+
 }

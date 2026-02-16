@@ -11,6 +11,8 @@ object GameModeIds {
 
     const val MANGA_RATING = "manga_rating"
 
+    const val RANKLE = "rankle"
+
     fun statsKey(categoryType: String, gameModeId: String): String =
         "${categoryType}_${gameModeId}"
 }

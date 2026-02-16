@@ -4,6 +4,7 @@ import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.model.MangaPair
 import com.example.mycomposeapp.feature.game.domain.model.Question
+import com.example.mycomposeapp.feature.game.domain.model.RankleGuess
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 object GameContract {
@@ -103,6 +104,16 @@ object GameContract {
             val selectedId: Long? = null
         ) : ModeState
 
+        data class Rankle(
+            val mangaTitle: String = "",
+            val coins: Int = 0,
+            val mangaImageUrl: String = "",
+            val guesses: List<RankleGuess> = emptyList(),
+            val attemptsLeft: Int = 5,
+            val isRoundOver: Boolean = false,
+            val actualRating: Double? = null
+        ) : ModeState
+
         data object None : ModeState
     }
 
@@ -146,6 +157,8 @@ object GameContract {
 
         val isMangaRatingMode: Boolean get() = modeState is ModeState.MangaRating
         val mangaRatingState: ModeState.MangaRating? get() = modeState as? ModeState.MangaRating
+
+        val rankleState: ModeState.Rankle? get() = modeState as? ModeState.Rankle
     }
 
     enum class GamePhase { Loading, Playing, AnswerRevealed, Results }

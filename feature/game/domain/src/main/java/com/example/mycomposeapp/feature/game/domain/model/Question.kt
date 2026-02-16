@@ -32,6 +32,13 @@ sealed interface QuestionContent {
         val achievements: List<Achievement>,
         val coverImageUrl: String = ""
     ) : QuestionContent
+
+    data class Rankle(
+        val id: Long,
+        val imageUrl: String,
+        val title: String,
+        val rating: Double
+    ) : QuestionContent
 }
 
 data class PlotHint(
