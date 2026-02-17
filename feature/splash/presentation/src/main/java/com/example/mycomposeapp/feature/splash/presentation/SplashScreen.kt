@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,19 +24,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.collectLatest
 import com.example.mycomposeapp.core.ui.R as CoreUiR
-import com.example.mycomposeapp.core.ui.theme.LocalAppColorScheme
-import com.example.mycomposeapp.core.ui.theme.LocalSpacing
-import com.example.mycomposeapp.feature.splash.presentation.navigation.SplashRoute
-
-
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 
 @Composable
 fun SplashScreen(
@@ -60,10 +55,9 @@ fun SplashScreen(
         }
     }
 
-
     SplashContent(
         state = state,
-        onEvent = viewModel::onEvent,
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -73,7 +67,7 @@ fun SplashContent(
     onEvent: (SplashContract.Event) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColorScheme.current
+    val colors = AppTheme.colors
 
     Box(modifier = modifier.fillMaxSize()) {
         Image(
@@ -102,18 +96,17 @@ private fun SplashForeground(
     modifier: Modifier = Modifier
 ) {
     val percent = (progress.coerceIn(0f, 1f) * 100).toInt()
-    val spacing = LocalSpacing.current
-    val colors = LocalAppColorScheme.current
+    val spacing = AppTheme.spacing
+    val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Box(modifier = modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier
                 .padding(horizontal = spacing.spacing24, vertical = spacing.spacing32)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-
             Column(
                 modifier = Modifier
                     .padding(top = spacing.spacing48)
@@ -122,25 +115,36 @@ private fun SplashForeground(
             ) {
                 Text(
                     text = stringResource(CoreUiR.string.splash_tagline),
-                    style = MaterialTheme.typography.labelSmall.copy(brush = colors.goldTextGradient),
-                    letterSpacing = 2.sp,
+                    style = typography.labelSmall.merge(
+                        TextStyle(
+                            brush = colors.goldTextGradient,
+                            letterSpacing = 2.sp
+                        )
+                    )
                 )
 
                 Spacer(Modifier.height(spacing.spacing8))
 
                 Text(
                     text = stringResource(CoreUiR.string.splash_title_guess),
-                    style = MaterialTheme.typography.displaySmall.copy(brush = colors.goldTextGradient),
-                    color = colors.splashTitleGold,
-                    fontWeight = FontWeight.Bold
+                    style = typography.displaySmall.merge(
+                        TextStyle(
+                            brush = colors.goldTextGradient,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ),
+                    color = colors.splashTitleGold
                 )
             }
 
             Column {
                 Text(
                     text = stringResource(CoreUiR.string.splash_init_title),
-                    style = MaterialTheme.typography.labelMedium,
-                    letterSpacing = 1.5.sp,
+                    style = typography.labelMedium.merge(
+                        TextStyle(
+                            letterSpacing = 1.5.sp
+                        )
+                    ),
                     color = colors.splashInitTitle
                 )
 
@@ -148,7 +152,7 @@ private fun SplashForeground(
 
                 Text(
                     text = stringResource(CoreUiR.string.splash_init_subtitle),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = typography.bodySmall,
                     color = colors.splashInitSubtitle
                 )
 
@@ -165,7 +169,7 @@ private fun SplashForeground(
 
                 Text(
                     text = stringResource(CoreUiR.string.splash_progress_percent, percent),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = typography.labelSmall,
                     color = colors.white,
                     modifier = Modifier.align(Alignment.End)
                 )
@@ -187,7 +191,7 @@ fun GoldGradientProgressBar(
     progress: Float,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColorScheme.current
+    val colors = AppTheme.colors
 
     Canvas(modifier = modifier) {
         val h = size.height
@@ -208,9 +212,7 @@ fun GoldGradientProgressBar(
     }
 }
 
-@Preview(
-    showBackground = true,
-)
+@Preview(showBackground = true)
 @Composable
 fun SplashContentPreview() {
     SplashContent(

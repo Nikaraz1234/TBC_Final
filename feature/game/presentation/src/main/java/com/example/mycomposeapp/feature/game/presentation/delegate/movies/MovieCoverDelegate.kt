@@ -1,9 +1,11 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -22,7 +24,8 @@ class MovieCoverDelegate(
     private val fetchCoverBatchUseCase: FetchCoverBatchUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -99,7 +102,29 @@ class MovieCoverDelegate(
                     )
                 )
             }
-            scope.coroutineScope.launch { try { updateCoinsUseCase(newCoins) } catch (_: Exception) { } }
+            scope.coroutineScope.launch {
+                try {
+                    val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
+                    val stats = user.stats
+
+                    val xpGain = 50
+                    val newTotalXp = stats.totalXp + xpGain
+                    val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
+                    val updatedStats = stats.copy(
+                        coins = stats.coins + GameConstants.COVER_COINS_PER_CORRECT,
+                        points = stats.points + scoreGain,
+                        totalXp = newTotalXp,
+                        level = newLevel,
+                        correctAnswers = stats.correctAnswers + 1,
+                        bestStreak = maxOf(stats.bestStreak, newBestStreak)
+                    )
+
+                    updateUserStatsUseCase(updatedStats)
+                } catch (_: Exception) { }
+            }
+
+
         } else {
             val state = scope.currentState()
             val cover = state.coverState ?: return

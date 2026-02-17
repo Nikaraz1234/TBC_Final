@@ -74,6 +74,9 @@ object Categories {
             id = GameModeIds.EMOJI,
             name = "By Emoji",
             description = "Decode emoji clues to find the manga",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        ),
 
         GameMode(
             id = GameModeIds.RANKLE,
@@ -82,8 +85,8 @@ object Categories {
             iconRes = R.drawable.ic_cover,
             isAvailable = true
         )
-
     )
+
 
     private val comingSoonGameModes = listOf(
         GameMode(

@@ -32,11 +32,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,7 +50,6 @@ import com.example.mycomposeapp.feature.main.presentation.components.QuickPlayBu
 import com.example.mycomposeapp.feature.main.presentation.components.TipsSection
 import com.example.mycomposeapp.feature.main.presentation.components.TodaysGoalsCard
 import com.example.mycomposeapp.feature.main.presentation.components.UserTopBar
-import androidx.compose.ui.res.stringResource
 import com.example.mycomposeapp.feature.main.presentation.R as MainR
 
 @Composable
@@ -70,15 +69,19 @@ fun MainScreen(
                 is MainContract.SideEffect.NavigateToGame -> {
                     onNavigateToGame(effect.gameModeId, effect.categoryType)
                 }
+
                 is MainContract.SideEffect.NavigateToProfile -> {
                     onNavigateToProfile()
                 }
+
                 is MainContract.SideEffect.ShowSnackbar -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
+
                 is MainContract.SideEffect.NavigateToWelcome -> {
                     onLogout()
                 }
+
                 is MainContract.SideEffect.NavigateToArchive -> {
                     onNavigateToArchive()
                 }
@@ -98,6 +101,7 @@ private fun MainContent(
     onEvent: (MainContract.Event) -> Unit
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
     val scrollState = rememberScrollState()
 
     LaunchedEffect(state.selectedCategory) {
@@ -196,9 +200,11 @@ private fun MainContent(
                             ) {
                                 Text(
                                     text = stringResource(MainR.string.btn_logout),
-                                    color = colors.textMuted
+                                    color = colors.textMuted,
+                                    style = typography.bodyMedium
                                 )
                             }
+
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     } else {
@@ -222,14 +228,13 @@ private fun CategoriesSection(
     onCategoryClick: (com.example.mycomposeapp.feature.main.presentation.model.Category) -> Unit
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(MainR.string.categories_header),
             color = colors.textMuted,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = typography.labelSmall,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -255,6 +260,7 @@ private fun ArchiveCard(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     GlassCard(
         modifier = modifier
@@ -269,18 +275,19 @@ private fun ArchiveCard(
                 text = "\uD83D\uDDC3\uFE0F",
                 fontSize = 28.sp
             )
+
             Spacer(modifier = Modifier.width(12.dp))
+
             Column {
                 Text(
                     text = stringResource(MainR.string.archive_title),
                     color = colors.textLight,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    style = typography.titleSmall
                 )
                 Text(
                     text = stringResource(MainR.string.archive_subtitle),
                     color = colors.textMuted,
-                    fontSize = 12.sp
+                    style = typography.bodySmall
                 )
             }
         }

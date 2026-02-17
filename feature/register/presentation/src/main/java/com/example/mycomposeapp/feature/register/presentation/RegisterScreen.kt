@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions as ComposeKeyboardActions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
@@ -65,12 +66,8 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is SideEffect.NavigateToDashboard -> {
-                    onNavigateToDashboard()
-                }
-                is SideEffect.NavigateToLogin -> {
-                    onNavigateToLogin()
-                }
+                is SideEffect.NavigateToDashboard -> onNavigateToDashboard()
+                is SideEffect.NavigateToLogin -> onNavigateToLogin()
             }
         }
     }
@@ -89,6 +86,7 @@ private fun RegisterContent(
 ) {
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
     val focusManager = LocalFocusManager.current
 
     if (state.showSuccessDialog) {
@@ -97,9 +95,7 @@ private fun RegisterContent(
         )
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         AsyncImage(
             model = CoreUiR.drawable.app_background,
             contentDescription = null,
@@ -128,17 +124,19 @@ private fun RegisterContent(
 
             Text(
                 text = stringResource(RegisterR.string.create_account),
-                style = TextStyle(
-                    brush = colors.goldTextGradient,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                style = typography.titleLarge.merge(
+                    TextStyle(
+                        brush = colors.goldTextGradient,
+                        fontSize = 28.sp, 
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             )
 
             Text(
                 text = stringResource(RegisterR.string.sign_up_to_get_started),
                 color = colors.textMuted,
-                fontSize = 14.sp
+                style = typography.bodySmall
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing24))
@@ -221,17 +219,19 @@ private fun RegisterContent(
                             checkmarkColor = colors.backgroundDark
                         )
                     )
+
                     Text(
                         text = stringResource(RegisterR.string.terms_agreement),
                         color = colors.textMuted,
-                        fontSize = 14.sp
+                        style = typography.bodyMedium
                     )
                 }
+
                 if (state.termsError != null) {
                     Text(
                         text = state.termsError,
                         color = colors.error,
-                        fontSize = 12.sp,
+                        style = typography.bodySmall,
                         modifier = Modifier.padding(start = spacing.spacing8)
                     )
                 }
@@ -243,7 +243,7 @@ private fun RegisterContent(
                 Text(
                     text = state.generalError,
                     color = colors.error,
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = spacing.spacing16)
                 )
@@ -272,13 +272,13 @@ private fun RegisterContent(
                 Text(
                     text = stringResource(RegisterR.string.already_have_account),
                     color = colors.textMuted,
-                    fontSize = 14.sp
+                    style = typography.bodyMedium
                 )
+
                 Text(
                     text = stringResource(RegisterR.string.btn_login),
                     color = colors.goldenYellow,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.clickable(enabled = !state.isLoading) {
                         onEvent(Event.OnLoginClicked)
                     }
@@ -295,6 +295,7 @@ private fun SuccessDialog(
     onDismiss: () -> Unit
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -302,10 +303,11 @@ private fun SuccessDialog(
         title = {
             Text(
                 text = stringResource(RegisterR.string.registration_successful),
-                style = TextStyle(
-                    brush = colors.goldTextGradient,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                style = typography.titleMedium.merge(
+                    TextStyle(
+                        brush = colors.goldTextGradient,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             )
         },
@@ -313,7 +315,7 @@ private fun SuccessDialog(
             Text(
                 text = stringResource(RegisterR.string.registration_success_message),
                 color = colors.textLight,
-                fontSize = 14.sp
+                style = typography.bodyMedium
             )
         },
         confirmButton = {
@@ -321,7 +323,7 @@ private fun SuccessDialog(
                 Text(
                     text = stringResource(RegisterR.string.btn_continue),
                     color = colors.goldenYellow,
-                    fontWeight = FontWeight.Bold
+                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
         }

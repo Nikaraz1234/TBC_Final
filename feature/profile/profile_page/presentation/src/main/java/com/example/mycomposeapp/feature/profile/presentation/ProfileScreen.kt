@@ -14,13 +14,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -41,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,12 +64,16 @@ import androidx.compose.ui.unit.dp
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.LocalAppColorScheme
+import com.example.mycomposeapp.feature.profile.presentation.mapper.toLevelProgressUi
+import com.example.mycomposeapp.feature.profile.presentation.model.LevelProgressUi
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -111,6 +119,7 @@ private fun ProfileContent(
     showSettingsSheet: Boolean,
     onDismissSettings: () -> Unit,
 ){
+    val userStats = state.user?.stats
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -120,34 +129,57 @@ private fun ProfileContent(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier.fillMaxSize()
-            .systemBarsPadding()) {
+        Column {
             ProfileTopBar(
                 onBackClick = { onEvent(ProfileContract.Event.OnBackButtonClicked) },
                 onSettingsClicked = { onEvent(ProfileContract.Event.OnSettingsClicked) }
             )
-            Spacer(modifier= Modifier.height(spacing.spacing32))
-            ProfileAvatarCard()
+            Column(modifier = Modifier.fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+            ) {
 
-            Spacer(modifier= Modifier.height(spacing.spacing32))
-            LevelProgress(0.6f)
 
-            Spacer(modifier = Modifier.height(spacing.spacing16))
+                Spacer(modifier= Modifier.height(spacing.spacing32))
+                ProfileAvatarCard(
+                    photoUrl = state.user?.photoUrl,
+                    username = state.user?.username ?: "",
+                    level = state.user?.stats?.level ?: 1
+                )
 
-            GlobalStats()
+                Spacer(modifier= Modifier.height(spacing.spacing32))
+                if (userStats != null) {
+                    val ui = remember(userStats.totalXp, userStats.level) {
+                        toLevelProgressUi(
+                            totalXp = userStats.totalXp,
+                            level = userStats.level
+                        )
+                    }
+                    LevelProgress(levelProgress = ui)
+                }
 
-            Spacer(modifier = Modifier.height(spacing.spacing16))
 
-            ButtonMedium(
-                text = "Edit profile",
-                onClick = { onEvent(ProfileContract.Event.OnEditProfileClicked) },
-                style = ButtonStyle.Filled,
-                enabled = true,
-                modifier = Modifier
-                    .padding(horizontal = spacing.spacing16, vertical = spacing.spacing16)
-            )
+                Spacer(modifier = Modifier.height(spacing.spacing16))
 
+                GlobalStats(
+                    state.user
+                )
+
+                Spacer(modifier = Modifier.height(spacing.spacing16))
+
+                ButtonMedium(
+                    text = "Edit profile",
+                    onClick = { onEvent(ProfileContract.Event.OnEditProfileClicked) },
+                    style = ButtonStyle.Filled,
+                    enabled = true,
+                    modifier = Modifier
+                        .padding(horizontal = spacing.spacing16, vertical = spacing.spacing16)
+                )
+
+            }
         }
+
         ProfileBottomSheet(
             visible = showSettingsSheet,
             onClose = onDismissSettings,
@@ -220,6 +252,9 @@ private fun ProfileTopBar(
 @Composable
 private fun ProfileAvatarCard(
     modifier: Modifier = Modifier,
+    photoUrl: String?,
+    username: String,
+    level: Int
 ) {
     Column(
         modifier = modifier,
@@ -243,11 +278,25 @@ private fun ProfileAvatarCard(
                         shape = CircleShape
                     )
             ) {
-                Image(
-                    painter = painterResource(id = CoreUiR.drawable.app_logo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
+                val hasPhoto = !photoUrl.isNullOrBlank()
+
+                if (hasPhoto) {
+                    AsyncImage(
+                        model = photoUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = painterResource(CoreUiR.drawable.app_logo),
+                        error = painterResource(CoreUiR.drawable.app_logo)
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(CoreUiR.drawable.app_logo),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Surface(
@@ -259,7 +308,7 @@ private fun ProfileAvatarCard(
                     .offset(y = (10).dp)
             ) {
                 Text(
-                    text = "LVL. 42",
+                    text = "LVL ".plus(level.toString()),
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
 
                     )
@@ -267,7 +316,7 @@ private fun ProfileAvatarCard(
         }
 
         Spacer(Modifier.height(spacing.spacing32))
-        Text(text = "Nika Razmadze",
+        Text(text = username,
             color = colors.white,
             fontSize = 24.sp)
     }
@@ -275,39 +324,44 @@ private fun ProfileAvatarCard(
 
 @Composable
 private fun LevelProgress(
-    progress: Float
-){
-    Box(modifier= Modifier.fillMaxWidth()
-        .padding(horizontal = spacing.spacing24)
-        .clip(radius.radius20)
-        .background(colors.glassGradient)) {
-            Column(modifier = Modifier.padding(spacing.spacing16)) {
+    levelProgress: LevelProgressUi
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.spacing24)
+            .clip(radius.radius20)
+            .background(colors.glassGradient)
+    ) {
+        Column(modifier = Modifier.padding(spacing.spacing16)) {
+            Text(
+                text = "Next Level",
+                color = colors.white,
+                fontSize = 18.sp
+            )
+
+            Spacer(modifier = Modifier.height(spacing.spacing8))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    text = "Next Level",
-                    color = colors.white,
-                    fontSize = 18.sp
+                    text = levelProgress.levelText,
+                    fontSize = 20.sp,
+                    color = colors.white
                 )
-                Spacer(modifier = Modifier.height(spacing.spacing8))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Level 43",
-                        fontSize = 20.sp,
-                        color = colors.white
-                    )
-                    Text(
-                        text = "1,250 / 2000 XP",
-                        color = colors.goldenYellow,
-                        fontSize = 20.sp
-                    )
-                }
-                Spacer(modifier = Modifier.height(spacing.spacing16))
-
-                LvlProgressBar(progress = progress)
-
+                Text(
+                    text = levelProgress.xpText,
+                    color = colors.goldenYellow,
+                    fontSize = 20.sp
+                )
             }
+
+            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+            LvlProgressBar(progress = levelProgress.progress)
+        }
     }
 }
 @Composable
@@ -338,49 +392,51 @@ private fun LvlProgressBar(
 }
 
 @Composable
-private fun GlobalStats(){
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text= "Global Stats",
-            color = colors.white,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(horizontal = spacing.spacing20),
-            fontWeight = FontWeight.SemiBold)
+private fun GlobalStats(user: User?){
+    if(user != null){
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(text= "Global Stats",
+                color = colors.white,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(horizontal = spacing.spacing20),
+                fontWeight = FontWeight.SemiBold)
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
-            horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
-        ) {
-            RankItem(
-                title = "Rank",
-                stat = "#1204",
-                modifier = Modifier.weight(1f)
-            )
-            RankItem(
-                title = "Games Played",
-                stat = "942",
-                modifier = Modifier.weight(1f)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
+                horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
+            ) {
+                RankItem(
+                    title = "Points",
+                    stat = user.stats.points.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                RankItem(
+                    title = "Games Played",
+                    stat = user.stats.gamesPlayed.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
+                horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
+            ) {
+                RankItem(
+                    title = "Total Guesses",
+                    stat = user.stats.correctAnswers.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                RankItem(
+                    title = "Best Streak",
+                    stat = user.stats.currentStreak.values.maxOrNull().toString(),
+                    modifier = Modifier.weight(1f),
+
+                    )
+            }
+
+
         }
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = spacing.spacing24, vertical = spacing.spacing12),
-            horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
-        ) {
-            RankItem(
-                title = "Total Guesses",
-                stat = "13022",
-                modifier = Modifier.weight(1f)
-            )
-            RankItem(
-                title = "Streak",
-                stat = "5",
-                modifier = Modifier.weight(1f),
-
-            )
-        }
-
-
     }
 }
 @Composable

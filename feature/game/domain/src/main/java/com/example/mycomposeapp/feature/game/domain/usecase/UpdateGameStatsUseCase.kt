@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.feature.game.domain.usecase
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.repository.UserRepository
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -53,6 +54,10 @@ class UpdateGameStatsUseCase @Inject constructor(
 
         val newCoins = if (gameModeId == GameModeIds.COVER) result.finalCoinBalance else currentStats.coins
 
+        val xpGain = calculateXpGain(result, gameModeId, isDailyMode)
+        val newTotalXp = currentStats.totalXp + xpGain
+        val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
         val updatedStats = currentStats.copy(
             gamesPlayed = currentStats.gamesPlayed + 1,
             correctAnswers = currentStats.correctAnswers + result.correctAnswers,
@@ -61,7 +66,9 @@ class UpdateGameStatsUseCase @Inject constructor(
             currentStreak = updatedCurrentStreak,
             highScore = updatedHighScore,
             coins = newCoins,
-            lastEmojiDate = updatedLastEmojiDate
+            lastEmojiDate = updatedLastEmojiDate,
+            totalXp = newTotalXp,
+            level = newLevel
         )
 
         userRepository.updateUserStats(updatedStats)
@@ -74,5 +81,14 @@ class UpdateGameStatsUseCase @Inject constructor(
             "movies_plot" to GameModeIds.statsKey("MOVIES", GameModeIds.PLOT)
         )
         return map.mapKeys { (key, _) -> oldToNew[key] ?: key }
+    }
+    private fun calculateXpGain(result: GameResult, gameModeId: String, isDailyMode: Boolean): Int {
+        val scoreXp = (result.totalScore / 10).coerceAtLeast(0)
+        val correctXp = result.correctAnswers * 5
+        val streakXp = result.bestStreak * 2
+        val dailyBonus = if (isDailyMode) 20 else 0
+        val modeBonus = if (gameModeId == GameModeIds.COVER) 10 else 0
+
+        return (scoreXp + correctXp + streakXp + dailyBonus + modeBonus).coerceAtLeast(0)
     }
 }

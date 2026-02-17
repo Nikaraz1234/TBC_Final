@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.feature.profile.editProfile.presentation)
     implementation(projects.feature.profile.editProfile.data)
     implementation(projects.feature.profile.profilePage.presentation)
+    implementation(projects.feature.notification.presentaiton)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -51,6 +52,7 @@ dependencies {
     implementation(libs.androidx.splashscreen)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation("com.google.firebase:firebase-messaging-ktx")
 
     testImplementation(libs.bundles.test.unit)
     androidTestImplementation(libs.bundles.test.android)

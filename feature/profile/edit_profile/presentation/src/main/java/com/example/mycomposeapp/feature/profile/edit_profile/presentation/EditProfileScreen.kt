@@ -65,6 +65,9 @@ import kotlinx.coroutines.flow.collectLatest
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.style.TextAlign
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.domain.model.User
@@ -74,7 +77,7 @@ import com.example.mycomposeapp.core.domain.model.UserStats
 fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    ){
+){
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -207,7 +210,10 @@ private fun EditProfileContent(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.spacing16)
+
         ) {
             ProfileTopBar(
                 onBackClick = { onEvent(EditProfileContract.Event.OnBackClick) }

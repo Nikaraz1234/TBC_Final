@@ -1,9 +1,11 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -23,7 +25,8 @@ class MangaRatingDelegate(
     private val fetchMangaPairsUseCase: FetchMangaPairsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -72,6 +75,9 @@ class MangaRatingDelegate(
         if (isCorrect) {
             val newStreak = manga.currentStreak + 1
             val newBestStreak = maxOf(manga.bestSessionStreak, newStreak)
+
+            val scoreGain =
+                GameConstants.BASE_POINTS + GameConstants.STREAK_BONUS_MULTIPLIER * newStreak
             val newCoins = manga.coins + GameConstants.MANGA_RATING_COINS_PER_CORRECT
 
             answerResults.add(
@@ -99,7 +105,25 @@ class MangaRatingDelegate(
                 )
             }
             scope.coroutineScope.launch {
-                try { updateCoinsUseCase(newCoins) } catch (_: Exception) { }
+                try {
+                    val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
+                    val stats = user.stats
+
+                    val xpGain = 50
+                    val newTotalXp = stats.totalXp + xpGain
+                    val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
+                    val updatedStats = stats.copy(
+                        coins = stats.coins + GameConstants.COVER_COINS_PER_CORRECT,
+                        points = stats.points + scoreGain,
+                        totalXp = newTotalXp,
+                        level = newLevel,
+                        correctAnswers = stats.correctAnswers + 1,
+                        bestStreak = maxOf(stats.bestStreak, newStreak)
+                    )
+
+                    updateUserStatsUseCase(updatedStats)
+                } catch (_: Exception) { }
             }
         } else {
             answerResults.add(

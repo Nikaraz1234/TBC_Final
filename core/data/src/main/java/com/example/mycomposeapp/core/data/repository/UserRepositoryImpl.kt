@@ -53,6 +53,7 @@ class UserRepositoryImpl @Inject constructor(
                                 stats = UserStats(
                                     coins = (stats?.get("coins") as? Long)?.toInt() ?: 0,
                                     level = (stats?.get("level") as? Long)?.toInt() ?: 1,
+                                    totalXp = (stats?.get("totalXp") as? Long)?.toInt() ?: 0,
                                     points = (stats?.get("points") as? Long)?.toInt() ?: 0,
                                     gamesPlayed = (stats?.get("gamesPlayed") as? Long)?.toInt() ?: 0,
                                     correctAnswers = (stats?.get("correctAnswers") as? Long)?.toInt() ?: 0,
@@ -92,6 +93,7 @@ class UserRepositoryImpl @Inject constructor(
                 "stats" to mapOf(
                     "coins" to 0,
                     "level" to 1,
+                    "totalXp" to 0,
                     "points" to 0,
                     "gamesPlayed" to 0,
                     "correctAnswers" to 0,
@@ -110,6 +112,7 @@ class UserRepositoryImpl @Inject constructor(
         val statsMap = mapOf(
             "coins" to stats.coins,
             "level" to stats.level,
+            "totalXp" to stats.totalXp,
             "points" to stats.points,
             "gamesPlayed" to stats.gamesPlayed,
             "correctAnswers" to stats.correctAnswers,

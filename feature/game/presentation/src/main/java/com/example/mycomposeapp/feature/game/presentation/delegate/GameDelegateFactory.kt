@@ -4,6 +4,7 @@ import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
 import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.FetchPlotBatchUseCase
@@ -38,7 +39,8 @@ class GameDelegateFactory @Inject constructor(
     private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase,
     private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
     private val fetchMangaPairsUseCase: FetchMangaPairsUseCase,
-    private val getRankleMangaUseCase: GetRankleMangaUseCase
+    private val getRankleMangaUseCase: GetRankleMangaUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
@@ -61,7 +63,8 @@ class GameDelegateFactory @Inject constructor(
                 fetchCoverBatchUseCase = fetchCoverBatchUseCase,
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
-                updateGameStatsUseCase = updateGameStatsUseCase
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             GameModeIds.EMOJI -> EmojiGameDelegate(
                 categoryType = categoryType,
@@ -72,7 +75,8 @@ class GameDelegateFactory @Inject constructor(
                     ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType"),
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
-                updateGameStatsUseCase = updateGameStatsUseCase
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             GameModeIds.PLOT -> MoviePlotDelegate(
                 categoryType = categoryType,
@@ -80,7 +84,8 @@ class GameDelegateFactory @Inject constructor(
                 fetchPlotBatchUseCase = fetchPlotBatchUseCase,
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
-                updateGameStatsUseCase = updateGameStatsUseCase
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
@@ -98,7 +103,8 @@ class GameDelegateFactory @Inject constructor(
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
                 fetchScreenshotBatchUseCase = fetchScreenshotBatchUseCase,
-                searchGamesUseCase = searchGamesUseCase
+                searchGamesUseCase = searchGamesUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             GameModeIds.GAME_ACHIEVEMENT -> GameAchievementDelegate(
                 categoryType = categoryType,
@@ -106,7 +112,8 @@ class GameDelegateFactory @Inject constructor(
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
-                fetchAchievementBatchUseCase = fetchAchievementBatchUseCase
+                fetchAchievementBatchUseCase = fetchAchievementBatchUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             GameModeIds.GAME_DESCRIPTION -> GameDescriptionDelegate(
                 categoryType = categoryType,
@@ -115,7 +122,8 @@ class GameDelegateFactory @Inject constructor(
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
                 fetchDescriptionBatchUseCase = fetchDescriptionBatchUseCase,
-                searchGamesUseCase = searchGamesUseCase
+                searchGamesUseCase = searchGamesUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
 
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
@@ -134,7 +142,8 @@ class GameDelegateFactory @Inject constructor(
                 fetchMangaPairsUseCase = fetchMangaPairsUseCase,
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
-                updateGameStatsUseCase = updateGameStatsUseCase
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             GameModeIds.EMOJI -> EmojiGameDelegate(
                 categoryType = categoryType,
@@ -145,7 +154,8 @@ class GameDelegateFactory @Inject constructor(
                     ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType"),
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
-                updateGameStatsUseCase = updateGameStatsUseCase
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
 
 
@@ -155,7 +165,8 @@ class GameDelegateFactory @Inject constructor(
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
-                getRankleMangaUseCase = getRankleMangaUseCase
+                getRankleMangaUseCase = getRankleMangaUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
             )
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }

@@ -74,10 +74,18 @@ class EditProfileViewModel @Inject constructor(
                 if (user == null) {
                     setState { copy(isLoading = false, error = "User not found") }
                 } else {
-                    setState { copy(isLoading = false, user = user, error = null) }
+                    setState {
+                        copy(
+                            isLoading = false,
+                            user = user,
+                            username = user.username,
+                            error = null
+                        )
+                    }
                 }
             }
         }
+
     }
     private fun changePassword() {
         val s = uiState.value
@@ -114,27 +122,28 @@ class EditProfileViewModel @Inject constructor(
 
 
     }
-    fun changeUsername() {
+    private fun changeUsername() {
         val s = uiState.value
-        val username = s.user?.username.orEmpty()
 
-        if (username.isBlank()) {
+        val newUsername = s.username.trim()
+        if (newUsername.isBlank()) {
             setState { copy(error = "Username cannot be empty") }
             return
         }
 
         handleResponse(
-            apiCall = { changeUsernameUseCase(s.username) },
-            onLoading = {
-                setState { copy(isLoading = true, error = null) }
-            },
+            apiCall = { changeUsernameUseCase(newUsername) },
+            onLoading = { setState { copy(isLoading = true, error = null) } },
             onSuccess = {
-                setState { copy(isLoading = false, error = null) }
+                setState {
+                    copy(
+                        isLoading = false,
+                        error = null,
+                        user = user?.copy(username = newUsername)
+                    )
+                }
             },
-            onError = { msg ->
-                setState { copy(isLoading = false, error = msg) }
-            }
-
+            onError = { msg -> setState { copy(isLoading = false, error = msg) } }
         )
     }
 }

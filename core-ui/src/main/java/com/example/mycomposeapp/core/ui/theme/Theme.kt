@@ -31,7 +31,7 @@ fun MyComposeAppTheme(
     ) {
         MaterialTheme(
             colorScheme = materialColorScheme,
-            typography = Typography,
+            typography = AppTypography,
             content = content
         )
     }
