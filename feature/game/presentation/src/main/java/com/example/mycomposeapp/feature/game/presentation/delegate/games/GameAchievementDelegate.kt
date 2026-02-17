@@ -116,7 +116,7 @@ class GameAchievementDelegate(
                     val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
                     val stats = user.stats
 
-                    val xpGain = 50
+                    val xpGain = GameConstants.XP_GAIN
                     val newTotalXp = stats.totalXp + xpGain
                     val newLevel = LevelingRules.calculateLevel(newTotalXp)
 

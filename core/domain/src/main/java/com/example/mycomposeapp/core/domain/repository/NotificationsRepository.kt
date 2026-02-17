@@ -5,13 +5,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface NotificationsRepository {
 
-    fun observeAll(): Flow<List<AppNotification>>
+    fun observeAll(userId: String): Flow<List<AppNotification>>
 
-    fun observeUnread(): Flow<List<AppNotification>>
+    fun observeUnread(userId: String): Flow<List<AppNotification>>
 
     suspend fun insert(notification: AppNotification)
 
-    suspend fun markAsRead(id: String)
+    suspend fun markAsRead(id: String, userId: String)
 
-    suspend fun clearAll()
 }

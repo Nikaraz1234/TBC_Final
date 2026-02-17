@@ -8,6 +8,6 @@ import javax.inject.Inject
 class ObserveUnreadNotificationsUseCase @Inject constructor(
     private val repository: NotificationsRepository
 ) {
-    operator fun invoke(): Flow<List<AppNotification>> =
-        repository.observeUnread()
+    operator fun invoke(userId: String): Flow<List<AppNotification>> =
+        repository.observeUnread(userId)
 }

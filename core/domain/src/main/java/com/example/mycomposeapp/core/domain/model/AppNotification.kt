@@ -7,5 +7,6 @@ data class AppNotification(
     val deeplink: String?,
     val type: String?,
     val createdAtMillis: Long,
-    val isRead: Boolean
+    val isRead: Boolean,
+    val userId: String
 )

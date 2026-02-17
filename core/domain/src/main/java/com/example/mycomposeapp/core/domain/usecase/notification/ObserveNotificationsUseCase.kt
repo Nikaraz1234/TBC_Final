@@ -8,6 +8,6 @@ import javax.inject.Inject
 class ObserveNotificationsUseCase @Inject constructor(
     private val repository: NotificationsRepository
 ) {
-    operator fun invoke(): Flow<List<AppNotification>> =
-        repository.observeAll()
+    operator fun invoke(userId: String): Flow<List<AppNotification>> =
+        repository.observeAll(userId)
 }

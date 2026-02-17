@@ -13,25 +13,17 @@ class NotificationsRepositoryImpl @Inject constructor(
     private val dao: NotificationsDao
 ) : NotificationsRepository {
 
-    override fun observeAll(): Flow<List<AppNotification>> =
-        dao.observeAll().map { list ->
-            list.map { it.toDomain() }
-        }
+    override fun observeAll(userId: String): Flow<List<AppNotification>> =
+        dao.observeAll(userId).map { it.map { e -> e.toDomain() } }
 
-    override fun observeUnread(): Flow<List<AppNotification>> =
-        dao.observeUnread().map { list ->
-            list.map { it.toDomain() }
-        }
+    override fun observeUnread(userId: String): Flow<List<AppNotification>> =
+        dao.observeUnread(userId).map { it.map { e -> e.toDomain() } }
 
     override suspend fun insert(notification: AppNotification) {
         dao.upsert(notification.toEntity())
     }
 
-    override suspend fun markAsRead(id: String) {
-        dao.markRead(id)
-    }
-
-    override suspend fun clearAll() {
-        dao.clearAll()
+    override suspend fun markAsRead(id: String, userId: String) {
+        dao.markRead(id, userId)
     }
 }

@@ -6,7 +6,4 @@ import javax.inject.Inject
 class ClearNotificationsUseCase @Inject constructor(
     private val repository: NotificationsRepository
 ) {
-    suspend operator fun invoke() {
-        repository.clearAll()
-    }
 }

@@ -251,7 +251,6 @@ class GameDescriptionDelegate(
 
         val current = questionQueue.removeAt(0)
 
-        // 👇 buffer the next question so questions.size >= 2 (so isLastQuestion becomes false)
         val bufferedNext = questionQueue.firstOrNull()
 
         scope.updateState {
@@ -264,7 +263,7 @@ class GameDescriptionDelegate(
 
             copy(
                 questions = listForUi,
-                currentQuestionIndex = 0, // always pointing at `current`
+                currentQuestionIndex = 0,
                 phase = GameContract.GamePhase.Playing,
                 userAnswer = "",
                 isAnswerRevealed = false,
@@ -355,7 +354,7 @@ class GameDescriptionDelegate(
                     val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
                     val stats = user.stats
 
-                    val xpGain = 50
+                    val xpGain = GameConstants.XP_GAIN
                     val newTotalXp = stats.totalXp + xpGain
                     val newLevel = LevelingRules.calculateLevel(newTotalXp)
 

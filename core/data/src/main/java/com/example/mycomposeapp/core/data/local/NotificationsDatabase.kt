@@ -7,7 +7,7 @@ import com.example.mycomposeapp.core.data.local.entity.NotificationEntity
 
 @Database(
     entities = [NotificationEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class NotificationsDatabase : RoomDatabase() {

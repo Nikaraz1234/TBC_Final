@@ -11,7 +11,8 @@ fun NotificationEntity.toDomain(): AppNotification =
         deeplink = deeplink,
         type = type,
         createdAtMillis = createdAtMillis,
-        isRead = isRead
+        isRead = isRead,
+        userId = userId
     )
 
 fun AppNotification.toEntity(): NotificationEntity =
@@ -22,5 +23,6 @@ fun AppNotification.toEntity(): NotificationEntity =
         deeplink = deeplink,
         type = type,
         createdAtMillis = createdAtMillis,
-        isRead = isRead
+        isRead = isRead,
+        userId = userId
     )
