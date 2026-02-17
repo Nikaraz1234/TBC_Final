@@ -2,6 +2,7 @@ package com.example.mycomposeapp.core.domain.usecase.daily
 
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.model.DailyGoal
+import com.example.mycomposeapp.core.domain.model.DailyGoalsAllProgress
 import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
 import com.example.mycomposeapp.core.domain.model.DailyGoalsProgress
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
@@ -27,8 +28,15 @@ class GetDailyGoalsUseCase @Inject constructor(
             .getPreference(PreferenceKeys.DAILY_GOALS_CATEGORIES_TRIED, "")
             .first()
 
+        val gameModesTried = dataStoreManager
+            .getPreference(PreferenceKeys.DAILY_GOALS_GAME_MODES_TRIED, "")
+            .first()
+
         val categoriesCount = if (categoriesTried.isBlank()) 0
         else categoriesTried.split(",").distinct().size
+
+        val gameModesCount = if (gameModesTried.isBlank()) 0
+        else gameModesTried.split(",").distinct().size
 
         val goals = listOf(
             DailyGoal(
@@ -48,9 +56,40 @@ class GetDailyGoalsUseCase @Inject constructor(
                 title = "Try ${DailyGoalsConstants.CATEGORIES_TO_TRY_TARGET} categories",
                 currentProgress = categoriesCount,
                 targetProgress = DailyGoalsConstants.CATEGORIES_TO_TRY_TARGET
+            ),
+            DailyGoal(
+                id = "game_modes_tried",
+                title = "Try ${DailyGoalsConstants.GAME_MODES_TO_TRY_TARGET} different game modes",
+                currentProgress = gameModesCount,
+                targetProgress = DailyGoalsConstants.GAME_MODES_TO_TRY_TARGET
             )
         )
 
         return DailyGoalsProgress(goals = goals)
+    }
+
+    suspend fun getAllProgress(): DailyGoalsAllProgress {
+        resetHelper.ensureTodayReset()
+
+        val categoriesTried = dataStoreManager
+            .getPreference(PreferenceKeys.DAILY_GOALS_CATEGORIES_TRIED, "")
+            .first()
+
+        val gameModesTried = dataStoreManager
+            .getPreference(PreferenceKeys.DAILY_GOALS_GAME_MODES_TRIED, "")
+            .first()
+
+        val categoriesList = if (categoriesTried.isBlank()) emptyList()
+        else categoriesTried.split(",").distinct()
+
+        val gameModesList = if (gameModesTried.isBlank()) emptyList()
+        else gameModesTried.split(",").distinct()
+
+        return DailyGoalsAllProgress(
+            categoriesCount = categoriesList.size,
+            gameModesCount = gameModesList.size,
+            categoriesTried = categoriesList,
+            gameModesTried = gameModesList
+        )
     }
 }

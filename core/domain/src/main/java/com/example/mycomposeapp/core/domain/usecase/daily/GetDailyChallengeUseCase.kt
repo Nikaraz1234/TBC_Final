@@ -3,6 +3,7 @@ package com.example.mycomposeapp.core.domain.usecase.daily
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.model.DailyChallenge
 import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
+import com.example.mycomposeapp.core.domain.model.GameModeInfo
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
@@ -11,25 +12,18 @@ import kotlinx.datetime.todayIn
 import javax.inject.Inject
 import kotlin.math.abs
 
-data class GameModeInfo(
-    val categoryName: String,
-    val categoryType: String,
-    val gameModeName: String,
-    val gameModeId: String
-)
-
 class GetDailyChallengeUseCase @Inject constructor(
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
+    private val getAvailableGameModesUseCase: GetAvailableGameModesUseCase
 ) {
-    suspend operator fun invoke(availableGameModes: List<GameModeInfo>): DailyChallenge? {
+    suspend operator fun invoke(): DailyChallenge? {
+        val availableGameModes = getAvailableGameModesUseCase()
         if (availableGameModes.isEmpty()) return null
 
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toString()
         val seed = abs(today.hashCode())
         val selectedIndex = seed % availableGameModes.size
         val selected = availableGameModes[selectedIndex]
-
-        val bonusMultiplier = DailyGoalsConstants.BONUS_MULTIPLIER_OPTIONS[seed % DailyGoalsConstants.BONUS_MULTIPLIER_OPTIONS.size]
 
         val completedDate = dataStoreManager
             .getPreference(PreferenceKeys.DAILY_CHALLENGE_COMPLETED_DATE, "")
@@ -42,7 +36,7 @@ class GetDailyChallengeUseCase @Inject constructor(
             categoryType = selected.categoryType,
             gameModeName = selected.gameModeName,
             gameModeId = selected.gameModeId,
-            bonusMultiplier = bonusMultiplier,
+            bonusMultiplier = DailyGoalsConstants.DAILY_CHALLENGE_MULTIPLIER,
             isCompleted = isCompleted
         )
     }

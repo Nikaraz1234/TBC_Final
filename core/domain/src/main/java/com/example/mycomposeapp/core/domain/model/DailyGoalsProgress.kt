@@ -13,3 +13,17 @@ data class DailyGoalsProgress(
     val completedCount: Int = goals.count { it.isCompleted },
     val totalCount: Int = goals.size
 )
+
+data class DailyGoalsAllProgress(
+    val categoriesCount: Int,
+    val gameModesCount: Int,
+    val categoriesTried: List<String>,
+    val gameModesTried: List<String>
+)
+
+data class GameModeInfo(
+    val categoryName: String,
+    val categoryType: String,
+    val gameModeName: String,
+    val gameModeId: String
+)

@@ -2,6 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -24,7 +26,9 @@ class MoviePlotDelegate(
     private val fetchPlotBatchUseCase: FetchPlotBatchUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -32,6 +36,7 @@ class MoviePlotDelegate(
     private val seenItemIds = mutableSetOf<String>()
     private val questionQueue = mutableListOf<Question>()
     private var prefetchJob: Job? = null
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -45,6 +50,10 @@ class MoviePlotDelegate(
                     modeState = GameContract.ModeState.Plot()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -72,7 +81,7 @@ class MoviePlotDelegate(
             val newBestStreak = maxOf(plot.bestSessionStreak, newStreak)
             val scoreGain = GameConstants.PLOT_BASE_POINTS + GameConstants.PLOT_STREAK_BONUS * newStreak
             val newScore = plot.currentScore + scoreGain
-            val newCoins = plot.coins + GameConstants.PLOT_COINS_PER_CORRECT
+            val newCoins = plot.coins + GameConstants.PLOT_COINS_PER_CORRECT * coinMultiplier
             val newCorrect = state.correctAnswersCount + 1
 
             answerResults.add(
@@ -338,6 +347,14 @@ class MoviePlotDelegate(
                     }
                 }
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) { }
         }
     }

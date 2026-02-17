@@ -26,3 +26,4 @@ nul
 
 # Firebase config - replace with your own from Firebase Console
 app/google-services.json
+/PROXYAI.md

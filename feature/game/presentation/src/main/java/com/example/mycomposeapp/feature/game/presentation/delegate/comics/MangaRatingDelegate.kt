@@ -2,6 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -23,7 +25,9 @@ class MangaRatingDelegate(
     private val fetchMangaPairsUseCase: FetchMangaPairsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -32,6 +36,7 @@ class MangaRatingDelegate(
     private val pairQueue = mutableListOf<MangaPair>()
     private var prefetchJob: Job? = null
     private var lastAnswerWrong = false
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -45,6 +50,10 @@ class MangaRatingDelegate(
                     modeState = GameContract.ModeState.MangaRating()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -72,7 +81,7 @@ class MangaRatingDelegate(
         if (isCorrect) {
             val newStreak = manga.currentStreak + 1
             val newBestStreak = maxOf(manga.bestSessionStreak, newStreak)
-            val newCoins = manga.coins + GameConstants.MANGA_RATING_COINS_PER_CORRECT
+            val newCoins = manga.coins + GameConstants.MANGA_RATING_COINS_PER_CORRECT * coinMultiplier
 
             answerResults.add(
                 AnswerResult(
@@ -261,6 +270,14 @@ class MangaRatingDelegate(
                     }
                 }
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) { }
         }
     }

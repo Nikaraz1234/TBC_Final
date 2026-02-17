@@ -2,6 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -22,7 +24,9 @@ class MovieCoverDelegate(
     private val fetchCoverBatchUseCase: FetchCoverBatchUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -30,6 +34,7 @@ class MovieCoverDelegate(
     private val seenItemIds = mutableSetOf<String>()
     private val questionQueue = mutableListOf<com.example.mycomposeapp.feature.game.domain.model.Question>()
     private var prefetchJob: Job? = null
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -43,6 +48,10 @@ class MovieCoverDelegate(
                     modeState = GameContract.ModeState.Cover()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -70,7 +79,7 @@ class MovieCoverDelegate(
             val newBestStreak = maxOf(cover.bestSessionStreak, newStreak)
             val scoreGain = GameConstants.COVER_BASE_POINTS + GameConstants.COVER_STREAK_BONUS * newStreak
             val newScore = cover.currentScore + scoreGain
-            val newCoins = cover.coins + GameConstants.COVER_COINS_PER_CORRECT
+            val newCoins = cover.coins + GameConstants.COVER_COINS_PER_CORRECT * coinMultiplier
             val newCorrect = state.correctAnswersCount + 1
 
             answerResults.add(
@@ -316,6 +325,14 @@ class MovieCoverDelegate(
                     }
                 }
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) { }
         }
     }

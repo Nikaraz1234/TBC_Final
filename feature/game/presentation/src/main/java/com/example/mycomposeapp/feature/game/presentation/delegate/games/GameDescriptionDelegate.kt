@@ -1,6 +1,8 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
 import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -25,7 +27,9 @@ class GameDescriptionDelegate(
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
     private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
-    private val searchGamesUseCase: SearchGamesUseCase
+    private val searchGamesUseCase: SearchGamesUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -37,6 +41,7 @@ class GameDescriptionDelegate(
 
     private var prefetchJob: Job? = null
     private var searchJob: Job? = null
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -50,6 +55,10 @@ class GameDescriptionDelegate(
                     modeState = GameContract.ModeState.Description()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -316,7 +325,7 @@ class GameDescriptionDelegate(
                 GameConstants.BASE_POINTS + GameConstants.STREAK_BONUS_MULTIPLIER * newStreak
             val newScore = mode.currentScore + scoreGain
 
-            val newCoins = mode.coins + GameConstants.COVER_COINS_PER_CORRECT
+            val newCoins = mode.coins + GameConstants.COVER_COINS_PER_CORRECT * coinMultiplier
             val newCorrect = state.correctAnswersCount + 1
 
             answerResults.add(
@@ -426,6 +435,14 @@ class GameDescriptionDelegate(
         scope.coroutineScope.launch {
             try {
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) {}
         }
     }

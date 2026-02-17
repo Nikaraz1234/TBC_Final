@@ -22,6 +22,7 @@ class DailyGoalsResetHelper @Inject constructor(
             dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_GAMES_PLAYED, 0)
             dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_PERFECT_SCORES, 0)
             dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_CATEGORIES_TRIED, "")
+            dataStoreManager.setPreference(PreferenceKeys.DAILY_GOALS_GAME_MODES_TRIED, "")
         }
     }
 }

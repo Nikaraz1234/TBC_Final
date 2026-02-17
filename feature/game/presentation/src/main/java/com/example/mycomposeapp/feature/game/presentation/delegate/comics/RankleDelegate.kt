@@ -2,6 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -30,7 +32,9 @@ class RankleDelegate(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
-    private val getRankleMangaUseCase: GetRankleMangaUseCase
+    private val getRankleMangaUseCase: GetRankleMangaUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -38,6 +42,7 @@ class RankleDelegate(
     private val seenIds = mutableSetOf<Long>()
     private var roundsPlayed = 0
     private var totalCorrect = 0
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -51,6 +56,10 @@ class RankleDelegate(
                     modeState = GameContract.ModeState.Rankle()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -97,7 +106,7 @@ class RankleDelegate(
 
         // Coin rewards: 5 for 1st try, 4 for 2nd, 3 for 3rd, 2 for 4th, 1 for 5th
         val attemptNumber = RANKLE_INITIAL_ATTEMPTS - rankle.attemptsLeft + 1
-        val coinsEarned = if (isCorrect) (RANKLE_COINS_WIN - attemptNumber + 1).coerceAtLeast(0) else 0
+        val coinsEarned = if (isCorrect) (RANKLE_COINS_WIN - attemptNumber + 1).coerceAtLeast(0) * coinMultiplier else 0
         val newCoins = rankle.coins + coinsEarned
 
         answerResults.add(
@@ -244,6 +253,14 @@ class RankleDelegate(
                     }
                 }
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) { }
         }
     }

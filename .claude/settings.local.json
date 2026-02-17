@@ -52,7 +52,8 @@
       "WebFetch(domain:wiki.teamfortress.com)",
       "WebFetch(domain:nik-davis.github.io)",
       "WebFetch(domain:store.steampowered.com)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

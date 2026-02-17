@@ -2,6 +2,8 @@ package com.example.mycomposeapp.feature.game.presentation.delegate.common
 
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.CategoryType
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -26,12 +28,15 @@ class EmojiGameDelegate(
     private val dailyPuzzleRepository: DailyPuzzleRepository,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
-    private val updateGameStatsUseCase: UpdateGameStatsUseCase
+    private val updateGameStatsUseCase: UpdateGameStatsUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
     private val answerResults = mutableListOf<AnswerResult>()
     private val isFromArchive = archiveDate != null
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -40,6 +45,12 @@ class EmojiGameDelegate(
     override fun loadGame() {
         val dateToLoad = archiveDate ?: LocalDate.now().toString()
         scope.coroutineScope.launch {
+            coinMultiplier = if (!isFromArchive) {
+                try {
+                    dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+                } catch (_: Exception) { 1 }
+            } else 1
+
             getDailyPuzzleUseCase(categoryType, dateToLoad).collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
@@ -107,7 +118,7 @@ class EmojiGameDelegate(
 
             val state = scope.currentState()
             val emoji = state.emojiState ?: return
-            val coinsEarned = if (!emoji.isFromArchive) GameConstants.EMOJI_DAILY_COINS_REWARD else 0
+            val coinsEarned = if (!emoji.isFromArchive) GameConstants.EMOJI_DAILY_COINS_REWARD * coinMultiplier else 0
             val newCoins = emoji.coins + coinsEarned
 
             scope.updateState {
@@ -140,6 +151,14 @@ class EmojiGameDelegate(
                             finalCoinBalance = newCoins
                         )
                         updateGameStatsUseCase(result, gameModeId, categoryType, true)
+                        updateDailyGoalProgressUseCase.recordGamePlayed(
+                            categoryType = categoryType,
+                            gameModeId = gameModeId,
+                            wasPerfect = true
+                        )
+                        if (coinMultiplier > 1) {
+                            dailyGoalsManagerUseCase.completeDailyChallenge()
+                        }
                     }
                 } catch (_: Exception) { }
             }

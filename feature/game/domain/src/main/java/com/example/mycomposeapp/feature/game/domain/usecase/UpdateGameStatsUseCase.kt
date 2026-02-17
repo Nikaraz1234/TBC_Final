@@ -2,6 +2,7 @@ package com.example.mycomposeapp.feature.game.domain.usecase
 
 import com.example.mycomposeapp.core.domain.repository.UserRepository
 import com.example.mycomposeapp.core.domain.model.GameModeIds
+import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
@@ -14,7 +15,8 @@ class UpdateGameStatsUseCase @Inject constructor(
         result: GameResult,
         gameModeId: String,
         categoryType: String,
-        isDailyMode: Boolean
+        isDailyMode: Boolean,
+        isDailyChallengeMode: Boolean = false
     ) {
         val user = userRepository.getCurrentUser().firstOrNull() ?: return
         val currentStats = user.stats

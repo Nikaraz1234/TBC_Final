@@ -9,7 +9,7 @@ class UpdateDailyGoalProgressUseCase @Inject constructor(
     private val dataStoreManager: DataStoreManager,
     private val resetHelper: DailyGoalsResetHelper
 ) {
-    suspend fun recordGamePlayed(categoryType: String, wasPerfect: Boolean) {
+    suspend fun recordGamePlayed(categoryType: String, gameModeId: String, wasPerfect: Boolean) {
         resetHelper.ensureTodayReset()
 
         val currentGames = dataStoreManager
@@ -34,6 +34,21 @@ class UpdateDailyGoalProgressUseCase @Inject constructor(
             dataStoreManager.setPreference(
                 PreferenceKeys.DAILY_GOALS_CATEGORIES_TRIED,
                 categoriesList.joinToString(",")
+            )
+        }
+
+        val currentGameModes = dataStoreManager
+            .getPreference(PreferenceKeys.DAILY_GOALS_GAME_MODES_TRIED, "")
+            .first()
+        val gameModesList = if (currentGameModes.isBlank()) mutableListOf()
+        else currentGameModes.split(",").toMutableList()
+
+        val gameModeKey = "${categoryType}_${gameModeId}"
+        if (gameModeKey !in gameModesList) {
+            gameModesList.add(gameModeKey)
+            dataStoreManager.setPreference(
+                PreferenceKeys.DAILY_GOALS_GAME_MODES_TRIED,
+                gameModesList.joinToString(",")
             )
         }
     }

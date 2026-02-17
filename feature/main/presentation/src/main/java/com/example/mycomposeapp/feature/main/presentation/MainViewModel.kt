@@ -1,10 +1,9 @@
 package com.example.mycomposeapp.feature.main.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.example.mycomposeapp.core.domain.model.GameModeInfo
 import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
-import com.example.mycomposeapp.core.domain.usecase.daily.GameModeInfo
-import com.example.mycomposeapp.core.domain.usecase.daily.GetDailyChallengeUseCase
-import com.example.mycomposeapp.core.domain.usecase.daily.GetDailyGoalsUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
@@ -25,8 +24,7 @@ class MainViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshUserUseCase: RefreshUserUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val getDailyChallengeUseCase: GetDailyChallengeUseCase,
-    private val getDailyGoalsUseCase: GetDailyGoalsUseCase
+    private val dailyGoalsManager: DailyGoalsManagerUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
 
     init {
@@ -60,31 +58,29 @@ class MainViewModel @Inject constructor(
 
     private fun loadDailyChallenge() {
         viewModelScope.launch {
-            val availableModes = getAvailableGameModeInfos()
-            val challenge = getDailyChallengeUseCase(availableModes)
-            setState { copy(dailyChallenge = challenge) }
+            try {
+                val challenge = dailyGoalsManager.getDailyChallenge()
+                setState { copy(dailyChallenge = challenge) }
+            } catch (e: Exception) {
+                // Handle error silently, daily challenge is optional
+            }
         }
     }
 
-    private fun getAvailableGameModeInfos(): List<GameModeInfo> =
-        Categories.all.flatMap { category ->
-            category.gameModes
-                .filter { it.isAvailable }
-                .map { gameMode ->
-                    GameModeInfo(
-                        categoryName = category.name,
-                        categoryType = category.type.name,
-                        gameModeName = gameMode.name,
-                        gameModeId = gameMode.id
-                    )
-                }
-        }
-
     private fun loadDailyGoals() {
         viewModelScope.launch {
-            val goals = getDailyGoalsUseCase()
-            setState { copy(dailyGoals = goals) }
+            try {
+                val goals = dailyGoalsManager.getDailyGoals()
+                setState { copy(dailyGoals = goals) }
+            } catch (e: Exception) {
+                // Handle error silently, daily goals are optional
+            }
         }
+    }
+
+    fun refreshDailyData() {
+        loadDailyChallenge()
+        loadDailyGoals()
     }
 
     fun onEvent(event: Event) {

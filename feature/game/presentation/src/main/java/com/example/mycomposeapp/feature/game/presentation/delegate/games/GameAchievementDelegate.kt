@@ -1,6 +1,8 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
 import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
+import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
@@ -22,7 +24,9 @@ class GameAchievementDelegate(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
-    private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase
+    private val fetchAchievementBatchUseCase: FetchAchievementBatchUseCase,
+    private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -31,6 +35,7 @@ class GameAchievementDelegate(
     private val questionQueue = mutableListOf<Question>()
     private var prefetchJob: Job? = null
     private var correctAnswersTotal = 0
+    private var coinMultiplier: Int = 1
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -44,6 +49,10 @@ class GameAchievementDelegate(
                     modeState = GameContract.ModeState.Achievement()
                 )
             }
+
+            coinMultiplier = try {
+                dailyGoalsManagerUseCase.getCoinMultiplier(categoryType, gameModeId)
+            } catch (_: Exception) { 1 }
 
             val user = getCurrentUserUseCase().firstOrNull()
             val initialCoins = user?.stats?.coins ?: 0
@@ -75,7 +84,7 @@ class GameAchievementDelegate(
             val scoreGain = GameConstants.ACHIEVEMENT_BASE_POINTS +
                     GameConstants.ACHIEVEMENT_STREAK_BONUS * newStreak
             val newScore = achievement.currentScore + scoreGain
-            val newCoins = achievement.coins + GameConstants.ACHIEVEMENT_COINS_PER_CORRECT
+            val newCoins = achievement.coins + GameConstants.ACHIEVEMENT_COINS_PER_CORRECT * coinMultiplier
             val newCorrect = state.correctAnswersCount + 1
 
             answerResults.add(
@@ -255,6 +264,14 @@ class GameAchievementDelegate(
         scope.coroutineScope.launch {
             try {
                 updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                updateDailyGoalProgressUseCase.recordGamePlayed(
+                    categoryType = categoryType,
+                    gameModeId = gameModeId,
+                    wasPerfect = false
+                )
+                if (coinMultiplier > 1) {
+                    dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
             } catch (_: Exception) {}
         }
     }
