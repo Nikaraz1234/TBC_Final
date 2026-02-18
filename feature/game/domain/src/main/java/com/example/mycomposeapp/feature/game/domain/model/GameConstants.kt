@@ -46,8 +46,9 @@ object GameConstants {
     const val MANGA_RATING_BATCH_SIZE = 10
 
     // Rankle
-    const val WIN_THRESHOLD = 0.05
+    const val WIN_THRESHOLD = 0.01
     const val RANKLE_INITIAL_ATTEMPTS = 5
+    const val RANKLE_INITIAL_LIVES = 1
     const val RANKLE_COINS_WIN = 5
 
 }

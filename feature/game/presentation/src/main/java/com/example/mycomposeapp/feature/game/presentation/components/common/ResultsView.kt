@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -230,7 +231,10 @@ private fun RegularResultsContent(
 
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 250.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
@@ -257,7 +261,7 @@ private fun RegularResultsContent(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
-                            if (!answer.isCorrect && answer.userAnswer != null) {
+                            if (answer.userAnswer != null) {
                                 Text(
                                     text = stringResource(GameR.string.your_answer_format, answer.userAnswer ?: ""),
                                     color = colors.textMuted,

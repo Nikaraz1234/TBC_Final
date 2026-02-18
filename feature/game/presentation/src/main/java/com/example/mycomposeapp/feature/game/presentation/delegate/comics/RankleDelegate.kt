@@ -43,6 +43,7 @@ class RankleDelegate(
     private var roundsPlayed = 0
     private var totalCorrect = 0
     private var coinMultiplier: Int = 1
+    private var gameStartTimeMs = 0L
 
     override fun attach(scope: DelegateScope) {
         this.scope = scope
@@ -70,6 +71,7 @@ class RankleDelegate(
                 )
             }
             fetchMangaAndStart()
+            gameStartTimeMs = System.currentTimeMillis()
         }
     }
 
@@ -109,16 +111,6 @@ class RankleDelegate(
         val coinsEarned = if (isCorrect) (RANKLE_COINS_WIN - attemptNumber + 1).coerceAtLeast(0) * coinMultiplier else 0
         val newCoins = rankle.coins + coinsEarned
 
-        answerResults.add(
-            AnswerResult(
-                questionId = "rankle_${rankle.mangaTitle}",
-                correctAnswer = "$actualRating",
-                userAnswer = "$guessValue",
-                isCorrect = isCorrect,
-                timeSpentSeconds = 0
-            )
-        )
-
         if (isCorrect) totalCorrect++
 
         scope.updateState {
@@ -143,6 +135,29 @@ class RankleDelegate(
 
     override fun onNextQuestion() {
         roundsPlayed++
+        val rankle = scope.currentState().rankleState ?: return
+        val wasCorrect = scope.currentState().isAnswerCorrect
+
+        answerResults.add(
+            AnswerResult(
+                questionId = "rankle_${rankle.mangaTitle}",
+                correctAnswer = "${rankle.actualRating}",
+                userAnswer = rankle.guesses.lastOrNull()?.input?.let { "%.2f".format(it) } ?: "",
+                isCorrect = wasCorrect,
+                timeSpentSeconds = 0
+            )
+        )
+
+        if (!wasCorrect) {
+            val newLives = rankle.livesRemaining - 1
+            scope.updateState {
+                copy(modeState = rankle.copy(livesRemaining = newLives))
+            }
+            if (newLives <= 0) {
+                finishGame()
+                return
+            }
+        }
         scope.coroutineScope.launch { fetchMangaAndStart() }
     }
 
@@ -221,13 +236,14 @@ class RankleDelegate(
         val state = scope.currentState()
         val rankle = state.rankleState ?: return
 
+        val elapsed = ((System.currentTimeMillis() - gameStartTimeMs) / 1000).toInt()
         val score = totalCorrect * BASE_POINTS
 
         val result = GameResult(
             totalQuestions = answerResults.size,
             correctAnswers = totalCorrect,
             totalScore = score,
-            timeTakenSeconds = 0,
+            timeTakenSeconds = elapsed,
             bestStreak = totalCorrect,
             answers = answerResults.toList(),
             isNewHighScore = false,

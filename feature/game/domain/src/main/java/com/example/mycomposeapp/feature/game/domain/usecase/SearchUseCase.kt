@@ -9,8 +9,14 @@ import javax.inject.Inject
 class SearchUseCase @Inject constructor(
     private val searchRepositories: Map<String, @JvmSuppressWildcards SearchRepository>
 ) {
-    operator fun invoke(categoryType: String, query: String): Flow<Resource<List<SearchResult>>> {
-        val repo = searchRepositories[categoryType]
+    operator fun invoke(
+        categoryType: String,
+        query: String,
+        gameModeId: String? = null
+    ): Flow<Resource<List<SearchResult>>> {
+        val compositeKey = gameModeId?.let { "${categoryType}_$it" }
+        val repo = (compositeKey?.let { searchRepositories[it] })
+            ?: searchRepositories[categoryType]
             ?: throw IllegalArgumentException("No search repository for category: $categoryType")
         return repo.search(query)
     }

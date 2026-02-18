@@ -14,4 +14,12 @@ interface SteamStoreService {
         @Query("start") start: Int,
         @Query("count") count: Int
     ): SteamSearchResponse
+
+    @GET("search/results/")
+    suspend fun searchGamesByName(
+        @Query("term") term: String,
+        @Query("json") json: Int = 1,
+        @Query("start") start: Int = 0,
+        @Query("count") count: Int = 10
+    ): SteamSearchResponse
 }

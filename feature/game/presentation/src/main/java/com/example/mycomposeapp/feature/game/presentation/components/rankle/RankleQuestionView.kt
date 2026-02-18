@@ -260,7 +260,7 @@ private fun RankleHelpDialog(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text("Color Feedback:", color = colors.textLight, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                HelpColorRow("Green", "Within 0.05 — You Win!", Color(0xFF4CAF50))
+                HelpColorRow("Green", "Within 0.02 — You Win!", Color(0xFF4CAF50))
                 HelpColorRow("Red", "Within 0.1", Color(0xFFE53935))
                 HelpColorRow("Orange", "Within 0.2", Color(0xFFFF9800))
                 HelpColorRow("Yellow", "Within 0.5", Color(0xFFFDD835))

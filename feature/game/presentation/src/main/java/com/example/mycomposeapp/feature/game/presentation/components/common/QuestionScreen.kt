@@ -238,12 +238,13 @@ fun QuestionScreen(
 
             NextButton(
                 isLastQuestion = when {
-                    state.isCoverMode -> false
-                    state.isPlotMode -> false
-                    state.isAchievementMode -> false
-                    state.screenshotState != null -> false
-                    state.descriptionState != null -> false
-                    isRankleMode -> false
+                    state.isCoverMode -> state.coverState?.livesRemaining == 0
+                    state.isPlotMode -> state.plotState?.guessesRemaining == 0
+                    state.isAchievementMode -> state.achievementState?.livesRemaining == 0
+                    state.screenshotState != null -> state.screenshotState?.livesRemaining == 0
+                    state.descriptionState != null -> state.descriptionState?.livesRemaining == 0
+                    isRankleMode -> state.rankleState?.livesRemaining == 0
+                        || (!state.isAnswerCorrect && (state.rankleState?.livesRemaining ?: 0) <= 1)
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },

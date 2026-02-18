@@ -17,6 +17,7 @@ import com.example.mycomposeapp.feature.game.data.repository.comics.MangaRatingR
 import com.example.mycomposeapp.feature.game.data.repository.comics.RankleRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.games.GameSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.games.GamesRepositoryImpl
+import com.example.mycomposeapp.feature.game.data.repository.games.SteamSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieCoverGameRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieDailyPuzzleRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MoviePlotGameRepositoryImpl
@@ -121,6 +122,13 @@ object GameDataModule {
     @StringKey("GAMES")
     fun provideGameSearchRepository(
         impl: GameSearchRepositoryImpl
+    ): SearchRepository = impl
+
+    @Provides
+    @IntoMap
+    @StringKey("GAMES_games_achievement")
+    fun provideSteamSearchRepository(
+        impl: SteamSearchRepositoryImpl
     ): SearchRepository = impl
 
     @Provides

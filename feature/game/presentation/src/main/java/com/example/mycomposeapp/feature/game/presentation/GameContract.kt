@@ -112,7 +112,8 @@ object GameContract {
             val guesses: List<RankleGuess> = emptyList(),
             val attemptsLeft: Int = 5,
             val isRoundOver: Boolean = false,
-            val actualRating: Double? = null
+            val actualRating: Double? = null,
+            val livesRemaining: Int = GameConstants.RANKLE_INITIAL_LIVES
         ) : ModeState
 
         data object None : ModeState

@@ -65,7 +65,7 @@ class GameViewModel @Inject constructor(
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
                 delay(300)
-                searchUseCase(route.categoryType, text).collect { resource ->
+                searchUseCase(route.categoryType, text, route.gameModeId).collect { resource ->
                     when (resource) {
                         is Resource.Success -> setState {
                             copy(searchResults = resource.data, isSearching = false)
