@@ -44,7 +44,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object GameDataModule {
 
-
     @Provides
     @Singleton
     fun provideTmdbApiService(@TmdbRetrofit retrofit: Retrofit): TmdbApiService {
@@ -126,12 +125,6 @@ object GameDataModule {
     @Provides
     @Singleton
     fun provideMangaRatingRepository(
-        impl: MangaRatingRepositoryImpl
-    ): MangaRatingRepository = impl
-
-    @Provides
-    @Singleton
-    fun provideMangaRatingRepository(
         malApiService: MalApiService
     ): MangaRatingRepository = MangaRatingRepositoryImpl(malApiService)
 
@@ -148,7 +141,10 @@ object GameDataModule {
     fun provideMangaSearchRepository(
         repo: MangaSearchRepositoryImpl
     ): SearchRepository = repo
-}
+
+    @Provides
+    @IntoMap
+    @StringKey("COMICS")
     fun provideRankleRepository(
         impl: RankleRepositoryImpl
     ): RankleRepository = impl

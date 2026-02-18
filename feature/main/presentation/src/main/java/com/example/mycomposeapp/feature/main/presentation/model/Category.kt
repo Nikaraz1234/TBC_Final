@@ -74,18 +74,18 @@ object Categories {
             id = GameModeIds.EMOJI,
             name = "By Emoji",
             description = "Decode emoji clues to find the manga",
-
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        ),
         GameMode(
             id = GameModeIds.RANKLE,
             name = "Guess the rating",
             description = "Guess the close approximation of the rating",
             iconRes = R.drawable.ic_cover,
             isAvailable = true
-        )
+                ))
 
-    )
-
-    private val comingSoonGameModes = listOf(
+        private val comingSoonGameModes = listOf(
         GameMode(
             id = "coming_soon",
             name = "Coming Soon",
@@ -93,7 +93,7 @@ object Categories {
             iconRes = R.drawable.ic_cover,
             isAvailable = false
         )
-    )
+        )
 
     val all = listOf(
         Category(
