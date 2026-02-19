@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.core.data.di
 
+import com.example.mycomposeapp.core.data.common.HandleResponse
 import com.example.mycomposeapp.core.data.repository.UserRepositoryImpl
 import com.example.mycomposeapp.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -24,8 +25,9 @@ object UserModule {
     @Singleton
     fun provideUserRepository(
         firebaseAuth: FirebaseAuth,
-        firestore: FirebaseFirestore
+        firestore: FirebaseFirestore,
+        handleResponse: HandleResponse
     ): UserRepository {
-        return UserRepositoryImpl(firebaseAuth, firestore)
+        return UserRepositoryImpl(firebaseAuth, firestore, handleResponse )
     }
 }

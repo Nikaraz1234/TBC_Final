@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11">
-      <module name="build-logic.convention" target="17" />
-      <module name="build-logic.convention.main" target="17" />
-      <module name="build-logic.convention.test" target="17" />
-      <module name="MyComposeApp.app" target="21" />
-      <module name="MyComposeApp.core-ui" target="21" />
-      <module name="MyComposeApp.core.data" target="21" />
-      <module name="MyComposeApp.core.presentation" target="21" />
-      <module name="MyComposeApp.feature.login.data" target="21" />
-      <module name="MyComposeApp.feature.login.presentation" target="21" />
-      <module name="MyComposeApp.feature.main.data" target="21" />
-      <module name="MyComposeApp.feature.main.presentation" target="21" />
-      <module name="MyComposeApp.feature.profile.edit_profile.data" target="21" />
-      <module name="MyComposeApp.feature.profile.edit_profile.presentation" target="21" />
-      <module name="MyComposeApp.feature.profile.profile_page.presentation" target="21" />
-      <module name="MyComposeApp.feature.register.data" target="21" />
-      <module name="MyComposeApp.feature.register.presentation" target="21" />
-      <module name="MyComposeApp.feature.splash.data" target="21" />
-      <module name="MyComposeApp.feature.splash.presentation" target="21" />
-      <module name="MyComposeApp.feature.welcome.data" target="21" />
-      <module name="MyComposeApp.feature.welcome.presentation" target="21" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>
