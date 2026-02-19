@@ -15,20 +15,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -116,11 +113,14 @@ private fun MainContent(
         if (state.isLoading) {
             Loader()
         } else {
+            // IMPORTANT:
+            // - Removed systemBarsPadding() because your Activity Scaffold already applies innerPadding to NavHost.
+            // - Keeping a small bottom padding so last items scroll comfortably above BottomBar.
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .systemBarsPadding()
                     .verticalScroll(scrollState)
+                    .padding(bottom = 16.dp)
             ) {
                 UserTopBar(
                     user = state.user,
@@ -193,19 +193,6 @@ private fun MainContent(
                             Spacer(modifier = Modifier.height(24.dp))
                             TipsSection(startIndex = state.tipStartIndex)
                             Spacer(modifier = Modifier.height(24.dp))
-
-                            TextButton(
-                                onClick = { onEvent(MainContract.Event.OnLogoutClicked) },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                Text(
-                                    text = stringResource(MainR.string.btn_logout),
-                                    color = colors.textMuted,
-                                    style = typography.bodyMedium
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     } else {
                         GameModeSection(
@@ -268,7 +255,7 @@ private fun ArchiveCard(
             .padding(horizontal = 16.dp)
             .clickable(onClick = onClick)
     ) {
-        Row(
+        androidx.compose.foundation.layout.Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

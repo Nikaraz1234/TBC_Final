@@ -44,7 +44,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -77,22 +76,18 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is SideEffect.NavigateToDashboard -> {
-                    onNavigateToDashboard()
-                }
-                is SideEffect.NavigateToRegister -> {
-                    onNavigateToRegister()
-                }
-                is SideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
+                is SideEffect.NavigateToDashboard -> onNavigateToDashboard()
+                is SideEffect.NavigateToRegister -> onNavigateToRegister()
+                is SideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
                 is SideEffect.LaunchGoogleSignIn -> {
                     coroutineScope.launch {
                         when (val result = GoogleSignInLauncher.launch(context, "LoginScreen")) {
                             is GoogleSignInLauncher.Result.Success ->
                                 viewModel.onEvent(Event.OnGoogleSignInResult(result.idToken))
+
                             is GoogleSignInLauncher.Result.Cancelled ->
                                 viewModel.onEvent(Event.OnGoogleSignInResult(null))
+
                             is GoogleSignInLauncher.Result.Error ->
                                 viewModel.onEvent(Event.OnGoogleSignInFailed(result.message))
                         }
@@ -121,10 +116,11 @@ private fun LoginContent(
 ) {
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
     val focusManager = LocalFocusManager.current
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         AsyncImage(
             model = CoreUiR.drawable.app_background,
@@ -152,9 +148,8 @@ private fun LoginContent(
 
             Text(
                 text = stringResource(LoginR.string.welcome_back),
-                style = TextStyle(
+                style = typography.displaySmall.copy(
                     brush = colors.goldTextGradient,
-                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -162,7 +157,7 @@ private fun LoginContent(
             Text(
                 text = stringResource(LoginR.string.sign_in_to_continue),
                 color = colors.textMuted,
-                fontSize = 14.sp
+                style = typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing32))
@@ -223,14 +218,14 @@ private fun LoginContent(
                     Text(
                         text = stringResource(LoginR.string.remember_me),
                         color = colors.textMuted,
-                        fontSize = 14.sp
+                        style = typography.bodyMedium
                     )
                 }
 
                 Text(
                     text = stringResource(LoginR.string.forgot_password),
                     color = colors.goldenYellow,
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     modifier = Modifier.clickable(enabled = !state.isLoading) {
                         onEvent(Event.OnForgotPasswordClicked)
                     }
@@ -243,7 +238,7 @@ private fun LoginContent(
                 Text(
                     text = state.generalError,
                     color = colors.error,
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = spacing.spacing16)
                 )
@@ -265,7 +260,6 @@ private fun LoginContent(
 
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
-            // OR divider
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -277,7 +271,7 @@ private fun LoginContent(
                 Text(
                     text = stringResource(LoginR.string.or_divider),
                     color = colors.textMuted,
-                    fontSize = 14.sp,
+                    style = typography.labelLarge,
                     modifier = Modifier.padding(horizontal = spacing.spacing16)
                 )
                 HorizontalDivider(
@@ -319,13 +313,12 @@ private fun LoginContent(
                 Text(
                     text = stringResource(LoginR.string.no_account_prompt),
                     color = colors.textMuted,
-                    fontSize = 14.sp
+                    style = typography.bodyMedium
                 )
                 Text(
                     text = stringResource(LoginR.string.btn_register),
                     color = colors.goldenYellow,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.clickable(enabled = !state.isLoading) {
                         onEvent(Event.OnRegisterClicked)
                     }

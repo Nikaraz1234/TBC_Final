@@ -20,11 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,8 +45,13 @@ fun AchievementQuestionView(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
-    val visibleCount = if (isRevealed) content.achievements.size
-    else achievementState.visibleAchievementCount.coerceAtMost(content.achievements.size)
+    val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
+
+    val visibleCount =
+        if (isRevealed) content.achievements.size
+        else achievementState.visibleAchievementCount.coerceAtMost(content.achievements.size)
+
     val visibleAchievements = content.achievements.take(visibleCount)
 
     Column(
@@ -61,7 +64,7 @@ fun AchievementQuestionView(
                 modifier = Modifier
                     .size(width = 140.dp, height = 200.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF1A1A2E)),
+                    .background(colors.backgroundDark),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
@@ -72,7 +75,7 @@ fun AchievementQuestionView(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing12))
         }
 
         // Achievement count
@@ -83,16 +86,16 @@ fun AchievementQuestionView(
                 content.achievements.size
             ),
             color = colors.textMuted,
-            fontSize = 12.sp,
+            style = typography.labelSmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = spacing.spacing8)
         )
 
         // Achievements card
         GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = spacing.spacing16)
                 .heightIn(max = 350.dp)
         ) {
             Column(
@@ -118,7 +121,7 @@ fun AchievementQuestionView(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing12))
 
         // Hint button
         if (!isRevealed && achievementState.visibleAchievementCount < GameConstants.ACHIEVEMENT_MAX_VISIBLE) {
@@ -133,8 +136,8 @@ fun AchievementQuestionView(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(GameR.string.not_enough_coins),
-                    color = AppTheme.colors.error,
-                    fontSize = 12.sp,
+                    color = colors.error,
+                    style = typography.labelSmall,
                     textAlign = TextAlign.Center
                 )
             }
@@ -151,6 +154,7 @@ private fun AchievementRow(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Row(
         modifier = modifier
@@ -163,7 +167,7 @@ private fun AchievementRow(
             modifier = Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(Color(0xFF1A1A2E)),
+                .background(colors.backgroundDark),
             contentAlignment = Alignment.Center
         ) {
             if (iconUrl.isNotEmpty()) {
@@ -176,7 +180,7 @@ private fun AchievementRow(
             } else {
                 Text(
                     text = "\uD83C\uDFC6",
-                    fontSize = 24.sp
+                    style = typography.headlineSmall.copy(fontSize = 24.sp)
                 )
             }
         }
@@ -187,17 +191,17 @@ private fun AchievementRow(
             Text(
                 text = name,
                 color = colors.textLight,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                style = typography.titleSmall
             )
+
             if (description.isNotEmpty()) {
                 Text(
                     text = description,
                     color = colors.textMuted,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
+                    style = typography.bodySmall.copy(lineHeight = 16.sp)
                 )
             }
+
             if (unlockPercentage > 0f) {
                 Text(
                     text = stringResource(
@@ -205,8 +209,7 @@ private fun AchievementRow(
                         unlockPercentage
                     ),
                     color = colors.textMuted,
-                    fontSize = 11.sp,
-                    fontStyle = FontStyle.Italic
+                    style = typography.labelSmall.copy(fontStyle = FontStyle.Italic)
                 )
             }
         }

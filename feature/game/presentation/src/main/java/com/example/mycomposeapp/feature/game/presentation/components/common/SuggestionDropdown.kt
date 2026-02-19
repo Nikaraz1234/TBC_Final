@@ -18,10 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
@@ -33,6 +31,7 @@ fun SuggestionDropdown(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
     val shape = RoundedCornerShape(12.dp)
 
     Column(
@@ -51,6 +50,7 @@ fun SuggestionDropdown(
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 if (item.imageUrl != null) {
                     AsyncImage(
                         model = item.imageUrl,
@@ -64,19 +64,22 @@ fun SuggestionDropdown(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
+
                     Text(
                         text = item.title,
+                        style = typography.titleSmall,
                         color = colors.textLight,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
                     if (item.subtitle.isNotBlank()) {
                         Text(
                             text = item.subtitle,
+                            style = typography.bodySmall,
                             color = colors.textMuted,
-                            fontSize = 12.sp
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

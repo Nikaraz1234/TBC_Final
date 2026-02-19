@@ -19,15 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
-import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
+import com.example.mycomposeapp.feature.game.presentation.R as GameR
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ResultsView(
@@ -38,7 +37,6 @@ fun ResultsView(
     isCoverMode: Boolean = false,
     isAchievementMode: Boolean = false,
     isMangaRatingMode: Boolean = false
-
 ) {
     val result = gameResult ?: return
 
@@ -55,7 +53,12 @@ fun ResultsView(
             modifier = modifier
         )
     } else {
-        RegularResultsContent(result = result, onPlayAgain = onPlayAgain, onExit = onExit, modifier = modifier)
+        RegularResultsContent(
+            result = result,
+            onPlayAgain = onPlayAgain,
+            onExit = onExit,
+            modifier = modifier
+        )
     }
 }
 
@@ -67,52 +70,56 @@ private fun ResultsHeader(
     isNewHighScore: Boolean = false
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
 
     Spacer(modifier = Modifier.height(40.dp))
 
-    Text(text = emoji, fontSize = 64.sp)
+    Text(
+        text = emoji,
+        style = typography.displayLarge
+    )
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(spacing.spacing16))
 
     Text(
         text = title,
         color = colors.goldenYellow,
-        fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
+        style = typography.headlineLarge,
         textAlign = TextAlign.Center
     )
 
     if (isNewHighScore) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing8))
         Text(
             text = stringResource(GameR.string.new_high_score),
             color = Color(0xFFFFD700),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.ExtraBold,
+            style = typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
             textAlign = TextAlign.Center
         )
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(spacing.spacing8))
 
     Text(
         text = stringResource(GameR.string.points_format, score),
         color = colors.textLight,
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Bold
+        style = typography.displaySmall.copy(fontWeight = FontWeight.Bold)
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(spacing.spacing24))
 }
 
 @Composable
 private fun ResultsStats(
     stats: List<Pair<String, String>>
 ) {
+    val spacing = AppTheme.spacing
+
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(spacing.spacing12)
         ) {
             stats.forEach { (label, value) ->
                 StatRow(label = label, value = value)
@@ -126,13 +133,15 @@ private fun ResultsActions(
     onPlayAgain: () -> Unit,
     onExit: () -> Unit
 ) {
+    val spacing = AppTheme.spacing
+
     ButtonLarge(
         text = stringResource(GameR.string.btn_play_again),
         onClick = onPlayAgain,
         style = ButtonStyle.Filled
     )
 
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(spacing.spacing12))
 
     ButtonLarge(
         text = stringResource(GameR.string.btn_back_to_menu),
@@ -140,7 +149,7 @@ private fun ResultsActions(
         style = ButtonStyle.Outlined
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(spacing.spacing24))
 }
 
 @Composable
@@ -148,11 +157,13 @@ private fun ResultsLayout(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val spacing = AppTheme.spacing
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(spacing.spacing16),
         horizontalAlignment = Alignment.CenterHorizontally,
         content = content
     )
@@ -166,7 +177,9 @@ private fun CoverResultsContent(
     onExit: () -> Unit,
     guessedLabel: String = ""
 ) {
+    val spacing = AppTheme.spacing
     val label = guessedLabel.ifEmpty { stringResource(GameR.string.movies_guessed) }
+
     ResultsLayout(modifier = modifier) {
         ResultsHeader(
             emoji = "\uD83C\uDFAC",
@@ -184,7 +197,7 @@ private fun CoverResultsContent(
             )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing24))
 
         ResultsActions(onPlayAgain = onPlayAgain, onExit = onExit)
     }
@@ -198,6 +211,8 @@ private fun RegularResultsContent(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
 
     val percentage = if (result.totalQuestions > 0) {
         (result.correctAnswers * 100) / result.totalQuestions
@@ -219,49 +234,63 @@ private fun RegularResultsContent(
 
         ResultsStats(
             stats = listOf(
-                stringResource(GameR.string.correct_answers) to stringResource(GameR.string.correct_answers_format, result.correctAnswers, result.totalQuestions),
-                stringResource(GameR.string.accuracy) to stringResource(GameR.string.accuracy_format, percentage),
+                stringResource(GameR.string.correct_answers) to stringResource(
+                    GameR.string.correct_answers_format,
+                    result.correctAnswers,
+                    result.totalQuestions
+                ),
+                stringResource(GameR.string.accuracy) to stringResource(
+                    GameR.string.accuracy_format,
+                    percentage
+                ),
                 stringResource(GameR.string.best_streak) to "${result.bestStreak}",
-                stringResource(GameR.string.time_taken) to stringResource(GameR.string.time_taken_format, result.timeTakenSeconds)
+                stringResource(GameR.string.time_taken) to stringResource(
+                    GameR.string.time_taken_format,
+                    result.timeTakenSeconds
+                )
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing16))
 
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(spacing.spacing8)
             ) {
                 Text(
                     text = stringResource(GameR.string.answer_summary),
                     color = colors.goldenYellow,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    style = typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
 
-                result.answers.forEachIndexed { index, answer ->
+                result.answers.forEachIndexed { _, answer ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = if (answer.isCorrect) "\u2705" else "\u274C",
-                            fontSize = 16.sp
+                            style = typography.titleMedium
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Spacer(modifier = Modifier.width(spacing.spacing8))
+
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = answer.correctAnswer,
                                 color = colors.textLight,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
+                                style = typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
                             )
+
                             if (!answer.isCorrect && answer.userAnswer != null) {
                                 Text(
-                                    text = stringResource(GameR.string.your_answer_format, answer.userAnswer ?: ""),
+                                    text = stringResource(
+                                        GameR.string.your_answer_format,
+                                        answer.userAnswer ?: ""
+                                    ),
                                     color = colors.textMuted,
-                                    fontSize = 12.sp
+                                    style = typography.bodySmall
                                 )
                             }
                         }
@@ -270,7 +299,7 @@ private fun RegularResultsContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing24))
 
         ResultsActions(onPlayAgain = onPlayAgain, onExit = onExit)
     }
@@ -282,6 +311,7 @@ private fun StatRow(
     value: String
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -290,13 +320,12 @@ private fun StatRow(
         Text(
             text = label,
             color = colors.textMuted,
-            fontSize = 14.sp
+            style = typography.bodyMedium
         )
         Text(
             text = value,
             color = colors.textLight,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            style = typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
         )
     }
 }

@@ -48,50 +48,63 @@ fun GameplayScreen(
             .fillMaxSize()
             .background(brush = colors.backgroundGradient)
     ) {
-        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-        when {
-            state.phase == GameContract.GamePhase.Loading && state.errorMessage != null -> {
-                GameErrorView(
-                    message = state.errorMessage ?: stringResource(R.string.something_went_wrong),
-                    onRetry = { viewModel.onEvent(GameContract.Event.OnRetryGame) },
-                    onExit = { viewModel.onEvent(GameContract.Event.OnExitGame) }
-                )
-            }
-            state.phase == GameContract.GamePhase.Loading -> {
-                Loader()
-            }
-            state.phase == GameContract.GamePhase.Results -> {
-                ResultsView(
-                    gameResult = state.gameResult,
-                    onPlayAgain = { viewModel.onEvent(GameContract.Event.OnRetryGame) },
-                    onExit = { viewModel.onEvent(GameContract.Event.OnExitGame) },
-                    isCoverMode = state.isCoverMode,
-                    isAchievementMode = state.isAchievementMode,
-                    isMangaRatingMode = state.isMangaRatingMode
-                )
-            }
-            state.isMangaRatingMode && (state.phase == GameContract.GamePhase.Playing || state.phase == GameContract.GamePhase.AnswerRevealed) -> {
-                val mangaState = state.mangaRatingState ?: return@Box
-                Column {
-                    MangaRatingTopBar(
-                        streak = mangaState.currentStreak,
-                        coins = mangaState.coins
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            when {
+                state.phase == GameContract.GamePhase.Loading && state.errorMessage != null -> {
+                    GameErrorView(
+                        message = state.errorMessage ?: stringResource(R.string.something_went_wrong),
+                        onRetry = { viewModel.onEvent(GameContract.Event.OnRetryGame) },
+                        onExit = { viewModel.onEvent(GameContract.Event.OnExitGame) }
                     )
-                    MangaRatingQuestionView(
-                        mangaRatingState = mangaState,
-                        isRevealed = state.phase == GameContract.GamePhase.AnswerRevealed,
-                        onMangaSelected = { viewModel.onEvent(GameContract.Event.OnMangaSelected(it)) },
-                        onNext = { viewModel.onEvent(GameContract.Event.OnNextQuestion) }
+                }
+
+                state.phase == GameContract.GamePhase.Loading -> {
+                    Loader()
+                }
+
+                state.phase == GameContract.GamePhase.Results -> {
+                    ResultsView(
+                        gameResult = state.gameResult,
+                        onPlayAgain = { viewModel.onEvent(GameContract.Event.OnRetryGame) },
+                        onExit = { viewModel.onEvent(GameContract.Event.OnExitGame) },
+                        isCoverMode = state.isCoverMode,
+                        isAchievementMode = state.isAchievementMode,
+                        isMangaRatingMode = state.isMangaRatingMode
+                    )
+                }
+
+                state.isMangaRatingMode &&
+                        (state.phase == GameContract.GamePhase.Playing ||
+                                state.phase == GameContract.GamePhase.AnswerRevealed) -> {
+
+                    val mangaState = state.mangaRatingState ?: return@Box
+
+                    Column {
+                        MangaRatingTopBar(
+                            streak = mangaState.currentStreak,
+                            coins = mangaState.coins
+                        )
+
+                        MangaRatingQuestionView(
+                            mangaRatingState = mangaState,
+                            isRevealed = state.phase == GameContract.GamePhase.AnswerRevealed,
+                            onMangaSelected = { viewModel.onEvent(GameContract.Event.OnMangaSelected(it)) },
+                            onNext = { viewModel.onEvent(GameContract.Event.OnNextQuestion) }
+                        )
+                    }
+                }
+
+                else -> {
+                    QuestionScreen(
+                        state = state,
+                        onEvent = viewModel::onEvent
                     )
                 }
             }
-            else -> {
-                QuestionScreen(
-                    state = state,
-                    onEvent = viewModel::onEvent
-                )
-            }
-        }
         }
     }
 }

@@ -30,16 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.foundation.text.KeyboardActions as ComposeKeyboardActions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.R as CoreUiR
@@ -124,19 +122,16 @@ private fun RegisterContent(
 
             Text(
                 text = stringResource(RegisterR.string.create_account),
-                style = typography.titleLarge.merge(
-                    TextStyle(
-                        brush = colors.goldTextGradient,
-                        fontSize = 28.sp, 
-                        fontWeight = FontWeight.Bold
-                    )
+                style = typography.displaySmall.copy(
+                    brush = colors.goldTextGradient,
+                    fontWeight = FontWeight.Bold
                 )
             )
 
             Text(
                 text = stringResource(RegisterR.string.sign_up_to_get_started),
                 color = colors.textMuted,
-                style = typography.bodySmall
+                style = typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing24))
@@ -303,11 +298,9 @@ private fun SuccessDialog(
         title = {
             Text(
                 text = stringResource(RegisterR.string.registration_successful),
-                style = typography.titleMedium.merge(
-                    TextStyle(
-                        brush = colors.goldTextGradient,
-                        fontWeight = FontWeight.Bold
-                    )
+                style = typography.titleLarge.copy(
+                    brush = colors.goldTextGradient,
+                    fontWeight = FontWeight.Bold
                 )
             )
         },

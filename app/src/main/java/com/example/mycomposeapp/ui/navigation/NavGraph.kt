@@ -2,6 +2,8 @@ package com.example.mycomposeapp.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,12 +32,15 @@ import com.example.mycomposeapp.feature.profile.edit_profile.presentation.naviga
 import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileRoute
 
 @Composable
-fun NavGraph() {
-    val navController = rememberNavController()
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    modifier : Modifier = Modifier
+) {
 
     NavHost(
         navController = navController,
-        startDestination = SplashRoute
+        startDestination = SplashRoute,
+        modifier = modifier
     ) {
         splashNavGraph(
             onGoDashboard = {

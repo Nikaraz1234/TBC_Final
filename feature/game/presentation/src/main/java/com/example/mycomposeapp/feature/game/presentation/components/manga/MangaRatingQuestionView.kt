@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,6 +35,8 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.MangaItem
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 
+private val SuccessGreen = Color(0xFF4CAF50)
+
 @Composable
 fun MangaRatingQuestionView(
     mangaRatingState: GameContract.ModeState.MangaRating,
@@ -45,27 +46,29 @@ fun MangaRatingQuestionView(
     modifier: Modifier = Modifier
 ) {
     val pair = mangaRatingState.currentPair ?: return
+
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = spacing.spacing16),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing8))
 
         Text(
             text = "Which manga is rated higher?",
             color = colors.textLight,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
+            style = typography.headlineSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing16))
 
         MangaCard(
             manga = pair.mangaA,
@@ -76,17 +79,16 @@ fun MangaRatingQuestionView(
             onClick = { if (!isRevealed) onMangaSelected(pair.mangaA.id) }
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing12))
 
         Text(
             text = "VS",
             color = colors.goldenYellow,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold,
+            style = typography.headlineMedium,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing12))
 
         MangaCard(
             manga = pair.mangaB,
@@ -98,18 +100,17 @@ fun MangaRatingQuestionView(
         )
 
         if (isRevealed) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing16))
 
             Text(
                 text = if (mangaRatingState.isAnswerCorrect) "Correct!" else "Wrong!",
-                color = if (mangaRatingState.isAnswerCorrect) Color(0xFF4CAF50) else AppTheme.colors.error,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                color = if (mangaRatingState.isAnswerCorrect) SuccessGreen else colors.error,
+                style = typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonLarge(
                 text = if (mangaRatingState.isAnswerCorrect) "Next" else "See Results",
@@ -133,10 +134,12 @@ private fun MangaCard(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     val borderColor by animateColorAsState(
         targetValue = when {
-            isWinner -> Color(0xFF4CAF50)
+            isWinner -> SuccessGreen
             isLoser -> colors.error
             isSelected -> colors.goldenYellow
             else -> Color.White.copy(alpha = 0.2f)
@@ -159,7 +162,7 @@ private fun MangaCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(spacing.spacing16),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
@@ -172,33 +175,31 @@ private fun MangaCard(
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing12))
 
             Text(
                 text = manga.title,
                 color = colors.textLight,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                style = typography.titleMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
             )
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             if (isRevealed) {
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Rating: ${manga.rating}",
-                    color = if (isWinner) Color(0xFF4CAF50) else colors.error,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = if (isWinner) SuccessGreen else colors.error,
+                    style = typography.headlineSmall.copy(fontSize = 20.sp),
                     textAlign = TextAlign.Center
                 )
             } else {
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Tap to select",
                     color = colors.textMuted,
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
             }

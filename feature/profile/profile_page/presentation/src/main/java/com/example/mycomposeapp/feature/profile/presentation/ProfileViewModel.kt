@@ -27,12 +27,14 @@ class ProfileViewModel @Inject constructor(
             OnBackButtonClicked -> TODO()
             OnEditProfileClicked -> sendSideEffect(ProfileContract.SideEffect.GoToEditProfile)
             EditProfileClicked -> TODO()
-            LogoutClicked -> TODO()
+            LogoutClicked -> logout()
             NotificationsClicked -> TODO()
             ToggleDarkTheme -> TODO()
             Load -> observeCurrentUser()
         }
     }
+
+
 
     private fun observeCurrentUser() {
         viewModelScope.launch {

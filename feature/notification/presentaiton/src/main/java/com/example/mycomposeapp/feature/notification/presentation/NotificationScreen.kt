@@ -12,22 +12,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,100 +40,201 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.mycomposeapp.core.ui.components.cards.GlassCard
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
-import com.example.mycomposeapp.core.ui.theme.Spacing
 import com.example.mycomposeapp.feature.notification.presentation.model.NotificationUi
 
 @Composable
 fun NotificationScreen(
     viewModel: NotificationViewModel = hiltViewModel()
-){
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(NotificationContract.Event.ScreenShown)
     }
 
     NotificationContent(
-        state,
-        viewModel::onEvent
+        state = state,
+        onEvent = viewModel::onEvent
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NotificationContent(
     state: NotificationContract.State,
-    onEvent: (NotificationContract.Event) -> Unit
-){
-    Column(modifier = Modifier.fillMaxSize()
-        .padding(horizontal = spacing.spacing16)
-        .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+    onEvent: (NotificationContract.Event) -> Unit,
+    modifier: Modifier = Modifier,
+    ) {
+    // Combine both lists so we can easily find by id
+    val allNotifications = remember(state.newNotifications, state.olderNotifications) {
+        state.newNotifications + state.olderNotifications
+    }
+
+    // Which notification is currently opened in the sheet
+    var opened by remember { androidx.compose.runtime.mutableStateOf<NotificationUi?>(null) }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = spacing.spacing16),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         NotificationTopBar()
+
         Spacer(modifier = Modifier.height(spacing.spacing16))
 
-        if(state.newNotifications.isNotEmpty()) {
+        if (state.newNotifications.isNotEmpty()) {
             HorizontalDivider(modifier = Modifier.height(2.dp))
             Spacer(modifier = Modifier.height(spacing.spacing16))
+
             NotificationsColumn(
                 notifications = state.newNotifications,
                 onItemClick = { id ->
-                    onEvent(NotificationContract.Event.MarkAsRead(id))
-                    onEvent(NotificationContract.Event.NotificationClicked(id))
+                    opened = allNotifications.firstOrNull { it.id == id }
+                    // optional: keep if you need analytics/navigation logic
+                    // onEvent(NotificationContract.Event.NotificationClicked(id))
                 }
             )
         }
-//        else{
-//            Text(text = "No New Notifications",
-//                modifier = Modifier.padding(horizontal = spacing.spacing8),
-//                color = colors.white,
-//                fontSize = 20.sp)
-//        }
-        Spacer(modifier = Modifier.height(spacing.spacing16))
 
+        Spacer(modifier = Modifier.height(spacing.spacing16))
         HorizontalDivider(modifier = Modifier.height(2.dp))
-
         Spacer(modifier = Modifier.height(spacing.spacing16))
-        if(state.olderNotifications.isNotEmpty()){
+
+        if (state.olderNotifications.isNotEmpty()) {
             NotificationsColumn(
                 notifications = state.olderNotifications,
                 onItemClick = { id ->
-                    onEvent(NotificationContract.Event.NotificationClicked(id))
+                    opened = allNotifications.firstOrNull { it.id == id }
+                    // optional
+                    // onEvent(NotificationContract.Event.NotificationClicked(id))
                 }
             )
-        }else{
-            Text(text = "No Notifications",
-                modifier = Modifier
-                    .padding(horizontal = spacing.spacing16),
+        } else {
+            Text(
+                text = "No Older Notifications",
+                modifier = Modifier.padding(horizontal = spacing.spacing16),
                 color = colors.textLight,
-                fontSize = 20.sp)
+                style = AppTheme.typography.titleMedium
+            )
         }
+    }
 
+    // Bottom sheet
+    if (opened != null) {
+        val current = opened!!
+
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                // Mark as read ONLY when closed
+                if (!current.isRead) onEvent(NotificationContract.Event.MarkAsRead(current.id))
+                opened = null
+            },
+            containerColor = Color.Transparent, // keep your glass look, we draw inside
+            tonalElevation = 0.dp
+        ) {
+            NotificationBottomSheetContent(
+                title = current.title,
+                body = current.body,
+                date = current.date,
+                onClose = {
+                    if (!current.isRead) onEvent(NotificationContract.Event.MarkAsRead(current.id))
+                    opened = null
+                }
+            )
+        }
     }
 }
 
 @Composable
-private fun NotificationTopBar(){
-    Row(horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()){
-        Text(text = "Notifications",
-            style = TextStyle(
+private fun NotificationBottomSheetContent(
+    title: String,
+    body: String,
+    date: String,
+    onClose: () -> Unit
+) {
+    val typography = AppTheme.typography
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = spacing.spacing16)
+            .padding(bottom = 100.dp)
+            .clip(radius.radius20)
+            .background(colors.glassGradient)
+            .border(1.dp, Color.White.copy(alpha = 0.12f), radius.radius20)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+    )  {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                style = typography.titleLarge,
+                color = colors.white,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = "Close",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(
+                        indication = ripple(bounded = true),
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { onClose() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                style = typography.labelLarge,
+                color = colors.white
+            )
+        }
+
+        Text(
+            text = date,
+            style = typography.labelMedium,
+            color = colors.white.copy(alpha = 0.7f)
+        )
+
+        Text(
+            text = body,
+            style = typography.bodyLarge,
+            color = colors.white.copy(alpha = 0.9f)
+        )
+    }
+}
+
+
+@Composable
+private fun NotificationTopBar() {
+    val typography = AppTheme.typography
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Notifications",
+            style = typography.titleLarge.copy(
                 brush = colors.goldTextGradient,
-                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             ),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis)
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -153,16 +257,19 @@ private fun NotificationsColumn(
         }
     }
 }
+
 @Composable
 private fun NotificationItem(
     item: NotificationUi,
     onClick: (() -> Unit)? = null
 ) {
+    val typography = AppTheme.typography
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(radius.radius20)
-            .background(colors.glassGradient) // keep your gradient if you like
+            .background(colors.glassGradient)
             .border(
                 width = 1.dp,
                 color = Color.White.copy(alpha = 0.12f),
@@ -187,8 +294,8 @@ private fun NotificationItem(
                 Text(
                     text = item.title,
                     modifier = Modifier.weight(1f),
-                    fontSize = 16.sp,
                     color = colors.white,
+                    style = typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -197,8 +304,8 @@ private fun NotificationItem(
 
                 Text(
                     text = item.date,
-                    fontSize = 12.sp,
                     color = colors.white.copy(alpha = 0.75f),
+                    style = typography.labelSmall,
                     maxLines = 1
                 )
             }
@@ -211,7 +318,7 @@ private fun NotificationItem(
                     text = item.body,
                     modifier = Modifier.weight(1f),
                     color = colors.white.copy(alpha = 0.9f),
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -229,7 +336,6 @@ private fun NotificationItem(
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)
