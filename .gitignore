@@ -26,3 +26,7 @@ nul
 
 # Firebase config - replace with your own from Firebase Console
 app/google-services.json
+
+# JVM crash dumps
+hs_err_pid*.log
+replay_pid*.log

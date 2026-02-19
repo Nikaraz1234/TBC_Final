@@ -40,7 +40,7 @@ dependencies {
     implementation(projects.feature.profile.editProfile.presentation)
     implementation(projects.feature.profile.editProfile.data)
     implementation(projects.feature.profile.profilePage.presentation)
-    implementation(projects.feature.notification.presentaiton)
+    implementation(projects.feature.notification.presentation)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
