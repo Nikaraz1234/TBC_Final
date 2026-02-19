@@ -22,6 +22,10 @@ import com.example.mycomposeapp.core.domain.model.CategoryType
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
 import com.example.mycomposeapp.feature.game.presentation.navigation.gameNavGraph
+import com.example.mycomposeapp.feature.leaderboard.presentation.LeaderboardScreen
+import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
+import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.leaderboardNavGraph
+import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileRoute
 
 @Composable
 fun NavGraph() {
@@ -127,5 +131,6 @@ fun NavGraph() {
                 }
             }
         )
+        leaderboardNavGraph()
     }
 }

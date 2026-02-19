@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.core.data.repository
 
+import com.example.mycomposeapp.core.data.common.HandleResponse
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.domain.model.UserStats
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val handleResponse: HandleResponse
 ) : UserRepository {
 
     companion object {
@@ -151,7 +153,16 @@ class UserRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message ?: "Failed to change username"))
         }
     }
+    override fun getAllUser(): Flow<Resource<List<User>>> {
+        return handleResponse.safeApiCall {
+            val snapshot = firestore.collection("users").get().await()
 
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(User::class.java)
+                    ?.copy(userId = doc.id)
+            }
+        }
+    }
     private fun mapToIntMap(raw: Any?): Map<String, Int> = when (raw) {
         is Map<*, *> -> raw.entries.mapNotNull { (k, v) ->
             val key = k as? String ?: return@mapNotNull null

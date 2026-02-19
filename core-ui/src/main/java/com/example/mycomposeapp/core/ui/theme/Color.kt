@@ -15,6 +15,13 @@ data class AppColorScheme(
     val goldenYellow: Color = Color(0xFFD4AF37),
     val goldenYellowDark: Color = Color(0xFFB8960C),
 
+    val silver: Color = Color(0xFFC0C0C0),
+    val silverDark: Color = Color(0xFF8C8C8C),
+
+    val bronze: Color = Color(0xFFCD7F32),
+    val bronzeDark: Color = Color(0xFF8C5A2B),
+
+
     // Gold gradient colors for text
     val gold1: Color = Color(0xFF7A5A1E),
     val gold2: Color = Color(0xFFC9A84E),
