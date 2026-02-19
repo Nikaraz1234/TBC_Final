@@ -8,16 +8,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 
 @Composable
 fun CoverGridOverlay(
@@ -30,6 +27,7 @@ fun CoverGridOverlay(
                 for (col in 0 until 3) {
                     val cellIndex = row * 3 + col
                     val isRevealed = cellIndex in revealedCells
+
                     GridCell(
                         isRevealed = isRevealed,
                         modifier = Modifier.weight(1f)
@@ -45,6 +43,8 @@ private fun GridCell(
     isRevealed: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val typography = AppTheme.typography
+
     Box(
         modifier = modifier.fillMaxHeight(),
         contentAlignment = Alignment.Center
@@ -57,14 +57,13 @@ private fun GridCell(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF1A1A2E)),
+                    .background(AppTheme.colors.backgroundDark),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "?",
-                    color = Color(0xFF4A4A6A),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    style = typography.headlineLarge,
+                    color = AppTheme.colors.textMuted
                 )
             }
         }

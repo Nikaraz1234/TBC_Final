@@ -12,11 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.input.AppTextField
-import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
+import com.example.mycomposeapp.feature.game.presentation.R as GameR
 
 @Composable
 fun AnswerInputView(
@@ -30,8 +29,13 @@ fun AnswerInputView(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
-    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
         AppTextField(
             value = userAnswer,
             onValueChange = onAnswerChanged,
@@ -56,7 +60,7 @@ fun AnswerInputView(
             Text(
                 text = stringResource(GameR.string.searching),
                 color = colors.textMuted,
-                fontSize = 12.sp
+                style = typography.labelSmall
             )
         }
     }

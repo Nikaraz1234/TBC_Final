@@ -20,10 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonSmall
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
@@ -44,12 +42,13 @@ fun PlotQuestionView(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. Cover image - only shown after answer reveal
+
         if (isRevealed && content.imageUrl.isNotEmpty()) {
             Box(
                 modifier = Modifier
@@ -69,13 +68,14 @@ fun PlotQuestionView(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // 2. Hint button (no hearts here - they're in the top bar)
         if (!isRevealed) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
                 ButtonSmall(
-                    text = stringResource(GameR.string.hint_cost_format, GameConstants.PLOT_HINT_COST),
+                    text = stringResource(
+                        GameR.string.hint_cost_format,
+                        GameConstants.PLOT_HINT_COST
+                    ),
                     onClick = onUseHint,
                     style = ButtonStyle.Outlined,
                     enabled = !plotState.allHintsRevealed
@@ -85,7 +85,7 @@ fun PlotQuestionView(
                     Text(
                         text = stringResource(GameR.string.not_enough_coins),
                         color = colors.error,
-                        fontSize = 11.sp,
+                        style = typography.labelSmall,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -94,7 +94,6 @@ fun PlotQuestionView(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // 3. Plot summary
         GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -104,29 +103,26 @@ fun PlotQuestionView(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Text(
                     text = stringResource(GameR.string.guess_plot_instruction),
                     color = colors.textMuted,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
                     text = content.plotSummary,
                     color = colors.textLight,
-                    fontSize = 16.sp,
-                    lineHeight = 24.sp,
+                    style = typography.bodyLarge,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 4. Hints card
         if (content.hints.isNotEmpty()) {
             GlassCard(
                 modifier = Modifier
@@ -162,6 +158,7 @@ private fun HintRow(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     Row(
         modifier = modifier
@@ -170,19 +167,18 @@ private fun HintRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Text(
             text = label,
             color = colors.textMuted,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
+            style = typography.labelMedium,
             modifier = Modifier.width(100.dp)
         )
 
         Text(
             text = if (isVisible) value else "\u2022 \u2022 \u2022 \u2022 \u2022",
             color = if (isVisible) colors.goldenYellow else colors.textMuted,
-            fontSize = 13.sp,
-            fontWeight = if (isVisible) FontWeight.SemiBold else FontWeight.Normal,
+            style = if (isVisible) typography.labelLarge else typography.labelMedium,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f)
         )

@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.display.CoinDisplay
 import com.example.mycomposeapp.core.ui.components.display.StreakDisplay
 import com.example.mycomposeapp.core.ui.theme.AppTheme
@@ -21,11 +20,15 @@ fun MangaRatingTopBar(
     modifier: Modifier = Modifier
 ) {
     val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing.spacing16, vertical = spacing.spacing12)
+            .padding(
+                horizontal = spacing.spacing16,
+                vertical = spacing.spacing12
+            )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -33,7 +36,13 @@ fun MangaRatingTopBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             StreakDisplay(streak = streak)
-            CoinDisplay(coins = coins, iconSize = 20.dp, fontSize = 14.sp, formatted = false)
+
+            CoinDisplay(
+                coins = coins,
+                iconSize = 20.dp,
+                fontSize = typography.labelLarge.fontSize,
+                formatted = false
+            )
         }
     }
 }

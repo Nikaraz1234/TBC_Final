@@ -84,8 +84,8 @@ object Categories {
             iconRes = R.drawable.ic_cover,
             isAvailable = true
         )
-
     )
+
 
     private val comingSoonGameModes = listOf(
         GameMode(

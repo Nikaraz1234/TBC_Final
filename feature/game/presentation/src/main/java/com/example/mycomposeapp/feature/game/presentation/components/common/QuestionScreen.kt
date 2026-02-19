@@ -16,10 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
-import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
@@ -32,6 +31,7 @@ import com.example.mycomposeapp.feature.game.presentation.components.games.scree
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.rankle.RankleQuestionView
+import com.example.mycomposeapp.feature.game.presentation.R as GameR
 
 @Composable
 fun QuestionScreen(
@@ -41,6 +41,9 @@ fun QuestionScreen(
 ) {
     val question = state.currentQuestion ?: return
     val isRevealed = state.phase == GameContract.GamePhase.AnswerRevealed
+
+    val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     Column(
         modifier = modifier
@@ -111,18 +114,17 @@ fun QuestionScreen(
                 )
             }
 
-            else -> {}
+            else -> Unit
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing16))
 
         when (val content = question.content) {
             is QuestionContent.Cover -> {
                 val cover = state.coverState
                 CoverQuestionView(
                     content = content,
-                    revealedCells = if (isRevealed) (0..8).toSet() else cover?.revealedCells
-                        ?: emptySet(),
+                    revealedCells = if (isRevealed) (0..8).toSet() else cover?.revealedCells ?: emptySet(),
                     coins = cover?.coins ?: 0,
                     revealCost = cover?.revealCost ?: 0,
                     canAffordReveal = cover?.canAffordReveal == true && !isRevealed,
@@ -207,7 +209,7 @@ fun QuestionScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing20))
 
         val isRankleMode = state.rankleState != null
 
@@ -223,18 +225,17 @@ fun QuestionScreen(
 
             // Show coin reward for emoji mode daily
             if (state.isEmojiMode && state.isAnswerCorrect && state.emojiState?.isFromArchive != true) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(spacing.spacing8))
                 Text(
                     text = stringResource(GameR.string.coins_reward),
                     color = Color(0xFFFFD700),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing20))
 
             NextButton(
                 isLastQuestion = when {
@@ -254,20 +255,26 @@ fun QuestionScreen(
         } else if (!isRankleMode) {
             // Rankle has its own input — skip shared AnswerInputView
             val achievementMode = state.achievementState
-            if (achievementMode != null && achievementMode.livesRemaining < GameConstants.ACHIEVEMENT_INITIAL_LIVES) {
+            if (achievementMode != null &&
+                achievementMode.livesRemaining < GameConstants.ACHIEVEMENT_INITIAL_LIVES
+            ) {
                 Text(
                     text = stringResource(
                         GameR.string.lives_remaining_format,
                         achievementMode.livesRemaining,
-                        stringResource(if (achievementMode.livesRemaining == 1) GameR.string.life_singular else GameR.string.lives_plural)
+                        stringResource(
+                            if (achievementMode.livesRemaining == 1)
+                                GameR.string.life_singular
+                            else
+                                GameR.string.lives_plural
+                        )
                     ),
                     color = Color(0xFFF44336),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = spacing.spacing8)
                 )
             }
 
@@ -277,15 +284,19 @@ fun QuestionScreen(
                     text = stringResource(
                         GameR.string.lives_remaining_format,
                         cover.livesRemaining,
-                        stringResource(if (cover.livesRemaining == 1) GameR.string.life_singular else GameR.string.lives_plural)
+                        stringResource(
+                            if (cover.livesRemaining == 1)
+                                GameR.string.life_singular
+                            else
+                                GameR.string.lives_plural
+                        )
                     ),
                     color = Color(0xFFF44336),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = spacing.spacing8)
                 )
             }
 
@@ -300,6 +311,6 @@ fun QuestionScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing24))
     }
 }

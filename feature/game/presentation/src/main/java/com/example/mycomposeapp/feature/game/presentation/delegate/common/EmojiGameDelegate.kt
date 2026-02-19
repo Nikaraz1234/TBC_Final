@@ -6,6 +6,7 @@ import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCa
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -30,7 +31,8 @@ class EmojiGameDelegate(
     private val updateCoinsUseCase: UpdateCoinsUseCase,
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
-    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope

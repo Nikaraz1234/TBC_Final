@@ -1,10 +1,12 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -29,7 +31,8 @@ class GameDescriptionDelegate(
     private val fetchDescriptionBatchUseCase: FetchDescriptionBatchUseCase,
     private val searchGamesUseCase: SearchGamesUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
-    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -257,7 +260,6 @@ class GameDescriptionDelegate(
 
         val current = questionQueue.removeAt(0)
 
-        // 👇 buffer the next question so questions.size >= 2 (so isLastQuestion becomes false)
         val bufferedNext = questionQueue.firstOrNull()
 
         scope.updateState {
@@ -270,7 +272,7 @@ class GameDescriptionDelegate(
 
             copy(
                 questions = listForUi,
-                currentQuestionIndex = 0, // always pointing at `current`
+                currentQuestionIndex = 0,
                 phase = GameContract.GamePhase.Playing,
                 userAnswer = "",
                 isAnswerRevealed = false,
@@ -357,7 +359,25 @@ class GameDescriptionDelegate(
             }
 
             scope.coroutineScope.launch {
-                try { updateCoinsUseCase(newCoins) } catch (_: Exception) {}
+                try {
+                    val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
+                    val stats = user.stats
+
+                    val xpGain = GameConstants.XP_GAIN
+                    val newTotalXp = stats.totalXp + xpGain
+                    val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
+                    val updatedStats = stats.copy(
+                        coins = stats.coins + GameConstants.COVER_COINS_PER_CORRECT,
+                        points = stats.points + scoreGain,
+                        totalXp = newTotalXp,
+                        level = newLevel,
+                        correctAnswers = stats.correctAnswers + 1,
+                        bestStreak = maxOf(stats.bestStreak, newBestStreak)
+                    )
+
+                    updateUserStatsUseCase(updatedStats)
+                } catch (_: Exception) { }
             }
 
         } else {

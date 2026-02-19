@@ -9,6 +9,7 @@ data class User(
 
 data class UserStats(
     val level: Int = 1,
+    val totalXp: Int = 0,
     val points: Int = 0,
     val coins: Int = 0,
     val highScore: Map<String, Int> = emptyMap(),

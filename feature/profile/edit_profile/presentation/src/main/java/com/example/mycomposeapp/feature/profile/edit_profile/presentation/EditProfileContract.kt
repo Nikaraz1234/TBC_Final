@@ -6,7 +6,7 @@ object EditProfileContract {
     data class State(
         val isLoading: Boolean = true,
         val user: User? = null,
-        val username: String = user!!.username,
+        val username: String = "",
         val email: String = "",
         val currentPassword: String = "",
         val newPassword: String = "",

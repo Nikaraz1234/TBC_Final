@@ -3,8 +3,8 @@ pluginManagement {
     repositories {
         google {
             content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("com\.android.*")
+                includeGroupByRegex("com\.google.*")
                 includeGroupByRegex("androidx.*")
             }
         }
@@ -63,3 +63,8 @@ include(":feature:profile:edit_profile:data")
 include(":feature:profile:edit_profile:domain")
 include(":feature:profile:edit_profile:presentation")
 include(":feature:leaderboard:presentation")
+
+include(":feature:notification")
+include(":feature:notification:data")
+include(":feature:notification:domain")
+include(":feature:notification:presentation")

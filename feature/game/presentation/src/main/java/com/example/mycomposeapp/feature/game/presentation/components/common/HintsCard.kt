@@ -14,8 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
@@ -29,15 +27,20 @@ fun HintsCard(
     rows: List<HintRow>
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
 
     if (rows.isEmpty()) return
 
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing.spacing16,)
+            .padding(horizontal = spacing.spacing16)
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(spacing.spacing16)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.spacing16)
+        ) {
             rows.forEachIndexed { index, row ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -46,14 +49,16 @@ fun HintsCard(
                     Text(
                         text = row.label,
                         color = colors.textMuted,
-                        fontSize = 12.sp,
+                        style = typography.labelSmall,
                         modifier = Modifier.weight(0.38f)
                     )
+
                     Text(
                         text = row.value,
                         color = colors.goldenYellow,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = typography.labelSmall.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
                         textAlign = TextAlign.End,
                         modifier = Modifier.weight(0.62f)
                     )
@@ -61,8 +66,10 @@ fun HintsCard(
 
                 if (index != rows.lastIndex) {
                     Spacer(Modifier.height(spacing.spacing12))
-                    HorizontalDivider(color = colors.glassWhite.copy(alpha = 0.25f))
-                    Spacer(Modifier.height(10.dp))
+                    HorizontalDivider(
+                        color = colors.glassWhite.copy(alpha = 0.25f)
+                    )
+                    Spacer(Modifier.height(spacing.spacing12))
                 }
             }
         }

@@ -1,10 +1,12 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
@@ -29,7 +31,8 @@ class GameScreenshotDelegate(
     private val fetchScreenshotBatchUseCase: FetchScreenshotBatchUseCase,
     private val searchGamesUseCase: SearchGamesUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
-    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
     private lateinit var scope: DelegateScope
     private val answerResults = mutableListOf<AnswerResult>()
@@ -405,9 +408,26 @@ class GameScreenshotDelegate(
             }
 
             scope.coroutineScope.launch {
-                try { updateCoinsUseCase(newCoins) } catch (_: Exception) {}
-            }
+                try {
+                    val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
+                    val stats = user.stats
 
+                    val xpGain = GameConstants.XP_GAIN
+                    val newTotalXp = stats.totalXp + xpGain
+                    val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
+                    val updatedStats = stats.copy(
+                        coins = stats.coins + GameConstants.COVER_COINS_PER_CORRECT,
+                        points = stats.points + scoreGain,
+                        totalXp = newTotalXp,
+                        level = newLevel,
+                        correctAnswers = stats.correctAnswers + 1,
+                        bestStreak = maxOf(stats.bestStreak, newBestStreak)
+                    )
+
+                    updateUserStatsUseCase(updatedStats)
+                } catch (_: Exception) { }
+            }
         } else {
             val newLives = (screenshot.livesRemaining - 1).coerceAtLeast(0)
 

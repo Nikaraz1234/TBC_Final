@@ -1,14 +1,17 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
+import com.example.mycomposeapp.core.domain.LevelingRules
 import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
 import com.example.mycomposeapp.feature.game.domain.model.ArrowDirection
 import com.example.mycomposeapp.feature.game.domain.model.FeedbackColor
+import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants.BASE_POINTS
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants.RANKLE_COINS_WIN
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants.RANKLE_INITIAL_ATTEMPTS
@@ -34,7 +37,8 @@ class RankleDelegate(
     private val updateGameStatsUseCase: UpdateGameStatsUseCase,
     private val getRankleMangaUseCase: GetRankleMangaUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
-    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase
+    private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase
 ) : GameModeDelegate {
 
     private lateinit var scope: DelegateScope
@@ -83,6 +87,10 @@ class RankleDelegate(
 
         val diff = abs(guessValue - actualRating)
         val isCorrect = diff <= WIN_THRESHOLD
+        val newStreak = state.currentStreak + 1
+
+        val scoreGain = BASE_POINTS + GameConstants.STREAK_BONUS_MULTIPLIER * newStreak
+
 
         val color = when {
             isCorrect -> FeedbackColor.GREEN
@@ -128,7 +136,25 @@ class RankleDelegate(
 
         if (isCorrect) {
             scope.coroutineScope.launch {
-                try { updateCoinsUseCase(newCoins) } catch (_: Exception) { }
+                try {
+                    val user = getCurrentUserUseCase().firstOrNull() ?: return@launch
+                    val stats = user.stats
+
+                    val xpGain = GameConstants.XP_GAIN
+                    val newTotalXp = stats.totalXp + xpGain
+                    val newLevel = LevelingRules.calculateLevel(newTotalXp)
+
+                    val updatedStats = stats.copy(
+                        coins = stats.coins + GameConstants.COVER_COINS_PER_CORRECT,
+                        points = stats.points + scoreGain,
+                        totalXp = newTotalXp,
+                        level = newLevel,
+                        correctAnswers = stats.correctAnswers + 1,
+                        bestStreak = maxOf(stats.bestStreak, newStreak)
+                    )
+
+                    updateUserStatsUseCase(updatedStats)
+                } catch (_: Exception) { }
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 
 @Composable
 fun HeartIndicator(
@@ -15,8 +16,9 @@ fun HeartIndicator(
     fontSize: TextUnit = 18.sp
 ) {
     Text(
-        text = "\u2764\uFE0F".repeat(remaining) + "\uD83D\uDDA4".repeat((total - remaining).coerceAtLeast(0)),
-        fontSize = fontSize,
+        text = "\u2764\uFE0F".repeat(remaining) +
+                "\uD83D\uDDA4".repeat((total - remaining).coerceAtLeast(0)),
+        style = AppTheme.typography.titleMedium,
         textAlign = TextAlign.Center,
         modifier = modifier
     )

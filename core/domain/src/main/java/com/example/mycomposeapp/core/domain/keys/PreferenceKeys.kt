@@ -16,4 +16,6 @@ object PreferenceKeys {
     val DAILY_GOALS_PERFECT_SCORES = intPreferencesKey("daily_goals_perfect_scores")
     val DAILY_GOALS_CATEGORIES_TRIED = stringPreferencesKey("daily_goals_categories_tried")
     val DAILY_GOALS_GAME_MODES_TRIED = stringPreferencesKey("daily_goals_game_modes_tried")
+
+    val FCM_TOKEN = stringPreferencesKey("fcm_token")
 }

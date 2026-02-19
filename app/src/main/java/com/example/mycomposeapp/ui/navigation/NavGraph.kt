@@ -1,8 +1,13 @@
 package com.example.mycomposeapp.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.example.mycomposeapp.feature.login.presentation.navigation.LoginRoute
 import com.example.mycomposeapp.feature.login.presentation.navigation.loginNavGraph
 import com.example.mycomposeapp.feature.main.presentation.navigation.MainRoute
@@ -18,22 +23,27 @@ import com.example.mycomposeapp.feature.welcome.presentation.navigation.welcomeN
 import com.example.mycomposeapp.feature.game.archive.navigation.ArchiveHubRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.EmojiArchiveRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.archiveNavGraph
-import com.example.mycomposeapp.core.domain.model.CategoryType
+import com.example.mycomposeapp.feature.notification.presentation.navigation.notificationNavGraph
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
 import com.example.mycomposeapp.feature.game.presentation.navigation.gameNavGraph
 import com.example.mycomposeapp.feature.leaderboard.presentation.LeaderboardScreen
 import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
 import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.leaderboardNavGraph
+import com.example.mycomposeapp.feature.notification.presentation.navigation.NotificationRoute
+import com.example.mycomposeapp.feature.profile.edit_profile.presentation.navigation.editProfileNavGraph
 import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileRoute
 
 @Composable
-fun NavGraph() {
-    val navController = rememberNavController()
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    modifier : Modifier = Modifier
+) {
 
     NavHost(
         navController = navController,
-        startDestination = SplashRoute
+        startDestination = SplashRoute,
+        modifier = modifier
     ) {
         splashNavGraph(
             onGoDashboard = {
@@ -81,7 +91,6 @@ fun NavGraph() {
                 navController.popBackStack()
             }
         )
-
         mainNavGraph(
             onNavigateToGame = { gameModeId, categoryType ->
                 navController.navigate(GameRoute(gameModeId = gameModeId, categoryType = categoryType))
@@ -98,6 +107,7 @@ fun NavGraph() {
                 navController.navigate(ArchiveHubRoute)
             }
         )
+        notificationNavGraph()
 
         gameNavGraph(
             onNavigateBack = { navController.popBackStack() }
@@ -132,5 +142,38 @@ fun NavGraph() {
             }
         )
         leaderboardNavGraph()
+
+        editProfileNavGraph ( onBack = {
+            navController.navigate(ProfileRoute)
+        })
+        composable(
+            route = AppDeepLinkRoutes.DAILY,
+            deepLinks = listOf(navDeepLink { uriPattern = "mytrivia://play/daily" })
+        ) {
+            LaunchedEffect(Unit) {
+                navController.navigate(
+                    SplashRoute
+                ) {
+                    popUpTo(AppDeepLinkRoutes.DAILY) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        }
+
+        composable(
+            route = AppDeepLinkRoutes.STREAK,
+            deepLinks = listOf(navDeepLink { uriPattern = "mytrivia://play/streak" })
+        ) {
+            LaunchedEffect(Unit) {
+                navController.navigate(
+                    SplashRoute
+                ) {
+                    popUpTo(AppDeepLinkRoutes.STREAK) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        }
+
+
     }
 }

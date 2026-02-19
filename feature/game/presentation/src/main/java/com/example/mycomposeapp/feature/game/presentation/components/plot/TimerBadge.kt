@@ -10,15 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 
 @Composable
 fun TimerBadge(
     timeRemaining: Int,
     modifier: Modifier = Modifier
 ) {
+    val typography = AppTheme.typography
+
     val color = when {
         timeRemaining > 20 -> Color(0xFF4CAF50)
         timeRemaining > 10 -> Color(0xFFFFC107)
@@ -37,8 +38,7 @@ fun TimerBadge(
         Text(
             text = "${timeRemaining}s",
             color = color,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
+            style = typography.titleSmall
         )
     }
 }

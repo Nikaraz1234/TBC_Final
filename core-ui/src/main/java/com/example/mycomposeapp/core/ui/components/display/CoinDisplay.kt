@@ -29,7 +29,8 @@ fun CoinDisplay(
 ) {
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
-    val displayText = if (formatted) NumberFormat.getNumberInstance().format(coins) else "$coins"
+    val displayText =
+        if (formatted) NumberFormat.getNumberInstance().format(coins) else "$coins"
 
     Row(
         modifier = modifier,
@@ -47,8 +48,7 @@ fun CoinDisplay(
         Text(
             text = displayText,
             color = colors.goldenYellow,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold
+            style = AppTheme.typography.titleSmall
         )
     }
 }

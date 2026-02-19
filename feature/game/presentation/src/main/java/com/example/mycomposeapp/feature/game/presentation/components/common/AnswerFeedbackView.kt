@@ -10,11 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 
@@ -26,33 +25,41 @@ fun AnswerFeedbackView(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
+
     val feedbackColor = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFF44336)
-    val feedbackText = if (isCorrect) stringResource(GameR.string.feedback_correct) else stringResource(GameR.string.feedback_wrong)
+    val feedbackText = if (isCorrect) {
+        stringResource(GameR.string.feedback_correct)
+    } else {
+        stringResource(GameR.string.feedback_wrong)
+    }
 
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = feedbackText,
             color = feedbackColor,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
+            style = typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center
         )
 
         if (!isCorrect) {
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = stringResource(GameR.string.the_answer_was),
                 color = colors.textMuted,
-                fontSize = 14.sp
+                style = typography.bodyMedium
             )
+
             Text(
                 text = correctAnswer,
                 color = colors.goldenYellow,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
+                style = typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
                 textAlign = TextAlign.Center
             )
         }

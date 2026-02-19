@@ -10,11 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
@@ -38,99 +37,109 @@ fun EmojiQuestionView(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
+    val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
 
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         if (content.isDaily && !isFromArchive) {
             Text(
                 text = stringResource(GameR.string.daily_puzzle_header),
                 color = colors.goldenYellow,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp
+                style = typography.labelSmall.copy(letterSpacing = 2.sp)
             )
         } else if (isFromArchive) {
             Text(
                 text = stringResource(GameR.string.archive_date_header, content.date),
                 color = colors.textMuted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp
+                style = typography.labelSmall.copy(letterSpacing = 2.sp)
             )
         }
 
         GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .padding(horizontal = 32.dp, vertical = spacing.spacing16)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
                 Text(
                     text = stringResource(GameR.string.guess_emoji_instruction),
                     color = colors.textMuted,
-                    fontSize = 14.sp,
+                    style = typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
 
+                // Emoji clues: keep big size, but still via typography base
                 Text(
                     text = content.emojiClues,
-                    fontSize = 48.sp,
+                    style = typography.displayLarge.copy(fontSize = 48.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(vertical = 24.dp)
                 )
 
                 HeartIndicator(
                     remaining = guessesRemaining,
-                    fontSize = 20.sp
+                    fontSize = typography.titleMedium.fontSize
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(spacing.spacing8))
 
                 Text(
                     text = stringResource(
                         GameR.string.guesses_remaining_format,
                         guessesRemaining,
-                        stringResource(if (guessesRemaining == 1) GameR.string.guess_singular else GameR.string.guesses_plural)
+                        stringResource(
+                            if (guessesRemaining == 1) GameR.string.guess_singular
+                            else GameR.string.guesses_plural
+                        )
                     ),
                     color = colors.textMuted,
-                    fontSize = 13.sp
+                    style = typography.labelMedium
                 )
 
                 // Hint section
                 if (isHintUsed && hintText.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(spacing.spacing16))
+
                     Text(
                         text = hintLabel,
                         color = colors.textMuted,
-                        fontSize = 12.sp
+                        style = typography.labelSmall
                     )
+
                     Text(
                         text = hintText,
                         color = colors.goldenYellow,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = typography.bodyLarge,
                         textAlign = TextAlign.Center
                     )
                 } else if (hintText.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(spacing.spacing16))
+
                     ButtonLarge(
-                        text = stringResource(GameR.string.hint_cost_format, GameConstants.EMOJI_HINT_COST),
+                        text = stringResource(
+                            GameR.string.hint_cost_format,
+                            GameConstants.EMOJI_HINT_COST
+                        ),
                         onClick = onUseHint,
                         style = ButtonStyle.Outlined,
                         enabled = canAffordHint,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = spacing.spacing16)
                     )
+
                     if (!canAffordHint && coins < GameConstants.EMOJI_HINT_COST) {
                         Text(
                             text = stringResource(GameR.string.not_enough_coins),
                             color = colors.error,
-                            fontSize = 11.sp,
+                            style = typography.labelSmall.copy(fontSize = 11.sp),
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }

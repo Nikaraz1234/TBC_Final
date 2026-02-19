@@ -16,8 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +25,6 @@ import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.game.domain.model.GameConstants
 import com.example.mycomposeapp.feature.game.presentation.components.common.HintRow
@@ -50,6 +47,8 @@ fun DescriptionQuestionView(
     showInsufficientFunds: Boolean = false,
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     val canShowHintButton = hintStep < 3
     val canBuyHint = coins >= hintCost
@@ -73,15 +72,12 @@ fun DescriptionQuestionView(
                     .padding(spacing.spacing16),
                 verticalArrangement = Arrangement.Center
             ) {
-
-                val textToShow = content.text.takeIf { it.isNotBlank() }
-                    ?: ""
+                val textToShow = content.text.takeIf { it.isNotBlank() } ?: ""
 
                 Text(
                     text = textToShow,
                     color = colors.textLight,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    style = typography.bodyMedium.copy(lineHeight = 20.sp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 120.dp, max = 240.dp)
@@ -101,21 +97,21 @@ fun DescriptionQuestionView(
         )
 
         if (canShowHintButton) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonLarge(
                 text = stringResource(GameR.string.hint_cost_format, hintCost),
                 onClick = onUseHint,
                 style = ButtonStyle.Outlined,
                 enabled = canBuyHint,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = spacing.spacing16)
             )
 
             if (showInsufficientFunds) {
                 Text(
                     text = stringResource(GameR.string.not_enough_coins),
                     color = colors.error,
-                    fontSize = 11.sp,
+                    style = typography.labelSmall.copy(fontSize = 11.sp),
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }

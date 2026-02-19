@@ -1,6 +1,8 @@
 package com.example.mycomposeapp.feature.game.domain.model
 
 object GameConstants {
+
+    const val XP_GAIN = 50
     // Cover mode
     const val COVER_INITIAL_LIVES = 3
     const val COVER_INITIAL_REVEAL_COST = 10
