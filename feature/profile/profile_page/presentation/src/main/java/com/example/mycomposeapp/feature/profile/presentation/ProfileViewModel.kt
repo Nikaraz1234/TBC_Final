@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.feature.profile.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
 import com.example.mycomposeapp.core.domain.usecase.datastore.RemovePreferenceUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.DeleteUserUseCase

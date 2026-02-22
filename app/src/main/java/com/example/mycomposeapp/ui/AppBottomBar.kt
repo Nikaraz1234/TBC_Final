@@ -1,6 +1,5 @@
 package com.example.mycomposeapp.ui
 
-import android.R
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -22,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mycomposeapp.core.ui.R.drawable.app_logo
 import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
@@ -48,7 +46,6 @@ fun AppBottomBar(
             .navigationBarsPadding()
             .clip(radius.radius12),
         color = AppTheme.colors.glassWhite,
-        color = Color.Transparent,
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
@@ -113,18 +110,6 @@ fun AppBottomBar(
                     }
                 }
             )
-            BottomBarItem(
-                selected = currentRoute == LeaderboardRoute::class.qualifiedName,
-                painter = painterResource(CoreUiR.drawable.ic_leaderboard),
-                onClick = {
-                    navController.navigate(LeaderboardRoute) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
-
         }
     }
 }

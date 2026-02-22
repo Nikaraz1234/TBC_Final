@@ -131,7 +131,7 @@ private fun MainContent(
             .fillMaxSize()
     ) {
         AsyncImage(
-            model = CoreUiR.drawable.background_new,
+            model = CoreUiR.drawable.app_background,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

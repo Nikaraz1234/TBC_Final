@@ -13,32 +13,27 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
-import com.example.mycomposeapp.core.ui.R as CoreUiR
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.mycomposeapp.core.ui.components.AppBackground
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.R as CoreUiR
 import com.example.mycomposeapp.core.ui.components.snackbar.CustomSnackBar
-
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.achievements.presentation.navigation.AchievementsRoute
 import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
@@ -54,7 +49,7 @@ class MainActivity : ComponentActivity() {
     private val requestNotificationPermission =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
-        ) { granted ->
+        ) { _ ->
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +61,9 @@ class MainActivity : ComponentActivity() {
 
         requestNotificationIfNeeded()
 
-
         setContent {
             MyComposeAppTheme {
-                androidx.compose.runtime.LaunchedEffect(Unit) {
+                LaunchedEffect(Unit) {
                     keepSplash = false
                 }
 
@@ -82,10 +76,12 @@ class MainActivity : ComponentActivity() {
                         destination.hasRoute<MainRoute>() ||
                                 destination.hasRoute<ProfileRoute>() ||
                                 destination.hasRoute<NotificationRoute>() ||
-                                destination.hasRoute<AchievementsRoute>()
+                                destination.hasRoute<AchievementsRoute>() ||
+                                destination.hasRoute<LeaderboardRoute>()
                     } ?: false
 
-
+                val snackbarHostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     AsyncImage(
@@ -99,21 +95,6 @@ class MainActivity : ComponentActivity() {
                         contentWindowInsets = WindowInsets.safeDrawing.only(
                             WindowInsetsSides.Top + WindowInsetsSides.Horizontal
                         ),
-                        bottomBar = {
-                            if (showBottomBar) AppBottomBar(navController)
-                        }
-                    ) { innerPadding ->
-
-                                destination.hasRoute<LeaderboardRoute>()
-                    } ?: false
-
-                val snackbarHostState = remember { SnackbarHostState() }
-                val scope = rememberCoroutineScope()
-
-
-                AppBackground {
-                    Scaffold(
-                        containerColor = androidx.compose.ui.graphics.Color.Transparent,
                         snackbarHost = {
                             SnackbarHost(
                                 hostState = snackbarHostState,
@@ -121,10 +102,7 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         bottomBar = {
-                            if (showBottomBar) AppBottomBar(
-                                navController,
-                                modifier = Modifier.navigationBarsPadding()
-                            )
+                            if (showBottomBar) AppBottomBar(navController)
                         }
                     ) { innerPadding ->
                         NavGraph(
@@ -138,8 +116,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-
-
             }
         }
     }
@@ -156,4 +132,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
