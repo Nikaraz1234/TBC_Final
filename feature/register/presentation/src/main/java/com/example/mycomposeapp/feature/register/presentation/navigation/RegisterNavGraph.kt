@@ -10,12 +10,14 @@ data object RegisterRoute
 
 fun NavGraphBuilder.registerNavGraph(
     onNavigateToDashboard: () -> Unit,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     composable<RegisterRoute> {
         RegisterScreen(
             onNavigateToDashboard = onNavigateToDashboard,
-            onNavigateToLogin = onNavigateToLogin
+            onNavigateToLogin = onNavigateToLogin,
+            showSnackbar = showSnackbar
         )
     }
 }

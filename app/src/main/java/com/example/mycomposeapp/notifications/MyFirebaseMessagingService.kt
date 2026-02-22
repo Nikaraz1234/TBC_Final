@@ -56,6 +56,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             val body = message.notification?.body
                 ?: data["body"]
                 ?: "Tap to open"
+            val iconName = data["icon"] // e.g. "ic_stat_notification"
+            val iconRes = if (!iconName.isNullOrBlank()) {
+                resources.getIdentifier(iconName, "drawable", packageName)
+            } else 0
+
+            val safeIcon = if (iconRes != 0) iconRes else com.example.mycomposeapp.core.ui.R.drawable.ic_notification
+
 
             val targetUserId = data["userId"]
             if (targetUserId != null && targetUserId != userId) return@launch
@@ -87,7 +94,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             val pendingIntent = PendingIntent.getActivity(
                 this@MyFirebaseMessagingService,
-                appNotification.id.hashCode(), // unique
+                appNotification.id.hashCode(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -96,7 +103,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 this@MyFirebaseMessagingService,
                 CHANNEL_DAILY_TRIVIA_REMINDER
             )
-                .setSmallIcon(com.example.mycomposeapp.feature.main.presentation.R.drawable.ic_cover)
+                .setSmallIcon(safeIcon)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)

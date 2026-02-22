@@ -37,7 +37,8 @@ import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileR
 @Composable
 fun NavGraph(
     navController: NavHostController = rememberNavController(),
-    modifier : Modifier = Modifier
+    modifier : Modifier = Modifier,
+    showSnackBar: (String) -> Unit
 ) {
 
     NavHost(
@@ -57,7 +58,9 @@ fun NavGraph(
                     popUpTo(SplashRoute) { inclusive = true }
                     launchSingleTop = true
                 }
-            }
+            },
+            showSnackBar
+
         )
 
         welcomeNavGraph(
@@ -67,7 +70,8 @@ fun NavGraph(
                 navController.navigate(MainRoute) {
                     popUpTo(0) { inclusive = true }
                 }
-            }
+            },
+            showSnackbar = showSnackBar
         )
 
         loginNavGraph(
@@ -78,7 +82,8 @@ fun NavGraph(
             },
             onNavigateToRegister = {
                 navController.navigate(RegisterRoute)
-            }
+            },
+                    showSnackBar
         )
 
         registerNavGraph(
@@ -89,7 +94,8 @@ fun NavGraph(
             },
             onNavigateToLogin = {
                 navController.popBackStack()
-            }
+            },
+            showSnackBar
         )
         mainNavGraph(
             onNavigateToGame = { gameModeId, categoryType ->
@@ -105,7 +111,8 @@ fun NavGraph(
             },
             onNavigateToArchive = {
                 navController.navigate(ArchiveHubRoute)
-            }
+            },
+            showSnackbar = showSnackBar
         )
         notificationNavGraph()
 
@@ -139,13 +146,19 @@ fun NavGraph(
                 navController.navigate(WelcomeRoute) {
                     popUpTo(0) { inclusive = true }
                 }
-            }
+            },
+            showSnackBar = showSnackBar,
         )
-        leaderboardNavGraph()
+        leaderboardNavGraph(
+            showSnackBar
+        )
 
-        editProfileNavGraph ( onBack = {
+        editProfileNavGraph (
+            onBack = {
             navController.navigate(ProfileRoute)
-        })
+            },
+            showSnackBar = showSnackBar
+        )
         composable(
             route = AppDeepLinkRoutes.DAILY,
             deepLinks = listOf(navDeepLink { uriPattern = "mytrivia://play/daily" })

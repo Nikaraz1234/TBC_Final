@@ -20,6 +20,7 @@ object ProfileContract {
         data object NotificationsClicked : Event
         data object LogoutClicked : Event
         data object Load : Event
+        data object DeleteUser: Event
     }
 
     sealed interface SideEffect {
@@ -27,5 +28,6 @@ object ProfileContract {
         data object GoBack: SideEffect
         data object GoToEditProfile: SideEffect
         data object GoToWelcomeScreen : SideEffect
+        data class ShowSnackBar(val msg: String) : SideEffect
     }
 }

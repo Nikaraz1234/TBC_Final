@@ -11,13 +11,15 @@ data object WelcomeRoute
 fun NavGraphBuilder.welcomeNavGraph(
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToDashboard: () -> Unit
+    onNavigateToDashboard: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     composable<WelcomeRoute> {
         WelcomeScreen(
             onNavigateToLogin = onNavigateToLogin,
             onNavigateToRegister = onNavigateToRegister,
-            onNavigateToDashboard = onNavigateToDashboard
+            onNavigateToDashboard = onNavigateToDashboard,
+            showSnackbar = showSnackbar
         )
     }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">Back</string>
+    <string name="edit_profile_title">Edit Profile</string>
+
+    <string name="camera_permission_needed_title">Camera permission needed</string>
+    <string name="camera_permission_needed_body">
+        Enable Camera permission in Settings to change your profile photo.
+    </string>
+    <string name="open_settings">Open Settings</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="username">Username</string>
+    <string name="change_username">Change Username</string>
+
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="change_password">Change Password</string>
+
+    <string name="change_photo">Change photo</string>
+    <string name="change_upper">CHANGE</string>
+
+    <string name="choose_photo_source_title">Choose photo source</string>
+    <string name="choose_photo_source_body">Select where to get your new profile picture.</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+
+    <string name="gallery_permission_needed_title">Gallery permission needed</string>
+    <string name="gallery_permission_needed_body">To choose a photo, allow access in Settings.</string>
+</resources>

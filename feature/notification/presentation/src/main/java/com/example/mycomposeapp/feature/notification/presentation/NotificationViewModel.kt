@@ -18,7 +18,7 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val observeNotifications: ObserveNotificationsUseCase,
     private val markRead: MarkNotificationReadUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
 ) : BaseViewModel<
         NotificationContract.State,
         NotificationContract.SideEffect,
@@ -31,6 +31,7 @@ class NotificationViewModel @Inject constructor(
             is NotificationContract.Event.NotificationClicked -> {}
             NotificationContract.Event.Refresh -> TODO()
             NotificationContract.Event.ScreenShown -> observeInbox()
+            is NotificationContract.Event.Delete -> {}
         }
 
     }

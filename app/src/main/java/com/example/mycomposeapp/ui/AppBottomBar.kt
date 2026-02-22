@@ -1,10 +1,12 @@
 package com.example.mycomposeapp.ui
 
+import android.R
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mycomposeapp.core.ui.R.drawable.app_logo
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
+import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
 import com.example.mycomposeapp.feature.main.presentation.navigation.MainRoute
 import com.example.mycomposeapp.feature.notification.presentation.navigation.NotificationRoute
 import com.example.mycomposeapp.core.ui.R as CoreUiR
@@ -29,22 +33,27 @@ import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileR
 
 @Composable
 fun AppBottomBar(
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier = Modifier
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .navigationBarsPadding()
             .clip(radius.radius12),
-        shadowElevation = 10.dp,
+        color = Color.Transparent,
+        shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
+        HorizontalDivider(modifier = Modifier.height(spacing.spacing1),
+            color = AppTheme.colors.onSurface)
         NavigationBar(
             containerColor = Color.Transparent,
-            modifier = Modifier.height(80.dp)
+            modifier = Modifier.height(80.dp),
+            tonalElevation = 0.dp,
         ) {
             BottomBarItem(
                 selected = currentRoute == MainRoute::class.qualifiedName,
@@ -62,6 +71,17 @@ fun AppBottomBar(
                 painter = painterResource(CoreUiR.drawable.ic_notification),
                 onClick = {
                     navController.navigate(NotificationRoute) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+            BottomBarItem(
+                selected = currentRoute == LeaderboardRoute::class.qualifiedName,
+                painter = painterResource(CoreUiR.drawable.ic_leaderboard),
+                onClick = {
+                    navController.navigate(LeaderboardRoute) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true

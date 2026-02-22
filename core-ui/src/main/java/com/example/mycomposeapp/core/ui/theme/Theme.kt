@@ -17,22 +17,42 @@ fun MyComposeAppTheme(
     val materialScheme = if (darkTheme) {
         darkColorScheme(
             primary = appColors.goldenYellow,
+            onPrimary = appColors.onPrimary,
             secondary = appColors.goldenYellowDark,
-            background = appColors.backgroundDark,
-            surface = appColors.backgroundDarkEnd,
-            onBackground = appColors.textLight,
-            onSurface = appColors.textLight,
+            onSecondary = appColors.onPrimary,
+
+            tertiary = appColors.gold3,
+
+            background = appColors.background,
+            onBackground = appColors.onBackground,
+
+            surface = appColors.surface,
+            onSurface = appColors.onSurface,
+
+            surfaceVariant = appColors.surfaceVariant,
+            outline = appColors.outline,
+
             error = appColors.error,
             onError = appColors.white
         )
     } else {
         lightColorScheme(
             primary = appColors.goldenYellow,
+            onPrimary = appColors.onPrimary,
             secondary = appColors.goldenYellowDark,
-            background = appColors.backgroundDark,
-            surface = appColors.backgroundDarkEnd,
-            onBackground = appColors.textLight,
-            onSurface = appColors.textLight,
+            onSecondary = appColors.onPrimary,
+
+            tertiary = appColors.gold3,
+
+            background = appColors.background,
+            onBackground = appColors.onBackground,
+
+            surface = appColors.surface,
+            onSurface = appColors.onSurface,
+
+            surfaceVariant = appColors.surfaceVariant,
+            outline = appColors.outline,
+
             error = appColors.error,
             onError = appColors.white
         )
@@ -40,14 +60,14 @@ fun MyComposeAppTheme(
 
     CompositionLocalProvider(
         LocalAppColorScheme provides appColors,
+        LocalAppTypography provides DefaultAppTypography,
         LocalSpacing provides Spacing(),
         LocalRadius provides Radius()
     ) {
         MaterialTheme(
             colorScheme = materialScheme,
-            typography = AppTypography,
+            typography = DefaultAppTypography.toMaterial3Typography(),
             content = content
         )
     }
 }
-

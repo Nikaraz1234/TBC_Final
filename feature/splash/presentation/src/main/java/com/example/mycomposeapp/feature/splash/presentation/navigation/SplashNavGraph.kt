@@ -11,12 +11,14 @@ data object SplashRoute
 
 fun NavGraphBuilder.splashNavGraph(
     onGoDashboard: () -> Unit,
-    onGoWelcome: () -> Unit
+    onGoWelcome: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     composable<SplashRoute> {
         SplashScreen(
             onGoDashboard = onGoDashboard,
-            onGoWelcome = onGoWelcome
+            onGoWelcome = onGoWelcome,
+            showSnackbar = showSnackbar
         )
     }
 }

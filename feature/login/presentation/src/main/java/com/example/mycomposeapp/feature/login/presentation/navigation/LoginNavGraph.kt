@@ -10,12 +10,14 @@ data object LoginRoute
 
 fun NavGraphBuilder.loginNavGraph(
     onNavigateToDashboard: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     composable<LoginRoute> {
         LoginScreen(
             onNavigateToDashboard = onNavigateToDashboard,
-            onNavigateToRegister = onNavigateToRegister
+            onNavigateToRegister = onNavigateToRegister,
+            showSnackbar = showSnackbar
         )
     }
 }
