@@ -2,7 +2,7 @@ package com.example.mycomposeapp.feature.welcome.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.presentation.common.GoogleSignInHandler
 import com.example.mycomposeapp.feature.welcome.presentation.WelcomeContract.Event
 import com.example.mycomposeapp.feature.welcome.presentation.WelcomeContract.SideEffect

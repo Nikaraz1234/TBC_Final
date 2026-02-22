@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.feature.game.domain.model
 
-import com.example.mycomposeapp.feature.game.domain.model.game.Achievement
+import com.example.mycomposeapp.feature.game.domain.model.games.Achievement
 
 data class Question(
     val id: String,

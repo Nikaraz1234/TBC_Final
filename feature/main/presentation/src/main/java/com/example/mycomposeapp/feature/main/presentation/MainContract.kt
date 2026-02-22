@@ -27,6 +27,7 @@ object MainContract {
         data object OnDailyChallengeClicked : Event
         data object OnLogoutClicked : Event
         data object OnArchiveClicked : Event
+        data object SeedEmojiPuzzles : Event
     }
 
     sealed interface SideEffect {

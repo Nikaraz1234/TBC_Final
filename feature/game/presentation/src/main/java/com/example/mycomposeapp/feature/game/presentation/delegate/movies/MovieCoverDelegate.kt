@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.movies
 
-import com.example.mycomposeapp.core.domain.LevelingRules
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
@@ -9,11 +9,13 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
-import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCase
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.movies.FetchCoverBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.R
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.Job
@@ -182,7 +184,14 @@ class MovieCoverDelegate(
                         )
                     )
                 }
-                scope.emitSideEffect(GameContract.SideEffect.ShowSnackbar("Wrong! $newLives lives remaining"))
+                scope.emitSideEffect(
+                    GameContract.SideEffect.ShowSnackbar(
+                        UiText.StringResource(
+                            R.string.wrong_lives_format,
+                            listOf(newLives, if (newLives == 1) "life" else "lives")
+                        )
+                    )
+                )
             }
         }
     }
@@ -243,7 +252,7 @@ class MovieCoverDelegate(
 
     private suspend fun fetchCoverBatchAndStart() {
         val maxPage = calculateMaxPage(scope.currentState().correctAnswersCount)
-        fetchCoverBatchUseCase(categoryType, maxPage, 5, seenItemIds).collect { resource ->
+        fetchCoverBatchUseCase(categoryType, maxPage, GameConstants.COVER_BATCH_SIZE, seenItemIds).collect { resource ->
             when (resource) {
                 is Resource.Success -> {
                     val questions = resource.data
@@ -295,14 +304,14 @@ class MovieCoverDelegate(
     }
 
     private fun calculateMaxPage(correctCount: Int): Int {
-        return ((correctCount / 10) + 1) * 10
+        return ((correctCount / GameConstants.COVER_PAGE_WINDOW) + 1) * GameConstants.COVER_PAGE_WINDOW
     }
 
     private fun prefetchIfNeeded() {
-        if (questionQueue.size <= 2 && prefetchJob?.isActive != true) {
+        if (questionQueue.size <= GameConstants.COVER_PREFETCH_THRESHOLD && prefetchJob?.isActive != true) {
             prefetchJob = scope.coroutineScope.launch {
                 val maxPage = calculateMaxPage(scope.currentState().correctAnswersCount)
-                fetchCoverBatchUseCase(categoryType, maxPage, 5, seenItemIds).collect { resource ->
+                fetchCoverBatchUseCase(categoryType, maxPage, GameConstants.COVER_BATCH_SIZE, seenItemIds).collect { resource ->
                     if (resource is Resource.Success) {
                         resource.data.forEach { q ->
                             seenItemIds.add(q.id.removePrefix("cover_"))
@@ -349,14 +358,28 @@ class MovieCoverDelegate(
                         copy(gameResult = gameResult?.copy(isNewHighScore = true))
                     }
                 }
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-                updateDailyGoalProgressUseCase.recordGamePlayed(
+                val updatedStats = updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                scope.onGameCompleted(updatedStats)
+                val xpResult = updateDailyGoalProgressUseCase.recordGamePlayed(
                     categoryType = categoryType,
                     gameModeId = gameModeId,
                     wasPerfect = false
                 )
                 if (coinMultiplier > 1) {
                     dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
+                if (xpResult.hasAnyXp) {
+                    val msg = buildString {
+                        if (xpResult.newlyCompletedGoalIds.isNotEmpty()) {
+                            append("Daily goal complete! +${xpResult.xpAwarded} XP")
+                        }
+                        if (xpResult.allGoalsCompleted) {
+                            append(" • All goals done! +${xpResult.bonusXpAwarded} XP bonus")
+                        }
+                    }
+                    scope.emitSideEffect(
+                        GameContract.SideEffect.ShowSnackbar(UiText.DynamicString(msg))
+                    )
                 }
             } catch (_: Exception) { }
         }

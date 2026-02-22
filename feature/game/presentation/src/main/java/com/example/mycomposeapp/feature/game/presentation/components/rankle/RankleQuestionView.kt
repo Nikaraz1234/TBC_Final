@@ -42,10 +42,10 @@ import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
 import com.example.mycomposeapp.core.ui.components.input.AppTextField
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.feature.game.domain.model.ArrowDirection
-import com.example.mycomposeapp.feature.game.domain.model.FeedbackColor
+import com.example.mycomposeapp.feature.game.domain.model.comics.ArrowDirection
+import com.example.mycomposeapp.feature.game.domain.model.comics.FeedbackColor
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
-import com.example.mycomposeapp.feature.game.domain.model.RankleGuess
+import com.example.mycomposeapp.feature.game.domain.model.comics.RankleGuess
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 import com.example.mycomposeapp.feature.game.presentation.R
 

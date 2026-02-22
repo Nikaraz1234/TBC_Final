@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.feature.register.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.usecase.auth.RegisterUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.validation.ValidateConfirmPasswordUseCase

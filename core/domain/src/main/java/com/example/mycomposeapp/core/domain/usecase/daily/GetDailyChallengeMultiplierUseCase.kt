@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.core.domain.usecase.daily
 
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
-import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
+import com.example.mycomposeapp.core.domain.constants.DailyGoalsConstants
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock

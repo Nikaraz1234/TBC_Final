@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.core.data.common
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException

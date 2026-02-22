@@ -1,6 +1,7 @@
 package com.example.mycomposeapp.core.domain.usecase.daily
 
 import com.example.mycomposeapp.core.domain.model.DailyChallenge
+import com.example.mycomposeapp.core.domain.model.DailyGoalXpResult
 import com.example.mycomposeapp.core.domain.model.DailyGoalsAllProgress
 import com.example.mycomposeapp.core.domain.model.DailyGoalsProgress
 import javax.inject.Inject
@@ -31,9 +32,8 @@ class DailyGoalsManagerUseCase @Inject constructor(
         categoryType: String,
         gameModeId: String,
         wasPerfect: Boolean
-    ) {
+    ): DailyGoalXpResult =
         updateDailyGoalProgressUseCase.recordGamePlayed(categoryType, gameModeId, wasPerfect)
-    }
     
     /**
      * Get today's daily challenge

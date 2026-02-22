@@ -55,7 +55,8 @@
       "Bash(git show:*)",
       "mcp__ide__getDiagnostics",
       "Bash(git -C \"D:/AndroidProjects/TBC_Final\" pull origin dev)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(BASE=\"/d/AndroidProjects/TBC_Final\" echo \"=== FINAL VERIFICATION ===\" echo \"\" echo \"1. No old constants in model:\" grep -r \"core.domain.model.DailyGoalsConstants\\\\|core.domain.model.ValidationConstants\\\\|game.domain.model.GameConstants\\\\|edit_profile.domain.StorageKeys[^.]\" \"$BASE\" --include=\"*.kt\")"
     ]
   }
 }

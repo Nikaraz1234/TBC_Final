@@ -3,7 +3,7 @@ package com.example.mycomposeapp.feature.login.presentation
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.usecase.auth.LoginUseCase

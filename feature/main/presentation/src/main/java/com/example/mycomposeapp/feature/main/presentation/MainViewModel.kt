@@ -7,6 +7,7 @@ import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCa
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
+import com.example.mycomposeapp.feature.game.domain.usecase.SeedEmojiPuzzlesUseCase
 import com.example.mycomposeapp.feature.main.presentation.MainContract.Event
 import com.example.mycomposeapp.feature.main.presentation.MainContract.SideEffect
 import com.example.mycomposeapp.feature.main.presentation.MainContract.State
@@ -24,7 +25,8 @@ class MainViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshUserUseCase: RefreshUserUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val dailyGoalsManager: DailyGoalsManagerUseCase
+    private val dailyGoalsManager: DailyGoalsManagerUseCase,
+    private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
 
     init {
@@ -108,6 +110,16 @@ class MainViewModel @Inject constructor(
             }
             is Event.OnArchiveClicked -> {
                 sendSideEffect(SideEffect.NavigateToArchive)
+            }
+            is Event.SeedEmojiPuzzles -> {
+                viewModelScope.launch {
+                    try {
+                        seedEmojiPuzzles()
+                        sendSideEffect(SideEffect.ShowSnackbar("Emoji puzzles seeded!"))
+                    } catch (e: Exception) {
+                        sendSideEffect(SideEffect.ShowSnackbar("Seed failed: ${e.message}"))
+                    }
+                }
             }
         }
     }

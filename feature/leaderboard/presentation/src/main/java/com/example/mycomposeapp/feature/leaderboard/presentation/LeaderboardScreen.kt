@@ -44,18 +44,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +71,11 @@ import com.example.mycomposeapp.core.presentation.common.extensions.CollectWithL
 import com.example.mycomposeapp.core.ui.components.badges.LevelBadge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
+import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
+import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
+import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 
@@ -78,7 +84,7 @@ fun LeaderboardScreen(
     viewModel: LeaderboardViewModel = hiltViewModel(),
     showSnackBar: (String) -> Unit,
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.CollectWithLifecycle { effect ->
         when (effect) {
@@ -105,9 +111,14 @@ private fun LeaderboardContent(
     val spacing = AppTheme.spacing
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
+        AsyncImage(
+            model = CoreUiR.drawable.app_background,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
         Column(modifier = Modifier.fillMaxWidth()) {
             LeaderboardsTopBar()
@@ -152,7 +163,6 @@ private fun LeaderboardContent(
 
 @Composable
 private fun LeaderboardsTopBar(
-
     modifier: Modifier = Modifier,
 ) {
     val colors = AppTheme.colors
@@ -164,8 +174,32 @@ private fun LeaderboardsTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(spacing.spacing56)
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = spacing.spacing12),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.leaderboard_back),
+                    tint = colors.white
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(R.string.leaderboard_info),
+                    tint = colors.white
+                )
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -174,7 +208,7 @@ private fun LeaderboardsTopBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Leaderboards",
+                text = stringResource(R.string.leaderboard_title),
                 style = typography.titleLarge.copy(
                     brush = colors.goldTextGradient
                 ),
@@ -188,9 +222,9 @@ private fun LeaderboardsTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardCategories(
-    options: List<CategoryType>,
-    selected: CategoryType?,
-    onSelectedChange: (CategoryType) -> Unit
+    options: List<LeaderboardFilter>,
+    selected: LeaderboardFilter?,
+    onSelectedChange: (LeaderboardFilter) -> Unit
 ) {
     val spacing = AppTheme.spacing
     val colors = AppTheme.colors
@@ -210,7 +244,7 @@ fun LeaderboardCategories(
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
                 .padding(horizontal = spacing.spacing32),
-            value = selected?.name ?: "Select category",
+            value = selected?.name ?: stringResource(R.string.leaderboard_select_category),
             onValueChange = {},
             readOnly = true,
             enabled = options.isNotEmpty(),
@@ -253,8 +287,8 @@ private fun ModeLayout(
     val spacing = AppTheme.spacing
 
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacing.spacing8),
+        contentPadding = PaddingValues(horizontal = spacing.spacing16),
     ) {
         items(modes) { mode ->
             val isSelected = mode == selectedMode
@@ -263,7 +297,7 @@ private fun ModeLayout(
                 onClick = { onModeSelected(mode) },
                 style = if (isSelected) ButtonStyle.Filled else ButtonStyle.Outlined,
                 modifier = Modifier
-                    .widthIn(min = 110.dp)
+                    .widthIn(min = AppDimensions.leaderboardModeMinWidth)
                     .padding(horizontal = spacing.spacing8)
             )
         }
@@ -315,6 +349,7 @@ private fun LeaderboardAvatarCard(
     statsKey: String?
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
     val radius = AppTheme.radius
     val onSurface = colors.onSurface
 
@@ -322,7 +357,7 @@ private fun LeaderboardAvatarCard(
 
     Column(
         modifier = modifier
-            .height(160.dp)
+            .height(AppDimensions.leaderboardAvatarCardHeight)
             .scale(scale),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -341,8 +376,12 @@ private fun LeaderboardAvatarCard(
                 shape = CircleShape,
                 tonalElevation = 2.dp,
                 modifier = Modifier
-                    .size(86.dp)
-                    .border(4.dp, medalColor, CircleShape)
+                    .size(AppDimensions.leaderboardAvatarSize)
+                    .border(
+                        width = spacing.spacing4,
+                        color = medalColor,
+                        shape = CircleShape
+                    )
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -362,22 +401,22 @@ private fun LeaderboardAvatarCard(
                 color = medalColor,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 10.dp)
+                    .offset(y = spacing.spacing10)
             ) {
                 Text(
                     text = "#$rank",
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = spacing.spacing10, vertical = spacing.spacing4),
                     color = colors.onSurface
                 )
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(spacing.spacing16))
 
         Text(text = user.username, color = onSurface)
 
         val score = statsKey?.let { user.stats.highScore[it] ?: 0 } ?: user.stats.points
-        Text(text = "$score pts", color = onSurface.copy(alpha = 0.85f))
+        Text(text = stringResource(R.string.leaderboard_score_format, score), color = onSurface.copy(alpha = 0.85f))
     }
 }
 
@@ -387,7 +426,8 @@ private fun Leaderboard(
     statsKey: String?
 ) {
     val spacing = AppTheme.spacing
-    val onSurface = AppTheme.colors.onSurface
+    val colors = AppTheme.colors
+    val onSurface = colors.onSurface
     val muted = onSurface.copy(alpha = 0.70f)
 
     val restUsers = remember(users) { users.drop(3) }
@@ -399,8 +439,16 @@ private fun Leaderboard(
             .padding(horizontal = spacing.spacing24),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "Other Rankings", color = muted, fontSize = 20.sp)
-        Text(text = "Points", color = muted, fontSize = 20.sp)
+        Text(
+            text = stringResource(R.string.leaderboard_other_rankings),
+            color = colors.silver,
+            style = AppTheme.typography.titleLarge
+        )
+        Text(
+            text = stringResource(R.string.leaderboard_points),
+            color = colors.silver,
+            style = AppTheme.typography.titleLarge
+        )
     }
 
     Spacer(modifier = Modifier.height(spacing.spacing8))
@@ -431,6 +479,7 @@ private fun LeaderboardUserCard(
 ) {
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
+    val radius = AppTheme.radius
     val onSurface = colors.onSurface
     val muted = onSurface.copy(alpha = 0.75f)
 
@@ -457,7 +506,7 @@ private fun LeaderboardUserCard(
             Surface(
                 shape = CircleShape,
                 tonalElevation = 2.dp,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(AppDimensions.leaderboardUserAvatarSize)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -483,7 +532,7 @@ private fun LeaderboardUserCard(
         }
 
         val score = selectedStatsKey?.let { user.stats.highScore[it] ?: 0 } ?: user.stats.points
-        Text(text = "$score pts", color = onSurface.copy(alpha = 0.9f))
+        Text(text = stringResource(R.string.leaderboard_score_format, score), color = onSurface.copy(alpha = 0.9f))
     }
 }
 

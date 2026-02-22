@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -40,12 +41,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +53,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +64,7 @@ import com.example.mycomposeapp.core.ui.components.avatar.UserAvatar
 import com.example.mycomposeapp.core.ui.components.badges.LevelBadge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
+import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.profile.presentation.mapper.toLevelProgressUi
 import com.example.mycomposeapp.feature.profile.presentation.model.LevelProgressUi
@@ -74,19 +74,16 @@ import com.example.mycomposeapp.feature.profile.presentation.R as ProfileR
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel(),
     onEditClick: () -> Unit,
     onLogout: () -> Unit,
-    showSnackBar: (String) -> Unit
+    showSnackBar: (String) -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
-    var showSettingsSheet by rememberSaveable { mutableStateOf(false) }
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                ProfileContract.SideEffect.ShowSettings -> showSettingsSheet = true
-                ProfileContract.SideEffect.GoBack -> Unit
                 ProfileContract.SideEffect.GoToEditProfile -> onEditClick()
                 ProfileContract.SideEffect.GoToWelcomeScreen -> onLogout()
                 is ProfileContract.SideEffect.ShowSnackBar -> showSnackBar(effect.msg)
@@ -94,15 +91,11 @@ fun ProfileScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(ProfileContract.Event.Load)
-    }
-
     ProfileContent(
         state = state,
         onEvent = viewModel::onEvent,
-        showSettingsSheet = showSettingsSheet,
-        onDismissSettings = { showSettingsSheet = false },
+        showSettingsSheet = state.showSettingsSheet,
+        onDismissSettings = { viewModel.onEvent(ProfileContract.Event.OnSettingsDismissed) },
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -194,7 +187,7 @@ private fun ProfileTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(AppDimensions.topBarHeight)
     ) {
         Row(
             modifier = Modifier
@@ -253,9 +246,9 @@ private fun ProfileAvatarCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(AppDimensions.profileAvatarBorderSize)
                     .border(
-                        width = 4.dp,
+                        width = spacing.spacing4,
                         color = colors.goldenYellow,
                         shape = CircleShape
                     ),
@@ -263,7 +256,7 @@ private fun ProfileAvatarCard(
             ) {
                 UserAvatar(
                     imageUrl = photoUrl,
-                    size = 112.dp
+                    size = AppDimensions.profileAvatarInnerSize
                 )
             }
 
@@ -271,7 +264,7 @@ private fun ProfileAvatarCard(
                 level = level,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 10.dp)
+                    .offset(y = spacing.spacing10)
             )
         }
 
@@ -303,8 +296,8 @@ private fun LevelProgress(
     ) {
         Column(modifier = Modifier.padding(spacing.spacing16)) {
             Text(
-                text = stringResource(ProfileR.string.next_level),
-                color = colors.onSurface,
+                text = stringResource(ProfileR.string.profile_next_level),
+                color = colors.white,
                 style = typography.titleMedium
             )
 
@@ -336,10 +329,11 @@ private fun LevelProgress(
 @Composable
 private fun LvlProgressBar(progress: Float) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
 
     Canvas(
         modifier = Modifier
-            .height(10.dp)
+            .height(spacing.spacing10)
             .fillMaxWidth()
     ) {
         val h = size.height
@@ -366,15 +360,14 @@ private fun GlobalStats(user: User?) {
 
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
-    val radius = AppTheme.radius
     val typography = AppTheme.typography
 
     val bestStreak = user.stats.bestStreak
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(ProfileR.string.global_stats),
-            color = colors.onBackground,
+            text = stringResource(ProfileR.string.profile_global_stats),
+            color = colors.white,
             modifier = Modifier.padding(horizontal = spacing.spacing20),
             style = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
         )
@@ -386,12 +379,12 @@ private fun GlobalStats(user: User?) {
             horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
         ) {
             RankItem(
-                title = stringResource(ProfileR.string.points),
+                title = stringResource(ProfileR.string.profile_stats_points),
                 stat = user.stats.points.toString(),
                 modifier = Modifier.weight(1f)
             )
             RankItem(
-                title = stringResource(ProfileR.string.games_played),
+                title = stringResource(ProfileR.string.profile_stats_games_played),
                 stat = user.stats.gamesPlayed.toString(),
                 modifier = Modifier.weight(1f)
             )
@@ -404,12 +397,12 @@ private fun GlobalStats(user: User?) {
             horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
         ) {
             RankItem(
-                title = stringResource(ProfileR.string.total_guesses),
+                title = stringResource(ProfileR.string.profile_stats_total_guesses),
                 stat = user.stats.correctAnswers.toString(),
                 modifier = Modifier.weight(1f)
             )
             RankItem(
-                title = stringResource(ProfileR.string.best_streak),
+                title = stringResource(ProfileR.string.profile_stats_best_streak),
                 stat = bestStreak.toString(),
                 modifier = Modifier.weight(1f)
             )
@@ -430,7 +423,7 @@ private fun RankItem(
 
     Box(
         modifier = modifier
-            .height(100.dp)
+            .height(AppDimensions.statsCardHeight)
             .clip(radius.radius28)
             .background(colors.glassGradient)
             .padding(horizontal = spacing.spacing20, vertical = spacing.spacing12),
@@ -445,7 +438,7 @@ private fun RankItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing4))
 
             Text(
                 text = stat,
@@ -497,6 +490,7 @@ private fun ProfileBottomSheetContent(
     maxHeightFraction: Float = 0.40f,
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
     val typography = AppTheme.typography
     val configuration = LocalConfiguration.current
     val maxHeight = (configuration.screenHeightDp * maxHeightFraction).dp
@@ -505,17 +499,17 @@ private fun ProfileBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxHeight)
-            .background(colors.background)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(colors.backgroundDark)
+            .padding(horizontal = spacing.spacing16, vertical = spacing.spacing8),
+        verticalArrangement = Arrangement.spacedBy(spacing.spacing8)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(ProfileR.string.settings),
-                color = colors.onSurface,
+                text = stringResource(ProfileR.string.profile_settings),
+                color = colors.white,
                 style = typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )
@@ -523,12 +517,30 @@ private fun ProfileBottomSheetContent(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = stringResource(ProfileR.string.close),
-                    tint = colors.onSurface
+                    tint = colors.white
                 )
             }
         }
 
         HorizontalDivider(color = colors.onSurface.copy(alpha = 0.12f))
+
+        SheetRow(
+            icon = painterResource(CoreUiR.drawable.ic_moon),
+            title = stringResource(ProfileR.string.settings_dark_theme),
+            onClick = { onEvent(ProfileContract.Event.ToggleDarkTheme) },
+            trailing = {
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { onEvent(ProfileContract.Event.ToggleDarkTheme) }
+                )
+            }
+        )
+
+        SheetRow(
+            icon = painterResource(CoreUiR.drawable.ic_notification),
+            title = stringResource(ProfileR.string.settings_notifications),
+            onClick = { onEvent(ProfileContract.Event.NotificationsClicked) }
+        )
 
         SheetRow(
             icon = painterResource(CoreUiR.drawable.ic_delete),
@@ -552,6 +564,7 @@ private fun SheetRow(
     trailing: @Composable (() -> Unit)? = null,
 ) {
     val colors = AppTheme.colors
+    val spacing = AppTheme.spacing
     val typography = AppTheme.typography
 
     Row(
@@ -559,17 +572,17 @@ private fun SheetRow(
             .fillMaxWidth()
             .clip(AppTheme.radius.radius16)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = spacing.spacing12, vertical = spacing.spacing12),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             icon,
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(spacing.spacing20),
             tint = colors.onSurface
         )
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(spacing.spacing12))
 
         Text(
             text = title,
@@ -582,7 +595,6 @@ private fun SheetRow(
     }
 }
 
-
 @Preview(name = "Profile (preview)", showBackground = true, showSystemUi = true)
 @Composable
 private fun ProfileContentPreview() {
@@ -592,5 +604,16 @@ private fun ProfileContentPreview() {
         showSettingsSheet = false,
         onDismissSettings = {},
         modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ProfileBottomSheetContentPreview() {
+    ProfileBottomSheetContent(
+        onClose = {},
+        onEvent = {},
+        isDarkTheme = true,
+        maxHeightFraction = 0.40f
     )
 }

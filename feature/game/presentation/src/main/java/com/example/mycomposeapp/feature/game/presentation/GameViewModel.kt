@@ -3,9 +3,13 @@ package com.example.mycomposeapp.feature.game.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
+import com.example.mycomposeapp.core.domain.model.UserStats
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
-import com.example.mycomposeapp.feature.game.domain.usecase.SearchUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
+import com.example.mycomposeapp.feature.achievements.domain.usecase.CheckAndUnlockAchievementsUseCase
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
+import com.example.mycomposeapp.feature.game.domain.usecase.movies.SearchMoviesUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameDelegateFactory
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
@@ -20,7 +24,8 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     gameDelegateFactory: GameDelegateFactory,
-    private val searchUseCase: SearchUseCase
+    private val searchUseCase: SearchMoviesUseCase,
+    private val checkAndUnlockAchievementsUseCase: CheckAndUnlockAchievementsUseCase
 ) : BaseViewModel<GameContract.State, GameContract.SideEffect, GameContract.Event>(
     GameContract.State()
 ), DelegateScope {
@@ -61,10 +66,10 @@ class GameViewModel @Inject constructor(
 
     private fun onAnswerTextChanged(text: String) {
         setState { copy(userAnswer = text) }
-        if (text.length >= 2) {
+        if (text.length >= GameConstants.MIN_SEARCH_QUERY_LENGTH) {
             searchJob?.cancel()
             searchJob = viewModelScope.launch {
-                delay(300)
+                delay(GameConstants.SEARCH_DEBOUNCE_MS)
                 searchUseCase(route.categoryType, text, route.gameModeId).collect { resource ->
                     when (resource) {
                         is Resource.Success -> setState {
@@ -85,6 +90,21 @@ class GameViewModel @Inject constructor(
     private fun onSuggestionSelected(title: String) {
         setState { copy(userAnswer = title, searchResults = emptyList()) }
         delegate.onAnswerSubmitted(title)
+    }
+
+    override suspend fun onGameCompleted(updatedStats: UserStats?) {
+        val stats = updatedStats ?: return
+        try {
+            val checkResult = checkAndUnlockAchievementsUseCase(stats)
+            if (checkResult.newlyUnlocked.isNotEmpty()) {
+                val names = checkResult.newlyUnlocked.joinToString { it.name }
+                sendSideEffect(
+                    GameContract.SideEffect.ShowSnackbar(
+                        UiText.StringResource(R.string.achievement_unlocked_format, listOf(names))
+                    )
+                )
+            }
+        } catch (_: Exception) {}
     }
 
     override fun onCleared() {

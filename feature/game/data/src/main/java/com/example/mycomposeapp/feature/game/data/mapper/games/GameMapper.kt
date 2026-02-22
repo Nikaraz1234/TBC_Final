@@ -5,8 +5,8 @@ import com.example.mycomposeapp.feature.game.data.remote.games.dto.GameScreensho
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
-import com.example.mycomposeapp.feature.game.domain.model.game.GameDescription
-import com.example.mycomposeapp.feature.game.domain.model.game.GameScreenshot
+import com.example.mycomposeapp.feature.game.domain.model.games.GameDescription
+import com.example.mycomposeapp.feature.game.domain.model.games.GameScreenshot
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

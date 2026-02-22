@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.feature.game.data.repository.comics
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.feature.game.data.mapper.comics.toSearchResult
 import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult

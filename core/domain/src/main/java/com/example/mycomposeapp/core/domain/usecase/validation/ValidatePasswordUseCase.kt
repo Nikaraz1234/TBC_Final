@@ -1,6 +1,8 @@
 package com.example.mycomposeapp.core.domain.usecase.validation
 
-import com.example.mycomposeapp.core.domain.model.ValidationConstants
+import com.example.mycomposeapp.core.domain.model.ValidationResult
+
+import com.example.mycomposeapp.core.domain.constants.ValidationConstants
 import javax.inject.Inject
 
 class ValidatePasswordUseCase @Inject constructor() {

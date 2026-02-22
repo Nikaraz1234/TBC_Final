@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
-import com.example.mycomposeapp.core.domain.LevelingRules
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
@@ -9,11 +9,12 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
-import com.example.mycomposeapp.feature.game.domain.model.MangaPair
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.model.comics.MangaPair
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
@@ -292,14 +293,28 @@ class MangaRatingDelegate(
                         copy(gameResult = gameResult?.copy(isNewHighScore = true))
                     }
                 }
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-                updateDailyGoalProgressUseCase.recordGamePlayed(
+                val updatedStats = updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                scope.onGameCompleted(updatedStats)
+                val xpResult = updateDailyGoalProgressUseCase.recordGamePlayed(
                     categoryType = categoryType,
                     gameModeId = gameModeId,
                     wasPerfect = false
                 )
                 if (coinMultiplier > 1) {
                     dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
+                if (xpResult.hasAnyXp) {
+                    val msg = buildString {
+                        if (xpResult.newlyCompletedGoalIds.isNotEmpty()) {
+                            append("Daily goal complete! +${xpResult.xpAwarded} XP")
+                        }
+                        if (xpResult.allGoalsCompleted) {
+                            append(" • All goals done! +${xpResult.bonusXpAwarded} XP bonus")
+                        }
+                    }
+                    scope.emitSideEffect(
+                        GameContract.SideEffect.ShowSnackbar(UiText.DynamicString(msg))
+                    )
                 }
             } catch (_: Exception) { }
         }

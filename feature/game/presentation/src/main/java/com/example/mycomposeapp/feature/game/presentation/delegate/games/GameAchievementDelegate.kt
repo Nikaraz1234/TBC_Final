@@ -1,19 +1,21 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
-import com.example.mycomposeapp.core.domain.LevelingRules
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.model.Question
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchAchievementBatchUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.R
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.Job
@@ -163,7 +165,12 @@ class GameAchievementDelegate(
                 }
 
                 scope.emitSideEffect(
-                    GameContract.SideEffect.ShowSnackbar("Wrong! $newLives lives remaining")
+                    GameContract.SideEffect.ShowSnackbar(
+                        UiText.StringResource(
+                            R.string.wrong_lives_format,
+                            listOf(newLives, if (newLives == 1) "life" else "lives")
+                        )
+                    )
                 )
                 return
             }
@@ -284,14 +291,28 @@ class GameAchievementDelegate(
 
         scope.coroutineScope.launch {
             try {
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-                updateDailyGoalProgressUseCase.recordGamePlayed(
+                val updatedStats = updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                scope.onGameCompleted(updatedStats)
+                val xpResult = updateDailyGoalProgressUseCase.recordGamePlayed(
                     categoryType = categoryType,
                     gameModeId = gameModeId,
                     wasPerfect = false
                 )
                 if (coinMultiplier > 1) {
                     dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
+                if (xpResult.hasAnyXp) {
+                    val msg = buildString {
+                        if (xpResult.newlyCompletedGoalIds.isNotEmpty()) {
+                            append("Daily goal complete! +${xpResult.xpAwarded} XP")
+                        }
+                        if (xpResult.allGoalsCompleted) {
+                            append(" • All goals done! +${xpResult.bonusXpAwarded} XP bonus")
+                        }
+                    }
+                    scope.emitSideEffect(
+                        GameContract.SideEffect.ShowSnackbar(UiText.DynamicString(msg))
+                    )
                 }
             } catch (_: Exception) {}
         }
@@ -378,7 +399,7 @@ class GameAchievementDelegate(
     }
 
     private fun prefetchIfNeeded() {
-        if (questionQueue.size <= 2 && prefetchJob?.isActive != true) {
+        if (questionQueue.size <= GameConstants.ACHIEVEMENT_PREFETCH_THRESHOLD && prefetchJob?.isActive != true) {
             prefetchJob = scope.coroutineScope.launch {
                 fetchAchievementBatchUseCase(
                     batchSize = GameConstants.ACHIEVEMENT_BATCH_SIZE,

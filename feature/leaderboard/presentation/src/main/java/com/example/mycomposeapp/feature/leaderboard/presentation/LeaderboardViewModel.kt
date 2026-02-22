@@ -47,7 +47,7 @@ class LeaderboardViewModel @Inject constructor(
             }
         )
     }
-    private fun categoryChanged(category: CategoryType) {
+    private fun categoryChanged(category: LeaderboardFilter) {
         val modes = getModesForCategory(category)
         val defaultMode = modes.firstOrNull().orEmpty()
         val key = firestoreStatsKey(category, defaultMode)
@@ -93,18 +93,18 @@ class LeaderboardViewModel @Inject constructor(
     }
 
     private fun firestoreStatsKey(
-        category: CategoryType?,
+        category: LeaderboardFilter?,
         modeLabel: String
     ): String {
         if (category == null) return ""
         val modeId = firestoreModeId(modeLabel)
         return GameModeIds.statsKey(category.firestorePrefix, modeId)
     }
-    private fun getModesForCategory(category: CategoryType): List<String> {
+    private fun getModesForCategory(category: LeaderboardFilter): List<String> {
         return when (category) {
-            CategoryType.Movie -> listOf("Cover", "Emoji", "Plot")
-            CategoryType.Game -> listOf("Screenshot", "Description", "Achievement")
-            CategoryType.Comics -> listOf("Rankle", "Rating", "Emoji")
+            LeaderboardFilter.Movie -> listOf("Cover", "Emoji", "Plot")
+            LeaderboardFilter.Game -> listOf("Screenshot", "Description", "Achievement")
+            LeaderboardFilter.Comics -> listOf("Rankle", "Rating", "Emoji")
         }
     }
 

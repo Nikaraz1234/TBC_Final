@@ -57,4 +57,10 @@
     <string name="Manga">Manga</string>
 <string name="achievement_count_format">Showing %1$d of %2$d achievements</string>
 <string name="achievement_unlock_format">%1$.1f%% of players</string>
+<string name="achievement_unlocked_format">Achievement unlocked: %s</string>
+<string name="no_more_achievement_questions">No more achievement questions available.</string>
+<string name="no_more_description_questions">No more description questions available.</string>
+<string name="unknown_studio">Unknown studio</string>
+<string name="unknown_genre">Unknown genre</string>
+<string name="unknown_year">Unknown year</string>
 </resources>

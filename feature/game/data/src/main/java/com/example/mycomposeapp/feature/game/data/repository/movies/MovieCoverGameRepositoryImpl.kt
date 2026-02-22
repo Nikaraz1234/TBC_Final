@@ -1,10 +1,10 @@
 package com.example.mycomposeapp.feature.game.data.repository.movies
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.feature.game.data.mapper.movies.toCoverQuestion
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
 import com.example.mycomposeapp.feature.game.domain.model.Question
-import com.example.mycomposeapp.feature.game.domain.repository.CoverGameRepository
+import com.example.mycomposeapp.feature.game.domain.repository.movies.CoverGameRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

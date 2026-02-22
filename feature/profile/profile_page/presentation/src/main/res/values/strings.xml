@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_title">Profile</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_edit">Edit profile</string>
+    <string name="profile_next_level">Next Level</string>
+    <string name="profile_global_stats">Global Stats</string>
+    <string name="profile_stats_points">Points</string>
+    <string name="profile_stats_games_played">Games Played</string>
+    <string name="profile_stats_total_guesses">Total Guesses</string>
+    <string name="profile_stats_best_streak">Best Streak</string>
+    <string name="settings_dark_theme">Dark theme</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_logout">Logout</string>
+    <string name="close">Close</string>
+</resources>
     <string name="profile_settings_cd">Settings</string>
 
     <string name="edit_profile">Edit profile</string>

@@ -1,10 +1,11 @@
 package com.example.mycomposeapp.feature.game.presentation
 
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
+import com.example.mycomposeapp.core.ui.util.UiText
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
-import com.example.mycomposeapp.feature.game.domain.model.MangaPair
+import com.example.mycomposeapp.feature.game.domain.model.comics.MangaPair
 import com.example.mycomposeapp.feature.game.domain.model.Question
-import com.example.mycomposeapp.feature.game.domain.model.RankleGuess
+import com.example.mycomposeapp.feature.game.domain.model.comics.RankleGuess
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
 
 object GameContract {
@@ -29,7 +30,8 @@ object GameContract {
             val hintText: String = "",
             val coins: Int = 0,
             val isFromArchive: Boolean = false,
-            val hintLabel: String = ""
+            val hintLabel: String = "",
+            val instruction: String = ""
         ) : ModeState {
             val canAffordHint: Boolean get() = coins >= GameConstants.EMOJI_HINT_COST && !isHintUsed
         }
@@ -179,6 +181,6 @@ object GameContract {
 
     sealed interface SideEffect {
         data object NavigateBack : SideEffect
-        data class ShowSnackbar(val message: String) : SideEffect
+        data class ShowSnackbar(val message: UiText) : SideEffect
     }
 }

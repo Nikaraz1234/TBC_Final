@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,22 +29,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.data.BuildConfig
 import com.example.mycomposeapp.core.ui.components.Loader
 import com.example.mycomposeapp.core.ui.components.cards.GlassCard
+import com.example.mycomposeapp.core.ui.theme.AppAnimation
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.main.presentation.components.CategoryCard
 import com.example.mycomposeapp.feature.main.presentation.components.DailyChallengeCard
@@ -54,6 +61,7 @@ import com.example.mycomposeapp.feature.main.presentation.components.QuickPlayBu
 import com.example.mycomposeapp.feature.main.presentation.components.TipsSection
 import com.example.mycomposeapp.feature.main.presentation.components.TodaysGoalsCard
 import com.example.mycomposeapp.feature.main.presentation.components.UserTopBar
+import com.example.mycomposeapp.core.ui.R as CoreUiR
 import com.example.mycomposeapp.feature.main.presentation.R as MainR
 
 @Composable
@@ -84,7 +92,6 @@ fun MainScreen(
                 }
 
                 is MainContract.SideEffect.ShowSnackbar -> {
-                    //Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                     showSnackbar(effect.message)
                 }
 
@@ -112,6 +119,7 @@ private fun MainContent(
 ) {
     val colors = AppTheme.colors
     val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
     val scrollState = rememberScrollState()
 
     LaunchedEffect(state.selectedCategory) {
@@ -120,7 +128,14 @@ private fun MainContent(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()) {
+            .fillMaxSize()
+    ) {
+        AsyncImage(
+            model = CoreUiR.drawable.background_new,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         if (state.isLoading) {
             Loader()
         } else {
@@ -128,21 +143,31 @@ private fun MainContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = spacing.spacing16)
             ) {
                 UserTopBar(
                     user = state.user,
                     onProfileClick = { onEvent(MainContract.Event.OnProfileClicked) }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                if (BuildConfig.DEBUG) {
+                    IconButton(onClick = { onEvent(MainContract.Event.SeedEmojiPuzzles) }) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = "Seed emoji puzzles",
+                            tint = colors.goldenYellow
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(spacing.spacing24))
 
                 AnimatedContent(
                     targetState = state.selectedCategory,
                     transitionSpec = {
                         val isForward = targetState != null
-                        val slideDuration = 350
-                        val fadeDuration = 175
+                        val slideDuration = AppAnimation.slideTransitionMs
+                        val fadeDuration = AppAnimation.fadeDurationMs
 
                         val enterSlide = slideInHorizontally(
                             animationSpec = tween(slideDuration),
@@ -171,24 +196,24 @@ private fun MainContent(
                                 onClick = { onEvent(MainContract.Event.OnQuickPlayClicked) }
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(spacing.spacing16))
 
                             if (state.dailyChallenge != null) {
                                 DailyChallengeCard(
                                     challenge = state.dailyChallenge,
                                     onClick = { onEvent(MainContract.Event.OnDailyChallengeClicked) }
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(spacing.spacing12))
                             }
 
                             ArchiveCard(
                                 onClick = { onEvent(MainContract.Event.OnArchiveClicked) }
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(spacing.spacing16))
 
                             if (state.dailyGoals != null) {
                                 TodaysGoalsCard(goalsProgress = state.dailyGoals)
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(spacing.spacing16))
                             }
 
                             CategoriesSection(
@@ -198,9 +223,9 @@ private fun MainContent(
                                 }
                             )
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(spacing.spacing24))
                             TipsSection(startIndex = state.tipStartIndex)
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(spacing.spacing24))
                         }
                     } else {
                         GameModeSection(
@@ -225,19 +250,20 @@ private fun CategoriesSection(
     val colors = AppTheme.colors
     val typography = AppTheme.typography
 
+    val spacing = AppTheme.spacing
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(MainR.string.categories_header),
             color = colors.textMuted,
             style = typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = spacing.spacing16)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.spacing12))
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(horizontal = spacing.spacing16),
+            horizontalArrangement = Arrangement.spacedBy(spacing.spacing12)
         ) {
             items(categories) { category ->
                 CategoryCard(
@@ -257,10 +283,11 @@ private fun ArchiveCard(
     val colors = AppTheme.colors
     val typography = AppTheme.typography
 
+    val spacing = AppTheme.spacing
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = spacing.spacing16)
             .clickable(onClick = onClick)
     ) {
         androidx.compose.foundation.layout.Row(
@@ -268,10 +295,10 @@ private fun ArchiveCard(
         ) {
             Text(
                 text = "\uD83D\uDDC3\uFE0F",
-                fontSize = 28.sp
+                style = typography.headlineMedium
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(spacing.spacing12))
 
             Column {
                 Text(

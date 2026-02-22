@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.core.domain.usecase.auth
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.repository.AuthRepository
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager

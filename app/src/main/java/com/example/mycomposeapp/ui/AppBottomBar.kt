@@ -10,6 +10,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mycomposeapp.core.ui.R.drawable.app_logo
+import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
+import com.example.mycomposeapp.feature.achievements.presentation.navigation.AchievementsRoute
 import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
 import com.example.mycomposeapp.feature.main.presentation.navigation.MainRoute
 import com.example.mycomposeapp.feature.notification.presentation.navigation.NotificationRoute
@@ -44,6 +47,7 @@ fun AppBottomBar(
         modifier = modifier
             .navigationBarsPadding()
             .clip(radius.radius12),
+        color = AppTheme.colors.glassWhite,
         color = Color.Transparent,
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
@@ -52,8 +56,7 @@ fun AppBottomBar(
             color = AppTheme.colors.onSurface)
         NavigationBar(
             containerColor = Color.Transparent,
-            modifier = Modifier.height(80.dp),
-            tonalElevation = 0.dp,
+            modifier = Modifier.height(AppDimensions.bottomBarHeight)
         ) {
             BottomBarItem(
                 selected = currentRoute == MainRoute::class.qualifiedName,
@@ -99,6 +102,28 @@ fun AppBottomBar(
                     }
                 }
             )
+            BottomBarItem(
+                selected = currentRoute == AchievementsRoute::class.qualifiedName,
+                painter = painterResource(CoreUiR.drawable.ic_trophy),
+                onClick = {
+                    navController.navigate(AchievementsRoute) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+            BottomBarItem(
+                selected = currentRoute == LeaderboardRoute::class.qualifiedName,
+                painter = painterResource(CoreUiR.drawable.ic_leaderboard),
+                onClick = {
+                    navController.navigate(LeaderboardRoute) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
 
         }
     }
@@ -110,7 +135,7 @@ private fun RowScope.BottomBarItem(
     painter: Painter,
     onClick: () -> Unit
 ) {
-    val iconSize = if (selected) 22.dp else 18.dp
+    val iconSize = if (selected) AppDimensions.bottomNavIconSelected else AppDimensions.bottomNavIconUnselected
 
     NavigationBarItem(
         selected = selected,
@@ -122,6 +147,11 @@ private fun RowScope.BottomBarItem(
                 modifier = Modifier.size(iconSize)
             )
         },
-        modifier = Modifier.padding(bottom = spacing.spacing20)
+        modifier = Modifier.padding(bottom = spacing.spacing20),
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = AppTheme.colors.goldenYellow,
+            unselectedIconColor = AppTheme.colors.textMuted,
+            indicatorColor = AppTheme.colors.glassWhite
+        )
     )
 }
