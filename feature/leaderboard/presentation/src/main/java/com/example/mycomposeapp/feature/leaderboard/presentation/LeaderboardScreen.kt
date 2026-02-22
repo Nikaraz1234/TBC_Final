@@ -113,13 +113,6 @@ private fun LeaderboardContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        AsyncImage(
-            model = CoreUiR.drawable.app_background,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
         Column(modifier = Modifier.fillMaxWidth()) {
             LeaderboardsTopBar()
 
