@@ -16,9 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.main.presentation.model.Category
 
@@ -36,14 +39,28 @@ fun CategoryCard(
         modifier = modifier
             .size(width = 120.dp, height = 140.dp)
             .clip(shape)
-            .background(
-                brush = Brush.verticalGradient(category.gradientColors),
-                shape = shape
-            )
             .border(1.dp, colors.glassBorder, shape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
+        if (category.backgroundImageRes != null) {
+            Image(
+                painter = painterResource(category.backgroundImageRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(category.gradientColors),
+                        shape = shape
+                    )
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

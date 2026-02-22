@@ -10,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.R as CoreUiR
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mycomposeapp.core.ui.components.Loader
@@ -35,7 +38,7 @@ fun GameplayScreen(
             when (effect) {
                 is GameContract.SideEffect.NavigateBack -> onNavigateBack()
                 is GameContract.SideEffect.ShowSnackbar -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, effect.message.asString(context), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -46,8 +49,13 @@ fun GameplayScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = colors.backgroundGradient)
     ) {
+        AsyncImage(
+            model = CoreUiR.drawable.app_background,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.comics
 
-import com.example.mycomposeapp.core.domain.LevelingRules
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
@@ -9,17 +9,18 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
-import com.example.mycomposeapp.feature.game.domain.model.ArrowDirection
-import com.example.mycomposeapp.feature.game.domain.model.FeedbackColor
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants.BASE_POINTS
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants.RANKLE_COINS_WIN
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants.RANKLE_INITIAL_ATTEMPTS
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants.WIN_THRESHOLD
+import com.example.mycomposeapp.feature.game.domain.model.comics.ArrowDirection
+import com.example.mycomposeapp.feature.game.domain.model.comics.FeedbackColor
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants.BASE_POINTS
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants.RANKLE_COINS_WIN
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants.RANKLE_INITIAL_ATTEMPTS
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants.WIN_THRESHOLD
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
-import com.example.mycomposeapp.feature.game.domain.model.RankleGuess
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.model.comics.RankleGuess
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.GetRankleMangaUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
@@ -294,14 +295,28 @@ class RankleDelegate(
                         copy(gameResult = gameResult?.copy(isNewHighScore = true))
                     }
                 }
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-                updateDailyGoalProgressUseCase.recordGamePlayed(
+                val updatedStats = updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                scope.onGameCompleted(updatedStats)
+                val xpResult = updateDailyGoalProgressUseCase.recordGamePlayed(
                     categoryType = categoryType,
                     gameModeId = gameModeId,
                     wasPerfect = false
                 )
                 if (coinMultiplier > 1) {
                     dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
+                if (xpResult.hasAnyXp) {
+                    val msg = buildString {
+                        if (xpResult.newlyCompletedGoalIds.isNotEmpty()) {
+                            append("Daily goal complete! +${xpResult.xpAwarded} XP")
+                        }
+                        if (xpResult.allGoalsCompleted) {
+                            append(" • All goals done! +${xpResult.bonusXpAwarded} XP bonus")
+                        }
+                    }
+                    scope.emitSideEffect(
+                        GameContract.SideEffect.ShowSnackbar(UiText.DynamicString(msg))
+                    )
                 }
             } catch (_: Exception) { }
         }

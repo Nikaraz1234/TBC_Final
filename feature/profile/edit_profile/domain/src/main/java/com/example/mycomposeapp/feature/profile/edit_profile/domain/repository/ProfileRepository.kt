@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.feature.profile.edit_profile.domain.repository
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.User
 import kotlinx.coroutines.flow.Flow
 

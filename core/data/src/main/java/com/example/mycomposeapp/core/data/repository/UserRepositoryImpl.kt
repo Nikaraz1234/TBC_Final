@@ -1,7 +1,7 @@
 package com.example.mycomposeapp.core.data.repository
 
 import com.example.mycomposeapp.core.data.common.HandleResponse
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.domain.model.UserStats
 import com.example.mycomposeapp.core.domain.repository.UserRepository

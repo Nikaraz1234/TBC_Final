@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,12 +40,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +52,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,6 +66,7 @@ import com.example.mycomposeapp.core.ui.components.badges.LevelBadge
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
+import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
@@ -76,39 +74,28 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.LocalAppColorScheme
 import com.example.mycomposeapp.feature.profile.presentation.mapper.toLevelProgressUi
 import com.example.mycomposeapp.feature.profile.presentation.model.LevelProgressUi
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel(),
     onEditClick: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
-
-    var showSettingsSheet by rememberSaveable { mutableStateOf(false) }
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.sideEffect.collectLatest { effect ->
+        viewModel.sideEffect.collect { effect ->
             when (effect) {
-                ProfileContract.SideEffect.ShowSettings -> showSettingsSheet = true
-                ProfileContract.SideEffect.GoBack -> Unit
-                ProfileContract.SideEffect.GoToEditProfile -> onEditClick()
+                ProfileContract.SideEffect.GoToEditProfile   -> onEditClick()
                 ProfileContract.SideEffect.GoToWelcomeScreen -> onLogout()
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(ProfileContract.Event.Load)
-    }
-
     ProfileContent(
         state = state,
         onEvent = viewModel::onEvent,
-        modifier = Modifier.fillMaxSize(),
-        showSettingsSheet = showSettingsSheet,
-        onDismissSettings = { showSettingsSheet = false },
+        modifier = Modifier.fillMaxSize()
     )
 }
 
@@ -117,8 +104,6 @@ private fun ProfileContent(
     state: ProfileContract.State,
     onEvent: (ProfileContract.Event) -> Unit,
     modifier: Modifier = Modifier,
-    showSettingsSheet: Boolean,
-    onDismissSettings: () -> Unit,
 ) {
     val userStats = state.user?.stats
 
@@ -131,8 +116,7 @@ private fun ProfileContent(
         )
 
         Column(modifier = Modifier
-            .systemBarsPadding()
-            .navigationBarsPadding()) {
+            .systemBarsPadding()) {
             ProfileTopBar(
                 onSettingsClicked = { onEvent(ProfileContract.Event.OnSettingsClicked) }
             )
@@ -170,7 +154,7 @@ private fun ProfileContent(
                 Spacer(modifier = Modifier.height(spacing.spacing16))
 
                 ButtonMedium(
-                    text = "Edit profile",
+                    text = stringResource(R.string.profile_edit),
                     onClick = { onEvent(ProfileContract.Event.OnEditProfileClicked) },
                     style = ButtonStyle.Filled,
                     enabled = true,
@@ -181,8 +165,8 @@ private fun ProfileContent(
         }
 
         ProfileBottomSheet(
-            visible = showSettingsSheet,
-            onClose = onDismissSettings,
+            visible = state.showSettingsSheet,
+            onClose = { onEvent(ProfileContract.Event.OnSettingsDismissed) },
             onEvent = onEvent,
             isDarkTheme = state.isDarkTheme
         )
@@ -199,7 +183,7 @@ private fun ProfileTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(AppDimensions.topBarHeight)
     ) {
         Row(
             modifier = Modifier
@@ -211,7 +195,7 @@ private fun ProfileTopBar(
             IconButton(onClick = onSettingsClicked) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.profile_settings),
                     tint = colors.white
                 )
             }
@@ -224,7 +208,7 @@ private fun ProfileTopBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Profile",
+                text = stringResource(R.string.profile_title),
                 style = typography.titleLarge.copy(
                     brush = colors.goldTextGradient,
                     fontWeight = FontWeight.SemiBold
@@ -258,9 +242,9 @@ private fun ProfileAvatarCard(
 
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(AppDimensions.profileAvatarBorderSize)
                     .border(
-                        width = 4.dp,
+                        width = spacing.spacing4,
                         color = colors.goldenYellow,
                         shape = CircleShape
                     ),
@@ -268,7 +252,7 @@ private fun ProfileAvatarCard(
             ) {
                 UserAvatar(
                     imageUrl = photoUrl,
-                    size = 112.dp
+                    size = AppDimensions.profileAvatarInnerSize
                 )
             }
 
@@ -276,7 +260,7 @@ private fun ProfileAvatarCard(
                 level = level,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 10.dp)
+                    .offset(y = spacing.spacing10)
             )
         }
 
@@ -305,7 +289,7 @@ private fun LevelProgress(
     ) {
         Column(modifier = Modifier.padding(spacing.spacing16)) {
             Text(
-                text = "Next Level",
+                text = stringResource(R.string.profile_next_level),
                 color = colors.white,
                 style = typography.titleMedium
             )
@@ -343,7 +327,7 @@ private fun LvlProgressBar(
 
     Canvas(
         modifier = Modifier
-            .height(10.dp)
+            .height(spacing.spacing10)
             .fillMaxWidth()
     ) {
         val h = size.height
@@ -373,7 +357,7 @@ private fun GlobalStats(user: User?) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Global Stats",
+            text = stringResource(R.string.profile_global_stats),
             color = colors.white,
             modifier = Modifier.padding(horizontal = spacing.spacing20),
             style = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
@@ -386,12 +370,12 @@ private fun GlobalStats(user: User?) {
             horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
         ) {
             RankItem(
-                title = "Points",
+                title = stringResource(R.string.profile_stats_points),
                 stat = user.stats.points.toString(),
                 modifier = Modifier.weight(1f)
             )
             RankItem(
-                title = "Games Played",
+                title = stringResource(R.string.profile_stats_games_played),
                 stat = user.stats.gamesPlayed.toString(),
                 modifier = Modifier.weight(1f)
             )
@@ -404,12 +388,12 @@ private fun GlobalStats(user: User?) {
             horizontalArrangement = Arrangement.spacedBy(spacing.spacing16)
         ) {
             RankItem(
-                title = "Total Guesses",
+                title = stringResource(R.string.profile_stats_total_guesses),
                 stat = user.stats.correctAnswers.toString(),
                 modifier = Modifier.weight(1f)
             )
             RankItem(
-                title = "Best Streak",
+                title = stringResource(R.string.profile_stats_best_streak),
                 stat = bestStreak.toString(),
                 modifier = Modifier.weight(1f)
             )
@@ -427,7 +411,7 @@ private fun RankItem(
 
     Box(
         modifier = modifier
-            .height(100.dp)
+            .height(AppDimensions.statsCardHeight)
             .clip(radius.radius28)
             .background(colors.glassGradient)
             .padding(horizontal = spacing.spacing20, vertical = spacing.spacing12),
@@ -442,7 +426,7 @@ private fun RankItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(spacing.spacing4))
 
             Text(
                 text = stat,
@@ -504,15 +488,15 @@ private fun ProfileBottomSheetContent(
             .fillMaxWidth()
             .heightIn(max = maxHeight)
             .background(colors.backgroundDark)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(horizontal = spacing.spacing16, vertical = spacing.spacing8),
+        verticalArrangement = Arrangement.spacedBy(spacing.spacing8)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Settings",
+                text = stringResource(R.string.profile_settings),
                 color = colors.white,
                 style = typography.titleLarge,
                 modifier = Modifier.weight(1f)
@@ -520,7 +504,7 @@ private fun ProfileBottomSheetContent(
             IconButton(onClick = onClose) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Close",
+                    contentDescription = stringResource(R.string.close),
                     tint = colors.white
                 )
             }
@@ -530,7 +514,7 @@ private fun ProfileBottomSheetContent(
 
         SheetRow(
             icon = painterResource(CoreUiR.drawable.ic_moon),
-            title = "Dark theme",
+            title = stringResource(R.string.settings_dark_theme),
             onClick = { onEvent(ProfileContract.Event.ToggleDarkTheme) },
             trailing = {
                 Switch(
@@ -542,13 +526,13 @@ private fun ProfileBottomSheetContent(
 
         SheetRow(
             icon = painterResource(CoreUiR.drawable.ic_notification),
-            title = "Notifications",
+            title = stringResource(R.string.settings_notifications),
             onClick = { onEvent(ProfileContract.Event.NotificationsClicked) }
         )
 
         SheetRow(
             icon = painterResource(CoreUiR.drawable.ic_back),
-            title = "Logout",
+            title = stringResource(R.string.settings_logout),
             onClick = { onEvent(ProfileContract.Event.LogoutClicked) }
         )
     }
@@ -567,7 +551,7 @@ private fun SheetRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .padding(horizontal = spacing.spacing12, vertical = spacing.spacing12)
             .background(colors.backgroundDark)
     ) {
         Row(
@@ -577,11 +561,11 @@ private fun SheetRow(
             Icon(
                 icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(spacing.spacing20),
                 tint = colors.white
             )
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(spacing.spacing12))
 
             Text(
                 text = title,
@@ -600,9 +584,7 @@ private fun SheetRow(
 private fun ProfileContentPreview_SheetClosed() {
     ProfileContent(
         state = ProfileContract.State(),
-        onEvent = {},
-        showSettingsSheet = false,
-        onDismissSettings = {}
+        onEvent = {}
     )
 }
 

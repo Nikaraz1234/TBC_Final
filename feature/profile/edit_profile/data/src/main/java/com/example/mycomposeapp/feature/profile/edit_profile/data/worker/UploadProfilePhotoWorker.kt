@@ -5,7 +5,7 @@ import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.example.mycomposeapp.feature.profile.edit_profile.domain.StorageKeys
+import com.example.mycomposeapp.feature.profile.edit_profile.domain.constants.StorageKeys
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await

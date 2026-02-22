@@ -4,10 +4,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.feature.game.domain.model.DailyPuzzle
 import com.example.mycomposeapp.feature.game.domain.model.Question
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
+import com.example.mycomposeapp.feature.game.data.seeder.AnimeEmojiPuzzleSeeder
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -117,6 +118,15 @@ class MangaEmojiRepositoryImpl @Inject constructor(
     override suspend fun markDailyCompleted(date: String) {
         val key = booleanPreferencesKey("daily_completed_$date")
         dataStore.edit { prefs -> prefs[key] = true }
+    }
+
+    override suspend fun seedPuzzles() {
+        val batch = firestore.batch()
+        val col = firestore.collection("anime_emoji")
+        AnimeEmojiPuzzleSeeder.ALL.forEach { data ->
+            batch.set(col.document(data["date"] as String), data)
+        }
+        batch.commit().await()
     }
 
     private suspend fun isDailyCompleted(date: String): Boolean {

@@ -4,9 +4,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.mycomposeapp.core.data.common.HandleResponse
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.feature.profile.edit_profile.data.worker.UploadProfilePhotoWorker
-import com.example.mycomposeapp.feature.profile.edit_profile.domain.StorageKeys
+import com.example.mycomposeapp.feature.profile.edit_profile.domain.constants.StorageKeys
 import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.feature.profile.edit_profile.domain.repository.ProfileRepository
 import com.google.firebase.firestore.FirebaseFirestore

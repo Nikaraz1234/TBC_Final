@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.feature.profile.presentation.mapper
 
-import com.example.mycomposeapp.core.domain.LevelingRules
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
 import com.example.mycomposeapp.feature.profile.presentation.model.LevelProgressUi
 
 fun toLevelProgressUi(totalXp: Int, level: Int): LevelProgressUi {

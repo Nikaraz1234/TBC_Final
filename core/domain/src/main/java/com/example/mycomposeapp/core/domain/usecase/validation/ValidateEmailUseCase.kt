@@ -1,5 +1,7 @@
 package com.example.mycomposeapp.core.domain.usecase.validation
 
+import com.example.mycomposeapp.core.domain.model.ValidationResult
+
 import javax.inject.Inject
 
 class ValidateEmailUseCase @Inject constructor() {

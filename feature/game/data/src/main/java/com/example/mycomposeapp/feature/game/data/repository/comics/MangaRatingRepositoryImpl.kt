@@ -1,9 +1,9 @@
 package com.example.mycomposeapp.feature.game.data.repository.comics
 
 import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
-import com.example.mycomposeapp.feature.game.domain.model.MangaItem
-import com.example.mycomposeapp.feature.game.domain.model.MangaPair
-import com.example.mycomposeapp.feature.game.domain.repository.MangaRatingRepository
+import com.example.mycomposeapp.feature.game.domain.model.comics.MangaItem
+import com.example.mycomposeapp.feature.game.domain.model.comics.MangaPair
+import com.example.mycomposeapp.feature.game.domain.repository.comics.MangaRatingRepository
 import javax.inject.Inject
 
 class MangaRatingRepositoryImpl @Inject constructor(

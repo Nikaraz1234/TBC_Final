@@ -7,8 +7,8 @@ object LeaderboardContract {
         val isLoading: Boolean = true,
         val users: List<User> = emptyList(),
         val filteredUsers: List<User> = emptyList(),
-        val categories: List<CategoryType> = CategoryType.entries.toList(),
-        val selectedCategory: CategoryType? = null,
+        val categories: List<LeaderboardFilter> = LeaderboardFilter.entries.toList(),
+        val selectedCategory: LeaderboardFilter? = null,
         val modes: List<String> = emptyList(),
         val selectedMode: String = "",
         val displayScore: Int = 0,
@@ -18,7 +18,7 @@ object LeaderboardContract {
 
     sealed interface Event {
         data object LoadLeaderboard: Event
-        data class CategoryChanged(val category: CategoryType) : Event
+        data class CategoryChanged(val category: LeaderboardFilter) : Event
         data class ModeChanged(val mode: String) : Event
 
     }

@@ -2,7 +2,7 @@ package com.example.mycomposeapp.feature.game.data.mapper.games
 
 import com.example.mycomposeapp.feature.game.data.remote.games.dto.SteamAchievementDto
 import com.example.mycomposeapp.feature.game.data.remote.games.dto.SteamAchievementPercentageDto
-import com.example.mycomposeapp.feature.game.domain.model.game.Achievement
+import com.example.mycomposeapp.feature.game.domain.model.games.Achievement
 
 fun SteamAchievementDto.toAchievement(): Achievement = Achievement(
     name = displayName ?: name,

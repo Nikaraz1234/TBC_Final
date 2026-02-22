@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="800dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- 1st place (tallest, center) -->
+  <path
+      android:pathData="M9,11H15V21H9Z"
+      android:fillColor="#000000"/>
+  <!-- 2nd place (left) -->
+  <path
+      android:pathData="M2,14H8V21H2Z"
+      android:fillColor="#000000"/>
+  <!-- 3rd place (right) -->
+  <path
+      android:pathData="M16,16H22V21H16Z"
+      android:fillColor="#000000"/>
+  <!-- 1 label -->
+  <path
+      android:pathData="M11.5,8 L12.5,7 L12.5,10 L11.5,10 Z"
+      android:fillColor="#000000"/>
+</vector>

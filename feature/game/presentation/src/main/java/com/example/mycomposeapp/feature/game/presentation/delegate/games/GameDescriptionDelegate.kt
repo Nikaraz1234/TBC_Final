@@ -1,21 +1,23 @@
 package com.example.mycomposeapp.feature.game.presentation.delegate.games
 
-import com.example.mycomposeapp.core.domain.LevelingRules
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.rules.LevelingRules
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.UpdateDailyGoalProgressUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.model.AnswerResult
-import com.example.mycomposeapp.feature.game.domain.model.GameConstants
+import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.domain.model.SearchResult
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchDescriptionBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase
+import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.R
 import com.example.mycomposeapp.feature.game.presentation.delegate.DelegateScope
 import com.example.mycomposeapp.feature.game.presentation.delegate.GameModeDelegate
 import kotlinx.coroutines.Job
@@ -110,7 +112,7 @@ class GameDescriptionDelegate(
         val mode = state.descriptionState ?: return
         val q = state.currentQuestion?.content as? QuestionContent.Description ?: return
 
-        if (mode.hintStep >= 3) return
+        if (mode.hintStep >= GameConstants.DESCRIPTION_MAX_HINT_STEPS) return
         if (mode.coins < mode.hintCost) {
             scope.updateState {
                 copy(modeState = mode.copy(showInsufficientFundsWarning = true))
@@ -159,7 +161,7 @@ class GameDescriptionDelegate(
         if (scope.currentState().isAnswerRevealed) return
 
         val query = text.trim()
-        if (query.length < 2) {
+        if (query.length < GameConstants.MIN_SEARCH_QUERY_LENGTH) {
             searchJob?.cancel()
             scope.updateState { copy(searchResults = emptyList(), isSearching = false) }
             return
@@ -199,7 +201,7 @@ class GameDescriptionDelegate(
 
     private suspend fun fetchDescriptionBatchAndStart() {
         fetchDescriptionBatchUseCase(
-            batchSize = 10,
+            batchSize = GameConstants.DESCRIPTION_BATCH_SIZE,
             seenIds = seenIds
         ).collect { resource ->
             when (resource) {
@@ -295,10 +297,10 @@ class GameDescriptionDelegate(
 
 
     private fun prefetchIfNeeded() {
-        if (questionQueue.size <= 2 && prefetchJob?.isActive != true) {
+        if (questionQueue.size <= GameConstants.DESCRIPTION_PREFETCH_THRESHOLD && prefetchJob?.isActive != true) {
             prefetchJob = scope.coroutineScope.launch {
                 fetchDescriptionBatchUseCase(
-                    batchSize = 10,
+                    batchSize = GameConstants.DESCRIPTION_BATCH_SIZE,
                     seenIds = seenIds
                 ).collect { resource ->
                     if (resource is Resource.Success) {
@@ -397,7 +399,12 @@ class GameDescriptionDelegate(
                 }
 
                 scope.emitSideEffect(
-                    GameContract.SideEffect.ShowSnackbar("Wrong! $newLives lives remaining")
+                    GameContract.SideEffect.ShowSnackbar(
+                        UiText.StringResource(
+                            R.string.wrong_lives_format,
+                            listOf(newLives, if (newLives == 1) "life" else "lives")
+                        )
+                    )
                 )
                 return
             }
@@ -454,14 +461,28 @@ class GameDescriptionDelegate(
 
         scope.coroutineScope.launch {
             try {
-                updateGameStatsUseCase(result, gameModeId, categoryType, false)
-                updateDailyGoalProgressUseCase.recordGamePlayed(
+                val updatedStats = updateGameStatsUseCase(result, gameModeId, categoryType, false)
+                scope.onGameCompleted(updatedStats)
+                val xpResult = updateDailyGoalProgressUseCase.recordGamePlayed(
                     categoryType = categoryType,
                     gameModeId = gameModeId,
                     wasPerfect = false
                 )
                 if (coinMultiplier > 1) {
                     dailyGoalsManagerUseCase.completeDailyChallenge()
+                }
+                if (xpResult.hasAnyXp) {
+                    val msg = buildString {
+                        if (xpResult.newlyCompletedGoalIds.isNotEmpty()) {
+                            append("Daily goal complete! +${xpResult.xpAwarded} XP")
+                        }
+                        if (xpResult.allGoalsCompleted) {
+                            append(" • All goals done! +${xpResult.bonusXpAwarded} XP bonus")
+                        }
+                    }
+                    scope.emitSideEffect(
+                        GameContract.SideEffect.ShowSnackbar(UiText.DynamicString(msg))
+                    )
                 }
             } catch (_: Exception) {}
         }

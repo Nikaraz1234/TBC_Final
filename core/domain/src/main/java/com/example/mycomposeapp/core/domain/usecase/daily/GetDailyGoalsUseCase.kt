@@ -3,7 +3,7 @@ package com.example.mycomposeapp.core.domain.usecase.daily
 import com.example.mycomposeapp.core.domain.keys.PreferenceKeys
 import com.example.mycomposeapp.core.domain.model.DailyGoal
 import com.example.mycomposeapp.core.domain.model.DailyGoalsAllProgress
-import com.example.mycomposeapp.core.domain.model.DailyGoalsConstants
+import com.example.mycomposeapp.core.domain.constants.DailyGoalsConstants
 import com.example.mycomposeapp.core.domain.model.DailyGoalsProgress
 import com.example.mycomposeapp.core.domain.repository.DataStoreManager
 import kotlinx.coroutines.flow.first
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class GetDailyGoalsUseCase @Inject constructor(
     private val dataStoreManager: DataStoreManager,
-    private val resetHelper: DailyGoalsResetHelper
+    private val resetHelper: EnsureDailyGoalsResetUseCase
 ) {
     suspend operator fun invoke(): DailyGoalsProgress {
         resetHelper.ensureTodayReset()

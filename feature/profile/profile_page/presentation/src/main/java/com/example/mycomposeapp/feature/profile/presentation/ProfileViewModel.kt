@@ -20,21 +20,20 @@ class ProfileViewModel @Inject constructor(
     initialState = ProfileContract.State()
 ) {
 
-
-    fun onEvent(event: ProfileContract.Event){
-        when(event) {
-            OnSettingsClicked -> sendSideEffect(ProfileContract.SideEffect.ShowSettings)
-            OnBackButtonClicked -> TODO()
-            OnEditProfileClicked -> sendSideEffect(ProfileContract.SideEffect.GoToEditProfile)
-            EditProfileClicked -> TODO()
-            LogoutClicked -> logout()
-            NotificationsClicked -> TODO()
-            ToggleDarkTheme -> TODO()
-            Load -> observeCurrentUser()
-        }
+    init {
+        observeCurrentUser()
     }
 
-
+    fun onEvent(event: ProfileContract.Event) {
+        when (event) {
+            OnSettingsClicked   -> setState { copy(showSettingsSheet = true) }
+            OnSettingsDismissed -> setState { copy(showSettingsSheet = false) }
+            OnEditProfileClicked -> sendSideEffect(ProfileContract.SideEffect.GoToEditProfile)
+            LogoutClicked        -> logout()
+            NotificationsClicked -> TODO()
+            ToggleDarkTheme      -> TODO()
+        }
+    }
 
     private fun observeCurrentUser() {
         viewModelScope.launch {

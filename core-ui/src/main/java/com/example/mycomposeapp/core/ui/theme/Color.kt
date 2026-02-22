@@ -51,6 +51,9 @@ data class AppColorScheme(
     // Error color
     val error: Color,
 
+    // Success color
+    val successGreen: Color,
+
     // Splash screen colors
     val splashOverlayTop: Color,
     val splashOverlayBottom: Color,
@@ -118,6 +121,7 @@ data class AppColorScheme(
             socialGlassBorder = Color.White.copy(alpha = 0.30f),
 
             error = Color(0xFFCF6679),
+            successGreen = Color(0xFF4CAF50),
 
             splashOverlayTop = Color(0xFF000000).copy(alpha = 0.35f),
             splashOverlayBottom = Color(0xFF000000).copy(alpha = 0.55f),
@@ -161,6 +165,7 @@ data class AppColorScheme(
             socialGlassBorder = Color(0xFF0F172A).copy(alpha = 0.12f),
 
             error = Color(0xFFD92D20),
+            successGreen = Color(0xFF388E3C),
 
             // Splash can stay dark-themed even in light mode (common pattern)
             splashOverlayTop = Color(0xFF000000).copy(alpha = 0.25f),

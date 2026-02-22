@@ -8,10 +8,10 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateCoinsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.UpdateUserStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
-import com.example.mycomposeapp.feature.game.domain.usecase.FetchCoverBatchUseCase
-import com.example.mycomposeapp.feature.game.domain.usecase.FetchPlotBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.movies.FetchCoverBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.movies.FetchPlotBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.GetDailyPuzzleUseCase
-import com.example.mycomposeapp.feature.game.domain.usecase.UpdateGameStatsUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.UpdateGameStatsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchAchievementBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.FetchScreenshotBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.games.SearchGamesUseCase

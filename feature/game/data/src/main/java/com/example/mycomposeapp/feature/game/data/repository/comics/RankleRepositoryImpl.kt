@@ -1,8 +1,8 @@
 package com.example.mycomposeapp.feature.game.data.repository.comics
 
 import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
-import com.example.mycomposeapp.feature.game.domain.model.game.RankleManga
-import com.example.mycomposeapp.feature.game.domain.repository.RankleRepository
+import com.example.mycomposeapp.feature.game.domain.model.comics.RankleManga
+import com.example.mycomposeapp.feature.game.domain.repository.comics.RankleRepository
 import javax.inject.Inject
 
 class RankleRepositoryImpl @Inject constructor(

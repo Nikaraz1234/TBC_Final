@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.core.domain.repository
 
-import com.example.mycomposeapp.core.domain.Resource
+import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.User
 import com.example.mycomposeapp.core.domain.model.UserStats
 import kotlinx.coroutines.flow.Flow

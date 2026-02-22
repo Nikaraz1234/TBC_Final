@@ -8,11 +8,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.R as CoreUiR
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -21,6 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
+import com.example.mycomposeapp.feature.achievements.presentation.navigation.AchievementsRoute
 import com.example.mycomposeapp.feature.main.presentation.navigation.MainRoute
 import com.example.mycomposeapp.feature.notification.presentation.navigation.NotificationRoute
 import com.example.mycomposeapp.feature.profile.presentation.navigation.ProfileRoute
@@ -61,23 +71,36 @@ class MainActivity : ComponentActivity() {
                     ?.any { destination ->
                         destination.hasRoute<MainRoute>() ||
                                 destination.hasRoute<ProfileRoute>() ||
-                                destination.hasRoute<NotificationRoute>()
+                                destination.hasRoute<NotificationRoute>() ||
+                                destination.hasRoute<AchievementsRoute>()
                     } ?: false
 
 
 
-                Scaffold(
-                    bottomBar = {
-                        if (showBottomBar) AppBottomBar(navController)
-                    }
-                ) { innerPadding ->
-
-                    NavGraph(
-                        navController = navController,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = CoreUiR.drawable.app_background,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
+                    Scaffold(
+                        containerColor = Color.Transparent,
+                        contentWindowInsets = WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
+                        ),
+                        bottomBar = {
+                            if (showBottomBar) AppBottomBar(navController)
+                        }
+                    ) { innerPadding ->
+
+                        NavGraph(
+                            navController = navController,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        )
+                    }
                 }
 
             }

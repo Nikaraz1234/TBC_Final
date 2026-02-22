@@ -32,7 +32,7 @@ import coil.compose.AsyncImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.feature.game.domain.model.MangaItem
+import com.example.mycomposeapp.feature.game.domain.model.comics.MangaItem
 import com.example.mycomposeapp.feature.game.presentation.GameContract
 
 private val SuccessGreen = Color(0xFF4CAF50)

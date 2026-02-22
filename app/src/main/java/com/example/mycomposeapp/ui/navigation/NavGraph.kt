@@ -23,6 +23,7 @@ import com.example.mycomposeapp.feature.welcome.presentation.navigation.welcomeN
 import com.example.mycomposeapp.feature.game.archive.navigation.ArchiveHubRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.EmojiArchiveRoute
 import com.example.mycomposeapp.feature.game.archive.navigation.archiveNavGraph
+import com.example.mycomposeapp.feature.achievements.presentation.navigation.achievementsNavGraph
 import com.example.mycomposeapp.feature.notification.presentation.navigation.notificationNavGraph
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
@@ -108,6 +109,7 @@ fun NavGraph(
             }
         )
         notificationNavGraph()
+        achievementsNavGraph()
 
         gameNavGraph(
             onNavigateBack = { navController.popBackStack() }

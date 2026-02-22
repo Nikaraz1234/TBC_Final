@@ -18,4 +18,6 @@ object PreferenceKeys {
     val DAILY_GOALS_GAME_MODES_TRIED = stringPreferencesKey("daily_goals_game_modes_tried")
 
     val FCM_TOKEN = stringPreferencesKey("fcm_token")
+
+    val DAILY_GOALS_ALL_COMPLETED_DATE = stringPreferencesKey("daily_goals_all_completed_date")
 }

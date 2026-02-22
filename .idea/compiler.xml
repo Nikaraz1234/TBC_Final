@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11">
-      <module name="MyComposeApp.feature.leaderboard.presentation" target="21" />
-      <module name="MyComposeApp.feature.notification.data" target="21" />
-      <module name="MyComposeApp.feature.notification.presentation" target="21" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>

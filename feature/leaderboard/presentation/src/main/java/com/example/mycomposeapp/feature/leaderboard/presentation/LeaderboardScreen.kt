@@ -38,15 +38,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,6 +55,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,10 +67,11 @@ import coil.request.ImageRequest
 import com.example.mycomposeapp.core.domain.model.GameModeIds
 import com.example.mycomposeapp.core.domain.model.GameModeIds.statsKey
 import com.example.mycomposeapp.core.domain.model.User
-import com.example.mycomposeapp.core.presentation.common.extensions.CollectWithLifecycle
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonSmall
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
+import com.example.mycomposeapp.core.ui.theme.AppDimensions
+import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
 import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
@@ -87,15 +87,7 @@ import com.example.mycomposeapp.core.ui.R as CoreUiR
 fun LeaderboardScreen(
     viewModel: LeaderboardViewModel = hiltViewModel()
 ){
-    val state by viewModel.uiState.collectAsState()
-
-    viewModel.sideEffect.CollectWithLifecycle { effect ->
-        when (effect) {
-            is LeaderboardContract.SideEffect.ShowSnackBar -> {
-                // snackBarHostState.showSnackbar(effect.message)
-            }
-        }
-    }
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(LeaderboardContract.Event.LoadLeaderboard)
@@ -111,8 +103,15 @@ private fun LeaderboardContent(
     state: LeaderboardContract.State,
     onEvent: (LeaderboardContract.Event) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()
-        .systemBarsPadding()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        AsyncImage(
+            model = CoreUiR.drawable.app_background,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(modifier = Modifier.fillMaxSize()
+            .systemBarsPadding()) {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             LeaderboardsTopBar(
@@ -151,6 +150,7 @@ private fun LeaderboardContent(
                 state.selectedStatsKey
             )
         }
+        }
     }
 
 }
@@ -163,18 +163,18 @@ private fun LeaderboardsTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(spacing.spacing56)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = spacing.spacing12),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.leaderboard_back),
                     tint = colors.white
                 )
             }
@@ -184,7 +184,7 @@ private fun LeaderboardsTopBar(
             IconButton(onClick = onInfoClick) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
-                    contentDescription = "Info",
+                    contentDescription = stringResource(R.string.leaderboard_info),
                     tint = colors.white
                 )
             }
@@ -197,7 +197,7 @@ private fun LeaderboardsTopBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Leaderboards",
+                text = stringResource(R.string.leaderboard_title),
                 style = androidx.compose.ui.text.TextStyle(
                     brush = colors.goldTextGradient,
                     fontSize = 18.sp,
@@ -215,9 +215,9 @@ private fun LeaderboardsTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardCategories(
-    options: List<CategoryType>,
-    selected: CategoryType?,
-    onSelectedChange: (CategoryType) -> Unit
+    options: List<LeaderboardFilter>,
+    selected: LeaderboardFilter?,
+    onSelectedChange: (LeaderboardFilter) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -230,7 +230,7 @@ fun LeaderboardCategories(
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
                 .padding(horizontal = spacing.spacing32),
-            value = selected?.name ?: "Select category",
+            value = selected?.name ?: stringResource(R.string.leaderboard_select_category),
             onValueChange = {},
             readOnly = true,
             enabled = options.isNotEmpty(),
@@ -266,9 +266,8 @@ private fun ModeLayout(
     onModeSelected: (String) -> Unit
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-
+        horizontalArrangement = Arrangement.spacedBy(spacing.spacing8),
+        contentPadding = PaddingValues(horizontal = spacing.spacing16),
     ) {
         items(modes) { mode ->
             val isSelected = mode == selectedMode
@@ -281,12 +280,10 @@ private fun ModeLayout(
                     ButtonStyle.Outlined
                 },
                 modifier = Modifier
-                    .widthIn(min = 110.dp)
+                    .widthIn(min = AppDimensions.leaderboardModeMinWidth)
                     .padding(horizontal = spacing.spacing8)
-
             )
         }
-
     }
 }
 @Composable
@@ -344,7 +341,7 @@ private fun LeaderboardAvatarCard(
 ) {
     val scale = if (rank == 1) 1.3f else 1f
     Column(
-        modifier = modifier.height(160.dp)
+        modifier = modifier.height(AppDimensions.leaderboardAvatarCardHeight)
             .scale(scale),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -364,9 +361,9 @@ private fun LeaderboardAvatarCard(
                 shape = CircleShape,
                 tonalElevation = 2.dp,
                 modifier = Modifier
-                    .size(86.dp)
+                    .size(AppDimensions.leaderboardAvatarSize)
                     .border(
-                        width = 4.dp,
+                        width = spacing.spacing4,
                         color = medalColor,
                         shape = CircleShape
                     )
@@ -389,17 +386,17 @@ private fun LeaderboardAvatarCard(
                 color = medalColor,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = (10).dp)
+                    .offset(y = spacing.spacing10)
             ) {
                 Text(
                     text = "#".plus(rank.toString()),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = spacing.spacing10, vertical = spacing.spacing4),
 
                     )
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(spacing.spacing16))
 
         Text(
             text = user.username,
@@ -407,7 +404,7 @@ private fun LeaderboardAvatarCard(
         )
         val score = statsKey?.let { user.stats.highScore[it] ?: 0 }
             ?: user.stats.points
-        Text(text = "$score pts", color = colors.white)
+        Text(text = stringResource(R.string.leaderboard_score_format, score), color = colors.white)
     }
 }
 @Composable
@@ -424,13 +421,13 @@ private fun Leaderboard(
     Row(modifier = Modifier.fillMaxWidth()
         .padding(horizontal = spacing.spacing24),
         horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = "Other Rankings",
+        Text(text = stringResource(R.string.leaderboard_other_rankings),
             color = colors.silver,
-            fontSize = 20.sp)
+            style = AppTheme.typography.titleLarge)
 
-        Text(text = "Points",
+        Text(text = stringResource(R.string.leaderboard_points),
             color = colors.silver,
-            fontSize = 20.sp)
+            style = AppTheme.typography.titleLarge)
     }
     Spacer(modifier = Modifier.height(spacing.spacing8))
     HorizontalDivider()
@@ -476,7 +473,7 @@ private fun LeaderboardUserCard(
                 shape = CircleShape,
                 tonalElevation = 2.dp,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(AppDimensions.leaderboardUserAvatarSize)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -500,10 +497,10 @@ private fun LeaderboardUserCard(
                     .clip(radius.radius8)
                     .background(brush = colors.glassGradient)
                     .padding(spacing.spacing4)
-                    .width(40.dp),
+                    .width(AppDimensions.leaderboardUserAvatarSize),
                     contentAlignment = Alignment.Center
                 ){
-                    Text(text = "LV. ".plus(user.stats.level.toString()),
+                    Text(text = stringResource(R.string.leaderboard_level_prefix).plus(user.stats.level.toString()),
                         style = androidx.compose.ui.text.TextStyle(
                             brush = colors.goldTextGradient
                         )
@@ -515,8 +512,7 @@ private fun LeaderboardUserCard(
         val score = selectedStatsKey?.let { user.stats.highScore[it] ?: 0 }
             ?: user.stats.points
 
-
-        Text(text = "$score pts", color = colors.white)
+        Text(text = stringResource(R.string.leaderboard_score_format, score), color = colors.white)
     }
 }
 
@@ -574,7 +570,6 @@ private fun LeaderboardContentPreview() {
                 isLoading = false,
                 users = previewUsers(),
                 modes = listOf("Daily", "Weekly", "All Time"),
-                //categories = listOf("Movies", "Gold League", "Silver League")
             ),
             onEvent = {}
         )
