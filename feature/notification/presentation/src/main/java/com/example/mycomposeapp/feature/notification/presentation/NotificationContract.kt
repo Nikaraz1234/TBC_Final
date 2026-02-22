@@ -24,6 +24,9 @@ object NotificationContract {
         ) : Event
 
         data class MarkAsRead(val id: String) : Event
+
+        data class Delete(val id: String) : Event
+
     }
 
     sealed interface SideEffect {

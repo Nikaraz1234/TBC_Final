@@ -3,20 +3,13 @@
     android:height="800dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <!-- 1st place (tallest, center) -->
   <path
-      android:pathData="M9,11H15V21H9Z"
+      android:pathData="M6.5,12h-4a0.5,0.5 0,0 0,-0.5 0.5V20H7V12.5A0.5,0.5 0,0 0,6.5 12Z"
       android:fillColor="#000000"/>
-  <!-- 2nd place (left) -->
   <path
-      android:pathData="M2,14H8V21H2Z"
+      android:pathData="M14,4H10a0.5,0.5 0,0 0,-0.5 0.5V20h5V4.5A0.5,0.5 0,0 0,14 4Z"
       android:fillColor="#000000"/>
-  <!-- 3rd place (right) -->
   <path
-      android:pathData="M16,16H22V21H16Z"
-      android:fillColor="#000000"/>
-  <!-- 1 label -->
-  <path
-      android:pathData="M11.5,8 L12.5,7 L12.5,10 L11.5,10 Z"
+      android:pathData="M21.5,8h-4a0.5,0.5 0,0 0,-0.5 0.5V20h5V8.5A0.5,0.5 0,0 0,21.5 8Z"
       android:fillColor="#000000"/>
 </vector>

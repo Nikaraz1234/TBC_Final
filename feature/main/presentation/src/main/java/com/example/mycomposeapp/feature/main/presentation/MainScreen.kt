@@ -15,11 +15,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -63,7 +70,8 @@ fun MainScreen(
     onNavigateToProfile: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToArchive: () -> Unit = {},
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel(),
+    showSnackbar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -84,7 +92,7 @@ fun MainScreen(
                 }
 
                 is MainContract.SideEffect.ShowSnackbar -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    showSnackbar(effect.message)
                 }
 
                 is MainContract.SideEffect.NavigateToWelcome -> {
@@ -131,9 +139,6 @@ private fun MainContent(
         if (state.isLoading) {
             Loader()
         } else {
-            // IMPORTANT:
-            // - Removed systemBarsPadding() because your Activity Scaffold already applies innerPadding to NavHost.
-            // - Keeping a small bottom padding so last items scroll comfortably above BottomBar.
             Column(
                 modifier = Modifier
                     .fillMaxSize()

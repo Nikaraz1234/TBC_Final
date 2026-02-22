@@ -1,8 +1,10 @@
 package com.example.mycomposeapp.feature.profile.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.example.mycomposeapp.core.domain.Resource
 import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
 import com.example.mycomposeapp.core.domain.usecase.datastore.RemovePreferenceUseCase
+import com.example.mycomposeapp.core.domain.usecase.user.DeleteUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.profile.presentation.ProfileContract.Event.*
@@ -15,7 +17,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val removePreferenceUseCase: RemovePreferenceUseCase
+    private val removePreferenceUseCase: RemovePreferenceUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase
 ) : BaseViewModel<ProfileContract.State, ProfileContract.SideEffect, ProfileContract.Event>(
     initialState = ProfileContract.State()
 ) {
@@ -31,9 +34,35 @@ class ProfileViewModel @Inject constructor(
             OnEditProfileClicked -> sendSideEffect(ProfileContract.SideEffect.GoToEditProfile)
             LogoutClicked        -> logout()
             NotificationsClicked -> TODO()
-            ToggleDarkTheme      -> TODO()
+            ToggleDarkTheme -> TODO()
+            Load -> observeCurrentUser()
+            DeleteUser -> deleteUser()
         }
     }
+
+    private fun deleteUser(){
+        viewModelScope.launch {
+            deleteUserUseCase().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        setState { copy(isLoading = true) }
+                    }
+
+                    is Resource.Success -> {
+                        setState { copy(isLoading = false) }
+                        sendSideEffect(ProfileContract.SideEffect.GoToWelcomeScreen)
+                    }
+
+                    is Resource.Error -> {
+                        setState { copy(isLoading = false) }
+                        sendSideEffect(ProfileContract.SideEffect.ShowSnackBar(result.message))
+                    }
+                }
+            }
+        }
+
+    }
+
 
     private fun observeCurrentUser() {
         viewModelScope.launch {

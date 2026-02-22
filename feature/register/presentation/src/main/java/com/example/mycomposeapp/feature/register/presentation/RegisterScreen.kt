@@ -57,7 +57,8 @@ import kotlinx.coroutines.flow.collectLatest
 fun RegisterScreen(
     onNavigateToDashboard: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = hiltViewModel(),
+    showSnackbar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 

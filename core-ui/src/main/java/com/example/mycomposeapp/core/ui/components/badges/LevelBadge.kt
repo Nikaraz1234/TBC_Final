@@ -19,14 +19,14 @@ fun LevelBadge(
 
     Text(
         text = "Lv. $level",
-        color = colors.backgroundDark,
-        style = MaterialTheme.typography.labelSmall,
+        color = colors.onSurface,
+        style = AppTheme.typography.labelSmall,
         fontWeight = FontWeight.Bold,
         modifier = modifier
             .background(
                 color = colors.goldenYellow,
                 shape = AppTheme.radius.radius8
             )
-            .padding(horizontal = spacing.spacing6, vertical = spacing.spacing2)
+            .padding(horizontal = spacing.spacing6, vertical = spacing.spacing4)
     )
 }

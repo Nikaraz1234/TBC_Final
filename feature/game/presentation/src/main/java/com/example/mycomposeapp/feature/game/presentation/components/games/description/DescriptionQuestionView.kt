@@ -81,8 +81,7 @@ fun DescriptionQuestionView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 120.dp, max = 240.dp)
-                        .verticalScroll(rememberScrollState())
-                        .clip(RoundedCornerShape(16.dp)),
+                        .verticalScroll(rememberScrollState()),
                     overflow = TextOverflow.Clip
                 )
             }
