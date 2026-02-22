@@ -21,7 +21,6 @@ data class AppColorScheme(
     val bronze: Color = Color(0xFFCD7F32),
     val bronzeDark: Color = Color(0xFF8C5A2B),
 
-
     // Gold gradient colors for text
     val gold1: Color,
     val gold2: Color,
@@ -59,6 +58,18 @@ data class AppColorScheme(
     val splashInitSubtitle: Color,
     val splashProgressTrack: Color
 ) {
+    // ------------------------------
+    // Semantic aliases (Material-like)
+    // ------------------------------
+    val background: Color get() = backgroundDark
+    val surface: Color get() = backgroundDarkEnd
+    val surfaceVariant: Color get() = glassWhiteDark
+    val outline: Color get() = glassBorder
+
+    val onBackground: Color get() = textLight
+    val onSurface: Color get() = textLight
+    val onPrimary: Color get() = black
+
     // Gradient brushes
     val backgroundGradient: Brush
         get() = Brush.verticalGradient(
@@ -74,7 +85,7 @@ data class AppColorScheme(
         get() = Brush.verticalGradient(
             colors = listOf(
                 socialGlassBackground,
-                Color.Black.copy(alpha = 0.0f) // subtle fade; optional
+                Color.Black.copy(alpha = 0.0f)
             )
         )
 
@@ -128,30 +139,25 @@ data class AppColorScheme(
         )
 
         fun light(): AppColorScheme = AppColorScheme(
-            // Light backgrounds that still “feel” premium and close to your dark look
             backgroundDark = Color(0xFFF6F7FB),
             backgroundDarkEnd = Color(0xFFEDF0F8),
 
-            // Keep gold identity (slightly brighter reads better on white)
             goldenYellow = Color(0xFFFFC83D),
             goldenYellowDark = Color(0xFFB8960C),
 
-            // Same gradient family, but a bit brighter / cleaner for readability
             gold1 = Color(0xFF8A6A2A),
             gold2 = Color(0xFFD7B45B),
             gold3 = Color(0xFFFFE8A6),
             gold4 = Color(0xFFFFC83D),
             gold5 = Color(0xFF9A7A34),
 
-            // Text flips (dark text on light background)
-            textLight = Color(0xFF0F172A),     // used as “primary text” in your app
+            textLight = Color(0xFF0F172A),
             textMuted = Color(0xFF5B6475),
 
             white = Color(0xFFFFFFFF),
             black = Color(0xFF000000),
             transparent = Color(0x00000000),
 
-            // Glass on light: use dark tint (not white), otherwise it disappears
             glassWhite = Color(0xFF0F172A).copy(alpha = 0.06f),
             glassWhiteLight = Color(0xFF0F172A).copy(alpha = 0.08f),
             glassWhiteDark = Color(0xFF0F172A).copy(alpha = 0.03f),
@@ -162,7 +168,6 @@ data class AppColorScheme(
 
             error = Color(0xFFD92D20),
 
-            // Splash can stay dark-themed even in light mode (common pattern)
             splashOverlayTop = Color(0xFF000000).copy(alpha = 0.25f),
             splashOverlayBottom = Color(0xFF000000).copy(alpha = 0.45f),
             splashTitleGold = Color(0xFFFFC83D),

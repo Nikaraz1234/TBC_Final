@@ -166,6 +166,31 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
     }
+    override fun deleteCurrentUser(): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+
+        val user = firebaseAuth.currentUser
+        if (user == null) {
+            emit(Resource.Error("Not authenticated"))
+            return@flow
+        }
+
+        val uid = user.uid
+
+        try {
+            firestore.collection(USERS_COLLECTION)
+                .document(uid)
+                .delete()
+                .await()
+
+            user.delete().await()
+
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to delete user"))
+        }
+    }
+
     private fun mapToIntMap(raw: Any?): Map<String, Int> = when (raw) {
         is Map<*, *> -> raw.entries.mapNotNull { (k, v) ->
             val key = k as? String ?: return@mapNotNull null

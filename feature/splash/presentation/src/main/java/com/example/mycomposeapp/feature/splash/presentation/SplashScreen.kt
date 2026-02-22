@@ -38,7 +38,8 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme
 fun SplashScreen(
     onGoDashboard: () -> Unit,
     onGoWelcome: () -> Unit,
-    viewModel: SplashViewModel = hiltViewModel()
+    viewModel: SplashViewModel = hiltViewModel(),
+    showSnackbar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -70,18 +71,6 @@ fun SplashContent(
     val colors = AppTheme.colors
 
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = CoreUiR.drawable.splash),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.splashOverlayGradient)
-        )
 
         SplashForeground(
             progress = state.progress,

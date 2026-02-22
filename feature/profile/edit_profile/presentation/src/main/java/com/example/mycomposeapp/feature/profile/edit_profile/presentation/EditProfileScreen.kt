@@ -6,9 +6,11 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,13 +20,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -49,7 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,11 +78,13 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import kotlinx.coroutines.flow.collectLatest
+import com.example.mycomposeapp.feature.profile.edit_profile.presentation.R as EditProfileR
 
 @Composable
 fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
+    showSnackBar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -101,18 +110,26 @@ private fun Context.findActivity(): ComponentActivity? =
         .filterIsInstance<ComponentActivity>()
         .firstOrNull()
 
+private enum class AvatarPickSource { Camera, Gallery }
+
 @Composable
 private fun EditProfileContent(
     state: EditProfileContract.State,
     onEvent: (EditProfileContract.Event) -> Unit
 ) {
     val typography = AppTheme.typography
-
     val context = LocalContext.current
     val activity = remember { context.findActivity() }
 
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var settingsDialogText by remember { mutableStateOf("" to "") } // title/body
+
+    var showPickSourceDialog by remember { mutableStateOf(false) }
     var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraPermTitle = stringResource(EditProfileR.string.camera_permission_needed_title)
+    val cameraPermBody = stringResource(EditProfileR.string.camera_permission_needed_body)
+    
 
     val takePictureLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -120,16 +137,14 @@ private fun EditProfileContent(
                 pendingCameraUri?.let { uri ->
                     onEvent(EditProfileContract.Event.OnPhotoSelected(uri.toString()))
                 }
-            } else {
-                pendingCameraUri = null
             }
+            pendingCameraUri = null
         }
 
     fun createTempImageUri(): Uri? {
         return try {
             val imagesDir = java.io.File(context.cacheDir, "images").apply { mkdirs() }
             val file = java.io.File.createTempFile("avatar_", ".jpg", imagesDir)
-
             androidx.core.content.FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
@@ -158,30 +173,79 @@ private fun EditProfileContent(
                     )
                 } ?: true
 
-                if (!shouldShowRationale) showSettingsDialog = true
+                if (!shouldShowRationale) {
+                    settingsDialogText = cameraPermTitle to cameraPermBody
+                    showSettingsDialog = true
+                }
             }
         }
 
-    fun handleAvatarClick() {
-        val granted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
+    val pickPhotoPickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            uri?.let { onEvent(EditProfileContract.Event.OnPhotoSelected(it.toString())) }
+        }
 
-        if (granted) startCameraFlow()
-        else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+    val legacyGetContentLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let { onEvent(EditProfileContract.Event.OnPhotoSelected(it.toString())) }
+        }
+
+    fun storagePermission(): String =
+        if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES
+        else Manifest.permission.READ_EXTERNAL_STORAGE
+
+    val storagePermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                legacyGetContentLauncher.launch("image/*")
+            } else {
+                val perm = storagePermission()
+                val shouldShowRationale = activity?.let {
+                    ActivityCompat.shouldShowRequestPermissionRationale(it, perm)
+                } ?: true
+
+                if (!shouldShowRationale) {
+                    settingsDialogText = cameraPermTitle to cameraPermBody
+                    showSettingsDialog = true
+                }
+            }
+        }
+
+    fun startGalleryFlow() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            pickPhotoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+            return
+        }
+
+        val perm = storagePermission()
+        val granted = ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED
+        if (granted) legacyGetContentLauncher.launch("image/*")
+        else storagePermissionLauncher.launch(perm)
+    }
+
+    fun handlePickSource(source: AvatarPickSource) {
+        when (source) {
+            AvatarPickSource.Camera -> {
+                val granted = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (granted) startCameraFlow()
+                else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+
+            AvatarPickSource.Gallery -> startGalleryFlow()
+        }
     }
 
     if (showSettingsDialog) {
         AlertDialog(
             onDismissRequest = { showSettingsDialog = false },
-            title = { Text(text = "Camera permission needed", style = typography.titleLarge) },
-            text = {
-                Text(
-                    text = "Enable Camera permission in Settings to change your profile photo.",
-                    style = typography.bodyMedium
-                )
-            },
+            title = { Text(text = settingsDialogText.first, style = typography.titleLarge) },
+            text = { Text(text = settingsDialogText.second, style = typography.bodyMedium) },
             confirmButton = {
                 TextButton(onClick = {
                     showSettingsDialog = false
@@ -191,29 +255,47 @@ private fun EditProfileContent(
                             Uri.fromParts("package", context.packageName, null)
                         )
                     )
-                }) { Text(text = "Open Settings", style = typography.labelLarge) }
+                }) {
+                    Text(text = stringResource(EditProfileR.string.open_settings), style = typography.labelLarge)
+                }
             },
             dismissButton = {
                 TextButton(onClick = { showSettingsDialog = false }) {
-                    Text(text = "Cancel", style = typography.labelLarge)
+                    Text(text = stringResource(EditProfileR.string.cancel), style = typography.labelLarge)
+                }
+            }
+        )
+    }
+
+    if (showPickSourceDialog) {
+        AlertDialog(
+            onDismissRequest = { showPickSourceDialog = false },
+            title = { Text(text = stringResource(EditProfileR.string.choose_photo_source_title), style = typography.titleLarge) },
+            text = { Text(text = stringResource(EditProfileR.string.choose_photo_source_body), style = typography.bodyMedium) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPickSourceDialog = false
+                    handlePickSource(AvatarPickSource.Camera)
+                }) {
+                    Text(text = stringResource(EditProfileR.string.camera), style = typography.labelLarge)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPickSourceDialog = false
+                    handlePickSource(AvatarPickSource.Gallery)
+                }) {
+                    Text(text = stringResource(EditProfileR.string.gallery), style = typography.labelLarge)
                 }
             }
         )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(CoreUiR.drawable.app_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
-                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.spacing16)
         ) {
@@ -224,7 +306,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ProfileAvatarCard(
-                onChangePhotoClick = { handleAvatarClick() },
+                onChangePhotoClick = { showPickSourceDialog = true },
                 photoUrl = state.user?.photoUrl
             )
 
@@ -241,7 +323,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing32))
 
             EditField(
-                title = "Username",
+                title = stringResource(EditProfileR.string.username),
                 value = state.username,
                 onValueChange = { onEvent(EditProfileContract.Event.OnUsernameChanged(it)) },
                 error = null
@@ -250,7 +332,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonMedium(
-                text = "Change Username",
+                text = stringResource(EditProfileR.string.change_username),
                 onClick = { onEvent(EditProfileContract.Event.OnChangeUsernameClicked) },
                 style = ButtonStyle.Filled,
                 enabled = true,
@@ -260,7 +342,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             PasswordTextField(
-                label = "Current Password",
+                label = stringResource(EditProfileR.string.current_password),
                 value = state.currentPassword,
                 onValueChange = { onEvent(EditProfileContract.Event.OnCurrentPasswordChanged(it)) },
                 error = null
@@ -269,7 +351,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             PasswordTextField(
-                label = "New Password",
+                label = stringResource(EditProfileR.string.new_password),
                 value = state.newPassword,
                 onValueChange = { onEvent(EditProfileContract.Event.OnNewPasswordChanged(it)) },
                 error = null
@@ -278,7 +360,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             PasswordTextField(
-                label = "Confirm New Password",
+                label = stringResource(EditProfileR.string.confirm_new_password),
                 value = state.confirmPassword,
                 onValueChange = { onEvent(EditProfileContract.Event.OnConfirmPasswordChanged(it)) },
                 error = null
@@ -287,7 +369,7 @@ private fun EditProfileContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             ButtonMedium(
-                text = "Change Password",
+                text = stringResource(EditProfileR.string.change_password),
                 onClick = { onEvent(EditProfileContract.Event.OnChangePasswordClicked) },
                 style = ButtonStyle.Filled,
                 enabled = true,
@@ -336,7 +418,7 @@ private fun ProfileTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(EditProfileR.string.back),
                     tint = colors.white
                 )
             }
@@ -349,7 +431,7 @@ private fun ProfileTopBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Edit Profile",
+                text = stringResource(EditProfileR.string.edit_profile_title),
                 style = typography.titleLarge.copy(
                     brush = colors.goldTextGradient,
                     fontWeight = FontWeight.SemiBold
@@ -420,13 +502,13 @@ private fun ProfileAvatarCard(
                     ) {
                         Icon(
                             painter = painterResource(CoreUiR.drawable.ic_camera),
-                            contentDescription = "Change photo",
+                            contentDescription = stringResource(EditProfileR.string.change_photo),
                             tint = colors.white,
                             modifier = Modifier.size(22.dp)
                         )
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            text = "CHANGE",
+                            text = stringResource(EditProfileR.string.change_upper),
                             color = colors.white,
                             style = typography.labelSmall.copy(
                                 fontWeight = FontWeight.SemiBold,

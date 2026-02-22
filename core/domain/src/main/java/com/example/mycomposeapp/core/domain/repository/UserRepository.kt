@@ -12,4 +12,6 @@ interface UserRepository {
     suspend fun updateCoins(coins: Int)
     fun changeUsername(newUsername: String): Flow<Resource<Unit>>
     fun getAllUser(): Flow<Resource<List<User>>>
+    fun deleteCurrentUser(): Flow<Resource<Unit>>
+
 }

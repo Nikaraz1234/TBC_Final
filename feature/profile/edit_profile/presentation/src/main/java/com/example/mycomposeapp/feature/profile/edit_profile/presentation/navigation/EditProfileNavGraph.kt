@@ -9,11 +9,13 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.editProfileNavGraph(
     onBack: () -> Unit,
+    showSnackBar: (String) -> Unit
 ) {
 
     composable<EditProfileRoute> {
         EditProfileScreen(
-            onBackClick = onBack
+            onBackClick = onBack,
+            showSnackBar = showSnackBar
         )
     }
 }

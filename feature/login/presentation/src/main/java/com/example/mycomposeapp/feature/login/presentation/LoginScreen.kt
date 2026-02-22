@@ -66,7 +66,8 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onNavigateToDashboard: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    showSnackbar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -78,7 +79,7 @@ fun LoginScreen(
             when (effect) {
                 is SideEffect.NavigateToDashboard -> onNavigateToDashboard()
                 is SideEffect.NavigateToRegister -> onNavigateToRegister()
-                is SideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                is SideEffect.ShowSnackbar -> showSnackbar
                 is SideEffect.LaunchGoogleSignIn -> {
                     coroutineScope.launch {
                         when (val result = GoogleSignInLauncher.launch(context, "LoginScreen")) {
@@ -100,7 +101,7 @@ fun LoginScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = AppTheme.colors.transparent
-    ) { _ ->
+    ) {
         LoginContent(
             state = state,
             onEvent = viewModel::onEvent

@@ -2,9 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="11">
-      <module name="MyComposeApp.feature.leaderboard.presentation" target="21" />
-      <module name="MyComposeApp.feature.notification.data" target="21" />
-      <module name="MyComposeApp.feature.notification.presentation" target="21" />
+      <module name="MyComposeApp.feature.notification.presentaiton" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

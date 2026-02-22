@@ -8,8 +8,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object LeaderboardRoute
 
-fun NavGraphBuilder.leaderboardNavGraph() {
+fun NavGraphBuilder.leaderboardNavGraph(
+    showSnackBar: (String) -> Unit
+) {
     composable<LeaderboardRoute> {
-        LeaderboardScreen()
+        LeaderboardScreen(
+            showSnackBar = showSnackBar
+        )
     }
 }
