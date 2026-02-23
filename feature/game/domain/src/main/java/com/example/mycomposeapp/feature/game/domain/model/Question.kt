@@ -1,5 +1,7 @@
 package com.example.mycomposeapp.feature.game.domain.model
 
+import com.example.mycomposeapp.feature.game.domain.model.books.BookCard
+import com.example.mycomposeapp.feature.game.domain.model.books.SynopsisOption
 import com.example.mycomposeapp.feature.game.domain.model.games.Achievement
 
 data class Question(
@@ -38,6 +40,17 @@ sealed interface QuestionContent {
         val imageUrl: String,
         val title: String,
         val rating: Double
+    ) : QuestionContent
+
+    data class BookSynopsis(
+        val coverImageUrl: String,
+        val options: List<SynopsisOption>
+    ) : QuestionContent
+
+    data class BookOddOneOut(
+        val books: List<BookCard>,
+        val traitDisplayName: String,
+        val sharedValue: String
     ) : QuestionContent
 }
 

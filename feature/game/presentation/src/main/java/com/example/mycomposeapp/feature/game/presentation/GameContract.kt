@@ -118,6 +118,35 @@ object GameContract {
             val livesRemaining: Int = GameConstants.RANKLE_INITIAL_LIVES
         ) : ModeState
 
+        data class BookSynopsis(
+            val coins: Int = 0,
+            val isHintUsed: Boolean = false,
+            val removedOptionIds: Set<String> = emptySet(),
+            val selectedOptionId: String? = null,
+            val currentScore: Int = 0,
+            val bestSessionStreak: Int = 0,
+            val isFetchingMore: Boolean = false,
+            val showInsufficientFundsWarning: Boolean = false
+        ) : ModeState {
+            val canAffordHint: Boolean get() = coins >= GameConstants.BOOK_SYNOPSIS_HINT_COST && !isHintUsed
+        }
+
+        data class BookOddOneOut(
+            val coins: Int = 0,
+            val isHintUsed: Boolean = false,
+            val isCategoryHintUsed: Boolean = false,
+            val removedBookIds: Set<String> = emptySet(),
+            val selectedBookId: String? = null,
+            val currentScore: Int = 0,
+            val bestSessionStreak: Int = 0,
+            val isFetchingMore: Boolean = false,
+            val showInsufficientFundsWarning: Boolean = false
+        ) : ModeState {
+            val canAffordHint: Boolean get() = coins >= GameConstants.BOOK_ODD_ONE_OUT_HINT_COST && !isHintUsed
+            val canAffordCategoryHint: Boolean
+                get() = coins >= GameConstants.BOOK_ODD_ONE_OUT_CATEGORY_HINT_COST && !isCategoryHintUsed
+        }
+
         data object None : ModeState
     }
 
@@ -163,6 +192,11 @@ object GameContract {
         val mangaRatingState: ModeState.MangaRating? get() = modeState as? ModeState.MangaRating
 
         val rankleState: ModeState.Rankle? get() = modeState as? ModeState.Rankle
+
+        val bookSynopsisState: ModeState.BookSynopsis? get() = modeState as? ModeState.BookSynopsis
+        val bookOddOneOutState: ModeState.BookOddOneOut? get() = modeState as? ModeState.BookOddOneOut
+        val isBookSynopsisMode: Boolean get() = modeState is ModeState.BookSynopsis
+        val isBookOddOneOutMode: Boolean get() = modeState is ModeState.BookOddOneOut
     }
 
     enum class GamePhase { Loading, Playing, AnswerRevealed, Results }
@@ -177,6 +211,7 @@ object GameContract {
         data class OnMangaSelected(val selectedId: Long) : Event
         data object OnRevealMore : Event
         data object OnUseHint : Event
+        data object OnUseCategoryHint : Event
     }
 
     sealed interface SideEffect {

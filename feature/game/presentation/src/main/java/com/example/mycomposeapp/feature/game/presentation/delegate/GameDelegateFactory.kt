@@ -25,6 +25,10 @@ import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieC
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.GetRankleMangaUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookSynopsisBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookOddOneOutBatchUseCase
+import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookSynopsisDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookOddOneOutDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.comics.RankleDelegate
 import javax.inject.Inject
 
@@ -44,13 +48,16 @@ class GameDelegateFactory @Inject constructor(
     private val getRankleMangaUseCase: GetRankleMangaUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
     private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
-    private val updateUserStatsUseCase: UpdateUserStatsUseCase
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase,
+    private val fetchBookSynopsisBatchUseCase: FetchBookSynopsisBatchUseCase,
+    private val fetchBookOddOneOutBatchUseCase: FetchBookOddOneOutBatchUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
             CategoryType.MOVIES.name -> createMoviesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.GAMES.name -> createGamesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.COMICS.name -> createComicsDelegate(gameModeId, categoryType, archiveDate)
+            CategoryType.BOOKS.name -> createBooksDelegate(gameModeId, categoryType)
             else -> throw IllegalArgumentException("Unknown category: $categoryType")
         }
     }
@@ -185,6 +192,37 @@ class GameDelegateFactory @Inject constructor(
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,
                 getRankleMangaUseCase = getRankleMangaUseCase,
+                updateDailyGoalProgressUseCase = updateDailyGoalProgressUseCase,
+                dailyGoalsManagerUseCase = dailyGoalsManagerUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
+            )
+            else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
+        }
+    }
+
+    private fun createBooksDelegate(
+        gameModeId: String,
+        categoryType: String
+    ): GameModeDelegate {
+        return when (gameModeId) {
+            GameModeIds.BOOK_SYNOPSIS -> BookSynopsisDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                fetchBookSynopsisBatchUseCase = fetchBookSynopsisBatchUseCase,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateDailyGoalProgressUseCase = updateDailyGoalProgressUseCase,
+                dailyGoalsManagerUseCase = dailyGoalsManagerUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
+            )
+            GameModeIds.BOOK_ODD_ONE_OUT -> BookOddOneOutDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                fetchBookOddOneOutBatchUseCase = fetchBookOddOneOutBatchUseCase,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
                 updateDailyGoalProgressUseCase = updateDailyGoalProgressUseCase,
                 dailyGoalsManagerUseCase = dailyGoalsManagerUseCase,
                 updateUserStatsUseCase = updateUserStatsUseCase

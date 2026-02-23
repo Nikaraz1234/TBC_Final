@@ -90,6 +90,23 @@ object Categories {
     )
 
 
+    private val booksGameModes = listOf(
+        GameMode(
+            id = GameModeIds.BOOK_SYNOPSIS,
+            name = "Guess the Synopsis",
+            description = "Which synopsis belongs to this book cover?",
+            iconRes = R.drawable.ic_plot,
+            isAvailable = true
+        ),
+        GameMode(
+            id = GameModeIds.BOOK_ODD_ONE_OUT,
+            name = "Odd One Out",
+            description = "Find the book that doesn't fit with the others",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        )
+    )
+
     private val comingSoonGameModes = listOf(
         GameMode(
             id = "coming_soon",
@@ -127,7 +144,7 @@ object Categories {
             type = CategoryType.BOOKS,
             name = "Books & Novels",
             gradientColors = listOf(Color(0xFF795548), Color(0xFF607D8B)),
-            gameModes = comingSoonGameModes,
+            gameModes = booksGameModes,
             backgroundImageRes = CoreUiR.drawable.books_cover
         ),
         Category(

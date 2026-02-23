@@ -11,6 +11,7 @@ interface GameModeDelegate {
     fun onExitGame()
     fun onRevealMore() {}
     fun onUseHint() {}
+    fun onUseCategoryHint() {}
     fun getAnswerResults(): List<AnswerResult>
     fun onCleared() {}
 }
