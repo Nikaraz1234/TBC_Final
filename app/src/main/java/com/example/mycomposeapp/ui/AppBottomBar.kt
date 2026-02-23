@@ -101,7 +101,7 @@ fun AppBottomBar(
             )
             BottomBarItem(
                 selected = currentRoute == AchievementsRoute::class.qualifiedName,
-                painter = painterResource(CoreUiR.drawable.ic_trophy),
+                painter = painterResource(CoreUiR.drawable.ic_achievement),
                 onClick = {
                     navController.navigate(AchievementsRoute) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }

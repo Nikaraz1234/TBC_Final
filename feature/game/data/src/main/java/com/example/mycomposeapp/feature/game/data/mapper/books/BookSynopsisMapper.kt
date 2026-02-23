@@ -9,7 +9,7 @@ fun buildSynopsisQuestion(
     target: GoogleBooksVolumeDto,
     fakeOptions: List<GoogleBooksVolumeDto>
 ): Question? {
-    val coverUrl = target.volumeInfo.imageLinks?.thumbnail?.toHttps() ?: return null
+    val coverUrl = target.volumeInfo.imageLinks?.thumbnail?.toHighQualityHttps() ?: return null
     val synopsis = target.volumeInfo.description ?: return null
     if (synopsis.isBlank()) return null
 
@@ -43,4 +43,5 @@ fun buildSynopsisQuestion(
     )
 }
 
-private fun String.toHttps(): String = replace("http://", "https://")
+private fun String.toHighQualityHttps(): String =
+    replace("http://", "https://").replace("zoom=1", "zoom=5")

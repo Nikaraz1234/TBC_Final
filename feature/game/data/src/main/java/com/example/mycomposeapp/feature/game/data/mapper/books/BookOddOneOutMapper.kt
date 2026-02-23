@@ -126,7 +126,7 @@ fun buildOddOneOutQuestion(
     val allFour = (three + oddOneOut).shuffled()
 
     val cards = allFour.mapNotNull { dto ->
-        val cover = dto.volumeInfo.imageLinks?.thumbnail?.toHttps() ?: return@mapNotNull null
+        val cover = dto.volumeInfo.imageLinks?.thumbnail?.toHighQualityHttps() ?: return@mapNotNull null
         BookCard(id = dto.id, title = dto.volumeInfo.title, coverUrl = cover)
     }
     if (cards.size < 4) return null
@@ -145,4 +145,5 @@ fun buildOddOneOutQuestion(
 private fun String.normalizeGenre(): String =
     this.split("/").first().trim()
 
-private fun String.toHttps(): String = replace("http://", "https://")
+private fun String.toHighQualityHttps(): String =
+    replace("http://", "https://").replace("zoom=1", "zoom=5")

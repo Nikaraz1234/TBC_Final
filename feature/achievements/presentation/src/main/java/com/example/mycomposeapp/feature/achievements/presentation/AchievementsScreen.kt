@@ -38,7 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.domain.model.UserStats
 import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.feature.achievements.domain.model.AchievementConditionType
+import com.example.mycomposeapp.feature.achievements.domain.model.AppAchievement
 import com.example.mycomposeapp.feature.achievements.presentation.components.AchievementCard
 import com.example.mycomposeapp.feature.achievements.presentation.components.AchievementFilterRow
 import com.example.mycomposeapp.core.ui.R as CoreUiR
@@ -218,7 +221,8 @@ fun AchievementsScreen(
                         ) { achievement ->
                             AchievementCard(
                                 achievement = achievement,
-                                isUnlocked = achievement.id in state.unlockedIds
+                                isUnlocked = achievement.id in state.unlockedIds,
+                                currentProgress = resolveProgress(achievement, state.userStats)
                             )
                         }
                     }
@@ -230,5 +234,21 @@ fun AchievementsScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
+}
+
+private fun resolveProgress(achievement: AppAchievement, stats: UserStats?): Int {
+    if (stats == null) return 0
+    return when (achievement.conditionType) {
+        AchievementConditionType.GAMES_PLAYED    -> stats.gamesPlayed
+        AchievementConditionType.CORRECT_ANSWERS -> stats.correctAnswers
+        AchievementConditionType.BEST_STREAK     -> stats.bestStreak
+        AchievementConditionType.TOTAL_XP        -> stats.totalXp
+        AchievementConditionType.LEVEL_REACHED   -> stats.level
+        AchievementConditionType.POINTS_SCORED   -> stats.points
+        AchievementConditionType.HIGH_SCORE      -> {
+            val key = achievement.conditionKey ?: return 0
+            stats.highScore[key] ?: 0
+        }
     }
 }
