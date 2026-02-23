@@ -9,4 +9,8 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

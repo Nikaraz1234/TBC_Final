@@ -8,6 +8,7 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.game.domain.usecase.SeedEmojiPuzzlesUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.scoring.MigrateGameStatsKeysUseCase
 import com.example.mycomposeapp.feature.main.presentation.MainContract.Event
 import com.example.mycomposeapp.feature.main.presentation.MainContract.SideEffect
 import com.example.mycomposeapp.feature.main.presentation.MainContract.State
@@ -26,10 +27,14 @@ class MainViewModel @Inject constructor(
     private val refreshUserUseCase: RefreshUserUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val dailyGoalsManager: DailyGoalsManagerUseCase,
-    private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase
+    private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase,
+    private val migrateGameStatsKeys: MigrateGameStatsKeysUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
 
     init {
+        viewModelScope.launch {
+            try { migrateGameStatsKeys() } catch (_: Exception) { }
+        }
         loadData()
     }
 

@@ -45,6 +45,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.bundles.google.credentials)
 
+    implementation(libs.kotlinx.datetime)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.bundles.test.android)
 
