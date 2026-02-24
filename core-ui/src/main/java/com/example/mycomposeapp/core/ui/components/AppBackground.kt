@@ -20,7 +20,7 @@ fun AppBackground(
 
     @DrawableRes val bgRes =
         if (dark) CoreUiR.drawable.app_background2
-        else CoreUiR.drawable.app_bg_11
+        else CoreUiR.drawable.app_background2_light3
 
     Box(modifier = modifier.fillMaxSize()) {
         Image(
