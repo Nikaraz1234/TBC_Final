@@ -54,6 +54,22 @@ sealed interface QuestionContent {
     ) : QuestionContent
 }
 
+    data class BookByOrder(
+        val puzzleId: Long,
+        val bookTitle: String,
+        val date: String,
+        val timeLimitSec: Int,
+        val genre: String,
+        val mainCharacter: String,
+        val events: List<BookEvent>,
+        val answer: List<Int>,
+        val isDaily: Boolean
+    ) : QuestionContent
+}
+data class BookEvent(
+    val eventId: Int,
+    val text: String
+)
 data class PlotHint(
     val label: String,
     val value: String

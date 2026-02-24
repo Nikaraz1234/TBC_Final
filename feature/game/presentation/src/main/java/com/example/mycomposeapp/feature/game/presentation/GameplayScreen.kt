@@ -28,7 +28,8 @@ import com.example.mycomposeapp.feature.game.presentation.components.manga.Manga
 @Composable
 fun GameplayScreen(
     onNavigateBack: () -> Unit,
-    viewModel: GameViewModel = hiltViewModel()
+    viewModel: GameViewModel = hiltViewModel(),
+    showSnackBar: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -38,8 +39,9 @@ fun GameplayScreen(
             when (effect) {
                 is GameContract.SideEffect.NavigateBack -> onNavigateBack()
                 is GameContract.SideEffect.ShowSnackbar -> {
-                    Toast.makeText(context, effect.message.asString(context), Toast.LENGTH_SHORT).show()
+                    showSnackBar(effect.message.asString(context))
                 }
+                GameContract.SideEffect.Exit -> onNavigateBack()
             }
         }
     }
@@ -50,12 +52,6 @@ fun GameplayScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AsyncImage(
-            model = CoreUiR.drawable.app_background,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
         Box(
             modifier = Modifier
                 .fillMaxSize()

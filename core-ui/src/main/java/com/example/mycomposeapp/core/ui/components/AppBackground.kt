@@ -19,8 +19,8 @@ fun AppBackground(
     val dark = isSystemInDarkTheme()
 
     @DrawableRes val bgRes =
-        if (dark) CoreUiR.drawable.app_background
-        else CoreUiR.drawable.app_bg_light
+        if (dark) CoreUiR.drawable.app_bg_3
+        else CoreUiR.drawable.app_bg_11
 
     Box(modifier = modifier.fillMaxSize()) {
         Image(

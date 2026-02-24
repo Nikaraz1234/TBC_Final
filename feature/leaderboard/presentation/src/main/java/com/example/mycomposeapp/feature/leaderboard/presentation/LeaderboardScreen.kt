@@ -113,13 +113,6 @@ private fun LeaderboardContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        AsyncImage(
-            model = CoreUiR.drawable.app_background,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
         Column(modifier = Modifier.fillMaxWidth()) {
             LeaderboardsTopBar()
 
@@ -176,30 +169,6 @@ private fun LeaderboardsTopBar(
             .fillMaxWidth()
             .height(spacing.spacing56)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = spacing.spacing12),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.leaderboard_back),
-                    tint = colors.white
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = stringResource(R.string.leaderboard_info),
-                    tint = colors.white
-                )
-            }
-        }
 
         Column(
             modifier = Modifier

@@ -1,6 +1,7 @@
 package com.example.mycomposeapp.feature.notification.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.example.mycomposeapp.core.domain.usecase.notification.DeleteNotificationUseCase
 import com.example.mycomposeapp.core.domain.usecase.notification.MarkNotificationReadUseCase
 import com.example.mycomposeapp.core.domain.usecase.notification.ObserveNotificationsUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
@@ -19,6 +20,7 @@ class NotificationViewModel @Inject constructor(
     private val observeNotifications: ObserveNotificationsUseCase,
     private val markRead: MarkNotificationReadUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val deleteNotificationUseCase: DeleteNotificationUseCase
 ) : BaseViewModel<
         NotificationContract.State,
         NotificationContract.SideEffect,
@@ -31,7 +33,7 @@ class NotificationViewModel @Inject constructor(
             is NotificationContract.Event.NotificationClicked -> {}
             NotificationContract.Event.Refresh -> TODO()
             NotificationContract.Event.ScreenShown -> observeInbox()
-            is NotificationContract.Event.Delete -> {}
+            is NotificationContract.Event.Delete -> deleteNotification(event.id)
         }
 
     }
@@ -41,8 +43,17 @@ class NotificationViewModel @Inject constructor(
             .first()
         return user.userId
     }
+    private fun deleteNotification(id: String) {
+        viewModelScope.launch {
+            runCatching {
+                deleteNotificationUseCase(id, requireUserId())
+            }.onFailure { e ->
+                setState { copy(errorMessage = e.message ?: "Failed to delete notification") }
+            }
+            sendSideEffect(NotificationContract.SideEffect.ShowMessage("Notification Deleted"))
+        }
 
-
+    }
     private fun markAsRead(id: String){
         viewModelScope.launch {
             markRead(id, requireUserId())

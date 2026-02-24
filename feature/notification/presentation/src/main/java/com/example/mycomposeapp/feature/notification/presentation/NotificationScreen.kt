@@ -162,7 +162,12 @@ private fun NotificationContent(
                 onClose = {
                     if (!current.isRead) onEvent(NotificationContract.Event.MarkAsRead(current.id))
                     opened = null
+                },
+                onDelete = {
+                    onEvent(NotificationContract.Event.Delete(current.id))
+                    opened = null
                 }
+
             )
         }
     }
@@ -173,7 +178,8 @@ private fun NotificationBottomSheetContent(
     title: String,
     body: String,
     date: String,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onDelete: () -> Unit
 ) {
     val colors = AppTheme.colors
     val typography = AppTheme.typography
@@ -208,11 +214,11 @@ private fun NotificationBottomSheetContent(
             )
 
             IconButton(
-                onClick = onClose,
+                onClick = onDelete,
                 modifier = Modifier.size(20.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = CoreUiR.drawable.ic_close),
+                    painter = painterResource(id = CoreUiR.drawable.ic_delete),
                     contentDescription = stringResource(NotificationR.string.close),
                     tint = onSurface
                 )

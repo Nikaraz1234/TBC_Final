@@ -49,6 +49,7 @@ fun AppButton(
     val colors = AppTheme.colors
     val radius = AppTheme.radius
     val spacing = AppTheme.spacing
+    val typography = AppTheme.typography
 
     val shape: Shape = when (size) {
         ButtonSize.Large -> radius.radius28
@@ -58,25 +59,54 @@ fun AppButton(
 
     val borderWidth = spacing.spacing1
 
+    val textStyle: TextStyle = when (size) {
+        ButtonSize.Large -> typography.labelLarge
+        ButtonSize.Medium -> typography.labelMedium
+        ButtonSize.Small -> typography.labelSmall
+    }
+
+    val disabledAlpha = 0.45f
+    val contentAlpha = if (enabled) 1f else disabledAlpha
+
     when (style) {
         ButtonStyle.Filled -> {
+            val bgBrush =
+                if (enabled) {
+                    colors.glassGradient
+                } else {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            colors.glassWhiteLight.copy(alpha = colors.glassWhiteLight.alpha * disabledAlpha),
+                            colors.glassWhiteDark.copy(alpha = colors.glassWhiteDark.alpha * disabledAlpha),
+                        )
+                    )
+                }
+
             Box(
                 modifier = modifier
                     .fillMaxWidth()
                     .height(size.height)
                     .clip(shape)
-                    .background(brush = colors.glassGradient, shape = shape)
-                    .border(borderWidth, colors.goldenYellow, shape)
+                    .background(brush = bgBrush, shape = shape)
+                    .border(
+                        width = borderWidth,
+                        color = (if (enabled) colors.goldenYellow else colors.goldenYellow.copy(alpha = disabledAlpha)),
+                        shape = shape
+                    )
                     .clickable(enabled = enabled, onClick = onClick),
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContent(
                     text = text,
-                    textBrush = colors.goldTextGradient,
-                    leadingIcon = leadingIcon
+                    textStyle = textStyle,
+                    textBrush = if (enabled) colors.goldTextGradient else null,
+                    textColor = if (enabled) null else colors.textMuted,
+                    leadingIcon = leadingIcon,
+                    contentAlpha = contentAlpha
                 )
             }
         }
+
         ButtonStyle.Outlined -> {
             Box(
                 modifier = modifier
@@ -84,32 +114,58 @@ fun AppButton(
                     .height(size.height)
                     .clip(shape)
                     .background(colors.transparent)
-                    .border(borderWidth, colors.goldenYellow, shape)
+                    .border(
+                        width = borderWidth,
+                        color = (if (enabled) colors.goldenYellow else colors.goldenYellow.copy(alpha = disabledAlpha)),
+                        shape = shape
+                    )
                     .clickable(enabled = enabled, onClick = onClick),
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContent(
                     text = text,
-                    textBrush = colors.goldTextGradient,
-                    leadingIcon = leadingIcon
+                    textStyle = textStyle,
+                    textBrush = if (enabled) colors.goldTextGradient else null,
+                    textColor = if (enabled) null else colors.textMuted,
+                    leadingIcon = leadingIcon,
+                    contentAlpha = contentAlpha
                 )
             }
         }
+
         ButtonStyle.Social -> {
+            val bgBrush =
+                if (enabled) {
+                    colors.socialGlassGradient
+                } else {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            colors.socialGlassBackground.copy(alpha = colors.socialGlassBackground.alpha * disabledAlpha),
+                            Color.Black.copy(alpha = 0.0f)
+                        )
+                    )
+                }
+
             Box(
                 modifier = modifier
                     .fillMaxWidth()
                     .height(size.height)
                     .clip(shape)
-                    .background(brush = colors.socialGlassGradient, shape = shape)
-                    .border(borderWidth, colors.socialGlassBorder, shape)
+                    .background(brush = bgBrush, shape = shape)
+                    .border(
+                        width = borderWidth,
+                        color = (if (enabled) colors.socialGlassBorder else colors.socialGlassBorder.copy(alpha = disabledAlpha)),
+                        shape = shape
+                    )
                     .clickable(enabled = enabled, onClick = onClick),
                 contentAlignment = Alignment.Center
             ) {
                 ButtonContent(
                     text = text,
-                    textColor = colors.white,
-                    leadingIcon = leadingIcon
+                    textStyle = textStyle,
+                    textColor = colors.textLight,
+                    leadingIcon = leadingIcon,
+                    contentAlpha = contentAlpha
                 )
             }
         }
@@ -119,9 +175,11 @@ fun AppButton(
 @Composable
 private fun ButtonContent(
     text: String,
+    textStyle: TextStyle,
     textBrush: Brush? = null,
     textColor: Color? = null,
-    leadingIcon: (@Composable () -> Unit)?
+    leadingIcon: (@Composable () -> Unit)?,
+    contentAlpha: Float = 1f
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -131,15 +189,18 @@ private fun ButtonContent(
             leadingIcon()
             Spacer(modifier = Modifier.width(AppTheme.spacing.spacing8))
         }
+
         if (textBrush != null) {
             Text(
                 text = text,
-                style = TextStyle(brush = textBrush)
+                style = textStyle.copy(brush = textBrush).copy(color = Color.Unspecified),
+                modifier = Modifier,
             )
         } else {
             Text(
                 text = text,
-                color = textColor ?: Color.White
+                style = textStyle,
+                color = (textColor ?: AppTheme.colors.textLight).copy(alpha = contentAlpha)
             )
         }
     }
@@ -154,15 +215,34 @@ private fun AppButtonAllSizesPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AppButton(text = "Large Filled", onClick = {}, size = ButtonSize.Large)
-            AppButton(text = "Medium Outlined", onClick = {}, size = ButtonSize.Medium, style = ButtonStyle.Outlined)
+
+            AppButton(
+                text = "Medium Outlined",
+                onClick = {},
+                size = ButtonSize.Medium,
+                style = ButtonStyle.Outlined
+            )
+
             AppButton(
                 text = "Small Social",
                 onClick = {},
                 size = ButtonSize.Small,
                 style = ButtonStyle.Social,
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Email, contentDescription = null, tint = Color.White)
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = null,
+                        tint = AppTheme.colors.textLight
+                    )
                 }
+            )
+
+            AppButton(
+                text = "Disabled Filled",
+                onClick = {},
+                enabled = false,
+                size = ButtonSize.Large,
+                style = ButtonStyle.Filled
             )
         }
     }

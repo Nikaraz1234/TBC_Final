@@ -13,6 +13,7 @@ object GameModeIds {
 
     const val RANKLE = "rankle"
 
+    const val BOOK_BY_ORDER = "BOOK_BY_ORDER"
     const val BOOK_SYNOPSIS = "book_synopsis"
     const val BOOK_ODD_ONE_OUT = "book_odd_one_out"
 

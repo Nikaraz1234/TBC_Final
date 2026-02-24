@@ -25,6 +25,7 @@ import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieC
 import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MoviePlotDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.GetRankleMangaUseCase
+import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookByOrderDelegate
 import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookSynopsisBatchUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookOddOneOutBatchUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookSynopsisDelegate
@@ -57,7 +58,7 @@ class GameDelegateFactory @Inject constructor(
             CategoryType.MOVIES.name -> createMoviesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.GAMES.name -> createGamesDelegate(gameModeId, categoryType, archiveDate)
             CategoryType.COMICS.name -> createComicsDelegate(gameModeId, categoryType, archiveDate)
-            CategoryType.BOOKS.name -> createBooksDelegate(gameModeId, categoryType)
+            CategoryType.BOOKS.name -> createBooksDelegate(gameModeId, categoryType, archiveDate)
             else -> throw IllegalArgumentException("Unknown category: $categoryType")
         }
     }
@@ -205,6 +206,14 @@ class GameDelegateFactory @Inject constructor(
         categoryType: String
     ): GameModeDelegate {
         return when (gameModeId) {
+          GameModeIds.BOOK_BY_ORDER -> BookByOrderDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                archiveDate = archiveDate,
+                getDailyPuzzleUseCase = getDailyPuzzleUseCase,
+                dailyPuzzleRepository = dailyPuzzleRepositories[categoryType]
+                    ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType")
+          
             GameModeIds.BOOK_SYNOPSIS -> BookSynopsisDelegate(
                 categoryType = categoryType,
                 gameModeId = gameModeId,

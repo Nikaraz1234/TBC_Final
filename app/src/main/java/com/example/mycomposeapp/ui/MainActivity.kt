@@ -32,6 +32,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.components.AppBackground
 import com.example.mycomposeapp.core.ui.R as CoreUiR
 import com.example.mycomposeapp.core.ui.components.snackbar.CustomSnackBar
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
@@ -83,13 +84,7 @@ class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val scope = rememberCoroutineScope()
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AsyncImage(
-                        model = CoreUiR.drawable.app_background,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                AppBackground {
                     Scaffold(
                         containerColor = Color.Transparent,
                         contentWindowInsets = WindowInsets.safeDrawing.only(

@@ -12,6 +12,7 @@ import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesServ
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
+import com.example.mycomposeapp.feature.game.data.repository.books.BookByOrderRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.books.BookOddOneOutRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.books.BookSynopsisRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaEmojiRepositoryImpl
@@ -162,6 +163,9 @@ object GameDataModule {
     ): SearchRepository = repo
 
     @Provides
+    @IntoMap
+    @StringKey("BOOKS")
+    fun provideBooksDailyPuzzleRepository(repo: BookByOrderRepositoryImpl): DailyPuzzleRepository = repo
     @Singleton
     fun provideGoogleBooksApiService(@GoogleBooksRetrofit retrofit: Retrofit): GoogleBooksApiService {
         return retrofit.create(GoogleBooksApiService::class.java)
