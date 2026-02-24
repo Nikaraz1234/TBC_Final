@@ -89,15 +89,6 @@ object Categories {
         )
     )
 
-    private val booksGameCategory = listOf(
-        GameMode(
-            id = GameModeIds.BOOK_BY_ORDER,
-            name = "Order Book Events",
-            description = "Order Book Events",
-            iconRes = R.drawable.ic_cover,
-            isAvailable = true
-        )
-    )
 
     private val booksGameModes = listOf(
         GameMode(
@@ -113,7 +104,14 @@ object Categories {
             description = "Find the book that doesn't fit with the others",
             iconRes = CoreUiR.drawable.ic_books_odd_one_out,
             isAvailable = true
-        )
+        ),
+        GameMode(
+                id = GameModeIds.BOOK_BY_ORDER,
+        name = "Order Book Events",
+        description = "Order Book Events",
+        iconRes = R.drawable.ic_cover,
+        isAvailable = true
+    )
     )
 
     private val comingSoonGameModes = listOf(
