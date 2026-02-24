@@ -1,7 +1,9 @@
 package com.example.mycomposeapp.feature.game.presentation
 
+import android.view.WindowInsets
 import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
+import com.example.mycomposeapp.feature.game.domain.model.BookEvent
 import com.example.mycomposeapp.feature.game.domain.model.GameResult
 import com.example.mycomposeapp.feature.game.domain.model.comics.MangaPair
 import com.example.mycomposeapp.feature.game.domain.model.Question
@@ -118,6 +120,22 @@ object GameContract {
             val livesRemaining: Int = GameConstants.RANKLE_INITIAL_LIVES
         ) : ModeState
 
+        data class BookByOrder(
+            val bookTitle: String = "",
+            val date: String = "",
+            val timeLimitSec: Int = 0,
+            val secondsLeft: Int = 0,
+            val genre: String = "",
+            val mainCharacter: String = "",
+
+            val allEvents: List<BookEvent> = emptyList(),
+            val pool: List<BookEvent> = emptyList(),
+            val slots: List<Int?> = List(6) { null },
+            val correctOrder: List<Int> = emptyList(),
+
+            val isFromArchive: Boolean = false,
+            val livesLeft: Int = 1
+        ) : ModeState
         data class BookSynopsis(
             val coins: Int = 0,
             val isHintUsed: Boolean = false,
@@ -193,6 +211,8 @@ object GameContract {
 
         val rankleState: ModeState.Rankle? get() = modeState as? ModeState.Rankle
 
+        val bookOrderState: ModeState.BookByOrder?
+            get() = modeState as? ModeState.BookByOrder
         val bookSynopsisState: ModeState.BookSynopsis? get() = modeState as? ModeState.BookSynopsis
         val bookOddOneOutState: ModeState.BookOddOneOut? get() = modeState as? ModeState.BookOddOneOut
         val isBookSynopsisMode: Boolean get() = modeState is ModeState.BookSynopsis
@@ -217,5 +237,6 @@ object GameContract {
     sealed interface SideEffect {
         data object NavigateBack : SideEffect
         data class ShowSnackbar(val message: UiText) : SideEffect
+        data object Exit : SideEffect
     }
 }

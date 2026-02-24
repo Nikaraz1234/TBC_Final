@@ -39,7 +39,6 @@ fun ArchiveHubScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = colors.backgroundGradient)
             .systemBarsPadding()
     ) {
         Row(
@@ -78,6 +77,14 @@ fun ArchiveHubScreen(
             title = "Manga",
             description = stringResource(ArchiveR.string.emoji_puzzles_desc_manga),
             onClick = { onNavigateToEmojiArchive("COMICS") },
+            modifier = Modifier.padding(horizontal = spacing.spacing16)
+        )
+        Spacer(modifier = Modifier.height(spacing.spacing16))
+        ArchiveCategoryCard(
+            emoji = "\uD83C\uDFAC",
+            title = "Books",
+            description = stringResource(ArchiveR.string.order_puzzles_desc_books),
+            onClick = { onNavigateToEmojiArchive("BOOKS") },
             modifier = Modifier.padding(horizontal = spacing.spacing16)
         )
     }

@@ -25,6 +25,28 @@ class EmojiArchiveViewModel @Inject constructor(
         loadArchive()
     }
 
+    fun onEvent(event: EmojiArchiveContract.Event) {
+        when (event) {
+            EmojiArchiveContract.Event.OpenDatePicker -> {
+                setState { copy(isDatePickerOpen = true) }
+            }
+            EmojiArchiveContract.Event.CloseDatePicker -> {
+                setState { copy(isDatePickerOpen = false) }
+            }
+            is EmojiArchiveContract.Event.DatePicked -> {
+                setState {
+                    copy(
+                        selectedDate = event.date,
+                        isDatePickerOpen = false
+                    )
+                }
+            }
+            EmojiArchiveContract.Event.ClearDateFilter -> {
+                setState { copy(selectedDate = null) }
+            }
+        }
+    }
+
     private fun loadArchive() {
         handleResponse(
             apiCall = { dailyPuzzleRepository.getArchivePuzzles() },

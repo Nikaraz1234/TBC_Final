@@ -28,6 +28,8 @@ object MainContract {
         data object OnLogoutClicked : Event
         data object OnArchiveClicked : Event
         data object SeedEmojiPuzzles : Event
+        data object SeedStoryOrderPuzzles : Event
+
     }
 
     sealed interface SideEffect {

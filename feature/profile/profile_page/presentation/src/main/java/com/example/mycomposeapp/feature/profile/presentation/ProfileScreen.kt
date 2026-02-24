@@ -101,7 +101,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileContent(
+internal fun ProfileContent(
     state: ProfileContract.State,
     onEvent: (ProfileContract.Event) -> Unit,
     showSettingsSheet: Boolean,
@@ -453,7 +453,7 @@ private fun RankItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileBottomSheet(
+internal fun ProfileBottomSheet(
     visible: Boolean,
     onClose: () -> Unit,
     onEvent: (ProfileContract.Event) -> Unit,
@@ -523,24 +523,6 @@ private fun ProfileBottomSheetContent(
         }
 
         HorizontalDivider(color = colors.onSurface.copy(alpha = 0.12f))
-
-        SheetRow(
-            icon = painterResource(CoreUiR.drawable.ic_moon),
-            title = stringResource(ProfileR.string.settings_dark_theme),
-            onClick = { onEvent(ProfileContract.Event.ToggleDarkTheme) },
-            trailing = {
-                Switch(
-                    checked = isDarkTheme,
-                    onCheckedChange = { onEvent(ProfileContract.Event.ToggleDarkTheme) }
-                )
-            }
-        )
-
-        SheetRow(
-            icon = painterResource(CoreUiR.drawable.ic_notification),
-            title = stringResource(ProfileR.string.settings_notifications),
-            onClick = { onEvent(ProfileContract.Event.NotificationsClicked) }
-        )
 
         SheetRow(
             icon = painterResource(CoreUiR.drawable.ic_delete),

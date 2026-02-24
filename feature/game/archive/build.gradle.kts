@@ -8,4 +8,6 @@ android {
 
 dependencies {
     implementation(projects.feature.game.domain)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+
 }

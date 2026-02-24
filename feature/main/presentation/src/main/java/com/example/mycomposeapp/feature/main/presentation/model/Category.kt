@@ -89,6 +89,15 @@ object Categories {
         )
     )
 
+    private val booksGameCategory = listOf(
+        GameMode(
+            id = GameModeIds.BOOK_BY_ORDER,
+            name = "Order Book Events",
+            description = "Order Book Events",
+            iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        )
+    )
 
     private val booksGameModes = listOf(
         GameMode(

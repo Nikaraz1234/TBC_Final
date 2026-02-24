@@ -146,14 +146,14 @@ data class AppColorScheme(
             backgroundDark = Color(0xFFF6F7FB),
             backgroundDarkEnd = Color(0xFFEDF0F8),
 
-            goldenYellow = Color(0xFFFFC83D),
-            goldenYellowDark = Color(0xFFB8960C),
+            goldenYellow = Color(0xFFE6B325),       // slightly darker & richer
+            goldenYellowDark = Color(0xFF9C7A0A),   // deeper amber
 
-            gold1 = Color(0xFF8A6A2A),
-            gold2 = Color(0xFFD7B45B),
-            gold3 = Color(0xFFFFE8A6),
-            gold4 = Color(0xFFFFC83D),
-            gold5 = Color(0xFF9A7A34),
+            gold1 = Color(0xFF7A5C1F),              // darker base gold
+            gold2 = Color(0xFFC49A3C),              // mid gold toned down
+            gold3 = Color(0xFFEFD27A),              // softer highlight (less white)
+            gold4 = Color(0xFFE6B325),              // consistent main gold
+            gold5 = Color(0xFF866823),
 
             textLight = Color(0xFF0F172A),
             textMuted = Color(0xFF5B6475),

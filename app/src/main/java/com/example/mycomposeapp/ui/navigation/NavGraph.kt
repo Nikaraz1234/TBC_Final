@@ -3,6 +3,7 @@ package com.example.mycomposeapp.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -119,7 +120,8 @@ fun NavGraph(
         achievementsNavGraph()
 
         gameNavGraph(
-            onNavigateBack = { navController.popBackStack() }
+            onNavigateBack = { navController.popBackStack() },
+            showSnackBar = showSnackBar
         )
 
         archiveNavGraph(
@@ -133,6 +135,15 @@ fun NavGraph(
                 navController.navigate(
                     GameRoute(
                         gameModeId = GameModeIds.EMOJI,
+                        categoryType = categoryType,
+                        archiveDate = archiveDate
+                    )
+                )
+            },
+            onNavigateToStoryOrderGame = { categoryType, archiveDate ->
+                navController.navigate(
+                    GameRoute(
+                        gameModeId = GameModeIds.BOOK_BY_ORDER,
                         categoryType = categoryType,
                         archiveDate = archiveDate
                     )
