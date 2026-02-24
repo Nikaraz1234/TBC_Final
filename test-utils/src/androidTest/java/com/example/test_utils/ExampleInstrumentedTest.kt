@@ -1,4 +1,4 @@
-package com.example.mycomposeapp.feature.notification.presentation
+package com.example.test_utils
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,9 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals(
-            "com.example.mycomposeapp.feature.notification.presentation.test",
-            appContext.packageName
-        )
+        assertEquals("com.example.test_utils.test", appContext.packageName)
     }
 }

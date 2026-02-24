@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.components.LoaderImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme
@@ -165,14 +166,13 @@ private fun MangaCard(
                 .padding(spacing.spacing16),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AsyncImage(
-                model = manga.imageUrl,
+            LoaderImage(
+                imageUrl = manga.imageUrl,
                 contentDescription = manga.title,
                 modifier = Modifier
                     .width(120.dp)
                     .aspectRatio(2f / 3f)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
+                    .clip(RoundedCornerShape(8.dp))
             )
 
             Spacer(modifier = Modifier.height(spacing.spacing12))

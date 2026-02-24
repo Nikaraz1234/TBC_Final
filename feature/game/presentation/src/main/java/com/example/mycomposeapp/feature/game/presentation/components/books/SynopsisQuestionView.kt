@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.components.LoaderImage
 import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.GameContract
@@ -44,8 +45,8 @@ fun SynopsisQuestionView(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-            model = content.coverImageUrl,
+        LoaderImage(
+            imageUrl = content.coverImageUrl,
             contentDescription = "Book cover",
             modifier = Modifier
                 .size(180.dp, 240.dp)

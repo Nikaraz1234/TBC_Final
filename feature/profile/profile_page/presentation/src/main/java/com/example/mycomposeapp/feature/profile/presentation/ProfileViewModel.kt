@@ -10,6 +10,7 @@ import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.profile.presentation.ProfileContract.Event.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import javax.inject.Inject
 
 
@@ -40,28 +41,23 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun deleteUser(){
-        viewModelScope.launch {
-            deleteUserUseCase().collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        setState { copy(isLoading = true) }
-                    }
-
-                    is Resource.Success -> {
-                        setState { copy(isLoading = false) }
-                        sendSideEffect(ProfileContract.SideEffect.GoToWelcomeScreen)
-                    }
-
-                    is Resource.Error -> {
-                        setState { copy(isLoading = false) }
-                        sendSideEffect(ProfileContract.SideEffect.ShowSnackBar(result.message))
-                    }
-                }
+    private fun deleteUser() {
+        handleResponse(
+            apiCall = { deleteUserUseCase() },
+            onLoading = {
+                setState { copy(isLoading = true) }
+            },
+            onSuccess = {
+                setState { copy(isLoading = false) }
+                sendSideEffect(ProfileContract.SideEffect.GoToWelcomeScreen)
+            },
+            onError = { message ->
+                setState { copy(isLoading = false) }
+                sendSideEffect(ProfileContract.SideEffect.ShowSnackBar(message))
             }
-        }
-
+        )
     }
+
 
 
     private fun observeCurrentUser() {
@@ -79,10 +75,11 @@ class ProfileViewModel @Inject constructor(
         handleResponse(
             apiCall = { logoutUseCase() },
             onSuccess = {
+                setState { copy(isLoading = false) }
                 sendSideEffect(ProfileContract.SideEffect.GoToWelcomeScreen)
             },
             onError = { message ->
-                setState { copy(error = message) }
+                setState { copy(error = message, isLoading = false) }
             },
             onLoading = {
                 setState { copy(isLoading = true) }

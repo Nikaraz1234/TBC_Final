@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val dailyGoalsManager: DailyGoalsManagerUseCase,
     private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase,
-    private val seedBookByOrderPuzzlesUseCase: SeedBookByOrderPuzzlesUseCase
+    private val seedBookByOrderPuzzlesUseCase: SeedBookByOrderPuzzlesUseCase,
     private val migrateGameStatsKeys: MigrateGameStatsKeysUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
 

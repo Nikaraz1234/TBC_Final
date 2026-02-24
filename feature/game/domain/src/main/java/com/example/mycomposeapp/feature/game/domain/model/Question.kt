@@ -52,7 +52,6 @@ sealed interface QuestionContent {
         val traitDisplayName: String,
         val sharedValue: String
     ) : QuestionContent
-}
 
     data class BookByOrder(
         val puzzleId: Long,
