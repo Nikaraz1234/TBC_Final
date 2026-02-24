@@ -166,6 +166,7 @@ object GameDataModule {
     @IntoMap
     @StringKey("BOOKS")
     fun provideBooksDailyPuzzleRepository(repo: BookByOrderRepositoryImpl): DailyPuzzleRepository = repo
+    @Provides
     @Singleton
     fun provideGoogleBooksApiService(@GoogleBooksRetrofit retrofit: Retrofit): GoogleBooksApiService {
         return retrofit.create(GoogleBooksApiService::class.java)

@@ -203,17 +203,23 @@ class GameDelegateFactory @Inject constructor(
 
     private fun createBooksDelegate(
         gameModeId: String,
-        categoryType: String
+        categoryType: String,
+        archiveDate: String?
     ): GameModeDelegate {
         return when (gameModeId) {
-          GameModeIds.BOOK_BY_ORDER -> BookByOrderDelegate(
+            GameModeIds.BOOK_BY_ORDER -> BookByOrderDelegate(
                 categoryType = categoryType,
                 gameModeId = gameModeId,
                 archiveDate = archiveDate,
                 getDailyPuzzleUseCase = getDailyPuzzleUseCase,
-                dailyPuzzleRepository = dailyPuzzleRepositories[categoryType]
-                    ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType")
-          
+                dailyPuzzleRepository = dailyPuzzleRepositories[categoryType] ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType"),
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateDailyGoalProgressUseCase = updateDailyGoalProgressUseCase,
+                dailyGoalsManagerUseCase = dailyGoalsManagerUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
+            )
             GameModeIds.BOOK_SYNOPSIS -> BookSynopsisDelegate(
                 categoryType = categoryType,
                 gameModeId = gameModeId,

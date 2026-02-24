@@ -52,7 +52,6 @@ sealed interface QuestionContent {
         val traitDisplayName: String,
         val sharedValue: String
     ) : QuestionContent
-}
 
     data class BookByOrder(
         val puzzleId: Long,
@@ -66,6 +65,7 @@ sealed interface QuestionContent {
         val isDaily: Boolean
     ) : QuestionContent
 }
+
 data class BookEvent(
     val eventId: Int,
     val text: String
