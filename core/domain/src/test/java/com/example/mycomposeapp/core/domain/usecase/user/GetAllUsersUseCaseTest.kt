@@ -6,12 +6,12 @@ import com.example.mycomposeapp.core.domain.repository.UserRepository
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class GetAllUsersUseCaseTest {
 
@@ -20,24 +20,24 @@ class GetAllUsersUseCaseTest {
 
     @Before
     fun setUp() {
-        userRepository = mock()
+        userRepository = mockk()
         useCase = GetAllUsersUseCase(userRepository)
     }
 
     @Test
     fun `invoke returns the exact flow from the repository`() = runTest {
         val flow = flowOf<Resource<List<User>>>()
-        whenever(userRepository.getAllUser()).thenReturn(flow)
+        every { userRepository.getAllUser() } returns flow
 
         val result = useCase()
 
-        verify(userRepository).getAllUser()
+        verify { userRepository.getAllUser() }
         assertEquals(flow, result)
     }
 
     @Test
     fun `invoke emits Loading state`() = runTest {
-        whenever(userRepository.getAllUser()).thenReturn(flowOf(Resource.Loading))
+        every { userRepository.getAllUser() } returns flowOf(Resource.Loading)
 
         val emissions = useCase().toList()
 
@@ -50,7 +50,7 @@ class GetAllUsersUseCaseTest {
             User(userId = "1", username = "Alice"),
             User(userId = "2", username = "Bob")
         )
-        whenever(userRepository.getAllUser()).thenReturn(flowOf(Resource.Success(users)))
+        every { userRepository.getAllUser() } returns flowOf(Resource.Success(users))
 
         val emissions = useCase().toList()
 
@@ -59,7 +59,7 @@ class GetAllUsersUseCaseTest {
 
     @Test
     fun `invoke emits Success with an empty list`() = runTest {
-        whenever(userRepository.getAllUser()).thenReturn(flowOf(Resource.Success(emptyList())))
+        every { userRepository.getAllUser() } returns flowOf(Resource.Success(emptyList()))
 
         val emissions = useCase().toList()
 
@@ -69,7 +69,7 @@ class GetAllUsersUseCaseTest {
     @Test
     fun `invoke emits Error with message`() = runTest {
         val message = "Network error"
-        whenever(userRepository.getAllUser()).thenReturn(flowOf(Resource.Error(message)))
+        every { userRepository.getAllUser() } returns flowOf(Resource.Error(message))
 
         val emissions = useCase().toList()
 
