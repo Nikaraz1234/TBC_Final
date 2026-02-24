@@ -89,6 +89,7 @@ object Categories {
         )
     )
 
+
     private val booksGameModes = listOf(
         GameMode(
             id = GameModeIds.BOOK_SYNOPSIS,
