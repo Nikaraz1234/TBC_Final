@@ -23,12 +23,6 @@ Players answer questions, earn XP, climb leaderboards, unlock achievements, and 
 
 ---
 
-## Screenshots
-
-> _Add screenshots / GIFs of the app here_
-
----
-
 ## Features
 
 | Area | Highlights |
