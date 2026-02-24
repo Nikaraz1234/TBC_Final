@@ -152,6 +152,13 @@ private fun MainContent(
                             tint = colors.goldenYellow
                         )
                     }
+                    IconButton(onClick = { onEvent(MainContract.Event.SeedStoryOrderPuzzles) }) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = "Seed story order puzzles",
+                            tint = colors.goldenYellow
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(spacing.spacing24))

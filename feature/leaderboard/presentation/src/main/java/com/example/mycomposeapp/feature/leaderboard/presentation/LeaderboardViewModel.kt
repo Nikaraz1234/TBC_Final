@@ -105,6 +105,7 @@ class LeaderboardViewModel @Inject constructor(
             LeaderboardFilter.Movie -> listOf("Cover", "Emoji", "Plot")
             LeaderboardFilter.Game -> listOf("Screenshot", "Description", "Achievement")
             LeaderboardFilter.Comics -> listOf("Rankle", "Rating", "Emoji")
+            LeaderboardFilter.Books -> listOf("Order")
         }
     }
 

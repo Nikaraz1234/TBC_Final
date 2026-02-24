@@ -6,5 +6,6 @@ enum class LeaderboardFilter(
 ) {
     Movie("Movie", "MOVIES"),
     Game("Game", "GAMES"),
-    Comics("Comics", "COMICS")
+    Comics("Comics", "COMICS"),
+    Books("Books", "BOOKS")
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.mycomposeapp.core.domain.common.Resource
 import com.example.mycomposeapp.core.domain.model.UserStats
+import com.example.mycomposeapp.core.domain.network.ConnectivityObserver
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.achievements.domain.usecase.CheckAndUnlockAchievementsUseCase
@@ -17,6 +18,8 @@ import com.example.mycomposeapp.feature.game.presentation.navigation.GameRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +27,7 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     gameDelegateFactory: GameDelegateFactory,
+    private val connectivityObserver: ConnectivityObserver,
     private val searchUseCase: SearchMoviesUseCase,
     private val checkAndUnlockAchievementsUseCase: CheckAndUnlockAchievementsUseCase
 ) : BaseViewModel<GameContract.State, GameContract.SideEffect, GameContract.Event>(
@@ -42,6 +46,7 @@ class GameViewModel @Inject constructor(
     init {
         delegate.attach(this)
         delegate.loadGame()
+        observeInternet()
     }
 
     // DelegateScope implementation
@@ -90,6 +95,24 @@ class GameViewModel @Inject constructor(
     private fun onSuggestionSelected(title: String) {
         setState { copy(userAnswer = title, searchResults = emptyList()) }
         delegate.onAnswerSubmitted(title)
+    }
+
+    private fun observeInternet() {
+        viewModelScope.launch {
+            connectivityObserver.hasInternet
+                .distinctUntilChanged()
+                .collectLatest { hasInternet ->
+                    if (!hasInternet) {
+                        searchJob?.cancel()
+                        delegate.onExitGame()
+                        sendSideEffect(GameContract.SideEffect.Exit)
+                        sendSideEffect(GameContract.SideEffect.ShowSnackbar(
+                            UiText.DynamicString("No Internet Connection")
+                        )
+                        )
+                    }
+                }
+        }
     }
 
     override suspend fun onGameCompleted(updatedStats: UserStats?) {

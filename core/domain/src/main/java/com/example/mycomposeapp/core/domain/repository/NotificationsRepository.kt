@@ -12,5 +12,5 @@ interface NotificationsRepository {
     suspend fun insert(notification: AppNotification)
 
     suspend fun markAsRead(id: String, userId: String)
-
+    suspend fun delete(id: String, userId: String)
 }

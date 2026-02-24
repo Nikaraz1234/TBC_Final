@@ -13,6 +13,8 @@ object GameModeIds {
 
     const val RANKLE = "rankle"
 
+    const val BOOK_BY_ORDER = "BOOK_BY_ORDER"
+
     fun statsKey(categoryType: String, gameModeId: String): String =
         "${categoryType}_${gameModeId}"
 }

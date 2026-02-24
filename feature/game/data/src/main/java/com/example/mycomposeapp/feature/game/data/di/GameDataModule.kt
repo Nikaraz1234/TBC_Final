@@ -11,6 +11,7 @@ import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesServ
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
+import com.example.mycomposeapp.feature.game.data.repository.books.BookByOrderRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaEmojiRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaRatingRepositoryImpl
@@ -156,4 +157,9 @@ object GameDataModule {
     fun provideMangaSearchRepository(
         repo: MangaSearchRepositoryImpl
     ): SearchRepository = repo
+
+    @Provides
+    @IntoMap
+    @StringKey("BOOKS")
+    fun provideBooksDailyPuzzleRepository(repo: BookByOrderRepositoryImpl): DailyPuzzleRepository = repo
 }

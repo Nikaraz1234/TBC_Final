@@ -8,8 +8,10 @@ import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.RefreshUserUseCase
 import com.example.mycomposeapp.core.presentation.common.BaseViewModel
 import com.example.mycomposeapp.feature.game.domain.usecase.SeedEmojiPuzzlesUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.books.SeedBookByOrderPuzzlesUseCase
 import com.example.mycomposeapp.feature.main.presentation.MainContract.Event
 import com.example.mycomposeapp.feature.main.presentation.MainContract.SideEffect
+import com.example.mycomposeapp.feature.main.presentation.MainContract.SideEffect.*
 import com.example.mycomposeapp.feature.main.presentation.MainContract.State
 import com.example.mycomposeapp.feature.main.presentation.model.Categories
 import com.example.mycomposeapp.feature.main.presentation.model.GameMode
@@ -26,7 +28,8 @@ class MainViewModel @Inject constructor(
     private val refreshUserUseCase: RefreshUserUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val dailyGoalsManager: DailyGoalsManagerUseCase,
-    private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase
+    private val seedEmojiPuzzles: SeedEmojiPuzzlesUseCase,
+    private val seedBookByOrderPuzzlesUseCase: SeedBookByOrderPuzzlesUseCase
 ) : BaseViewModel<State, SideEffect, Event>(State()) {
 
     init {
@@ -115,9 +118,20 @@ class MainViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         seedEmojiPuzzles()
-                        sendSideEffect(SideEffect.ShowSnackbar("Emoji puzzles seeded!"))
+                        sendSideEffect(ShowSnackbar("Emoji puzzles seeded!"))
                     } catch (e: Exception) {
-                        sendSideEffect(SideEffect.ShowSnackbar("Seed failed: ${e.message}"))
+                        sendSideEffect(ShowSnackbar("Seed failed: ${e.message}"))
+                    }
+                }
+            }
+
+            Event.SeedStoryOrderPuzzles -> {
+                viewModelScope.launch {
+                    try {
+                        seedBookByOrderPuzzlesUseCase()
+                        sendSideEffect(ShowSnackbar("Story puzzles seeded!"))
+                    } catch (e: Exception) {
+                        sendSideEffect(ShowSnackbar("Seed failed: ${e.message}"))
                     }
                 }
             }

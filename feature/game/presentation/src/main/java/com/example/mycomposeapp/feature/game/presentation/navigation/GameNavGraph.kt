@@ -13,9 +13,13 @@ data class GameRoute(
 )
 
 fun NavGraphBuilder.gameNavGraph(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    showSnackBar: (String) -> Unit
+
 ) {
     composable<GameRoute> {
-        GameplayScreen(onNavigateBack = onNavigateBack)
+        GameplayScreen(onNavigateBack = onNavigateBack,
+            showSnackBar = showSnackBar
+        )
     }
 }

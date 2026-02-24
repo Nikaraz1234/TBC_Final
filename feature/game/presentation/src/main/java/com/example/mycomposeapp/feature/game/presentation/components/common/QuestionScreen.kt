@@ -21,6 +21,9 @@ import com.example.mycomposeapp.core.ui.theme.AppTheme
 import com.example.mycomposeapp.feature.game.domain.constants.GameConstants
 import com.example.mycomposeapp.feature.game.domain.model.QuestionContent
 import com.example.mycomposeapp.feature.game.presentation.GameContract
+import com.example.mycomposeapp.feature.game.presentation.GameContract.Event.*
+import com.example.mycomposeapp.feature.game.presentation.GameContract.ModeState.*
+import com.example.mycomposeapp.feature.game.presentation.components.books.BookByOrderQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.common.AnswerInputView
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.cover.CoverQuestionView
@@ -115,6 +118,8 @@ fun QuestionScreen(
                     streak = 0
                 )
             }
+            is GameContract.ModeState.BookByOrder -> {
+            }
 
             else -> Unit
         }
@@ -149,7 +154,7 @@ fun QuestionScreen(
             }
 
             is QuestionContent.Plot -> {
-                val plotState = state.plotState ?: GameContract.ModeState.Plot()
+                val plotState = state.plotState ?: Plot()
                 PlotQuestionView(
                     content = content,
                     plotState = plotState,
@@ -160,7 +165,7 @@ fun QuestionScreen(
             }
 
             is QuestionContent.Screenshot -> {
-                val ssState = state.screenshotState ?: GameContract.ModeState.Screenshot()
+                val ssState = state.screenshotState ?: Screenshot()
                 ScreenshotQuestionView(
                     content = content,
                     coins = ssState.coins,
@@ -175,7 +180,7 @@ fun QuestionScreen(
             }
 
             is QuestionContent.Description -> {
-                val descState = state.descriptionState ?: GameContract.ModeState.Description()
+                val descState = state.descriptionState ?: Description()
                 DescriptionQuestionView(
                     content = content,
                     guessesRemaining = descState.guessesRemaining,
@@ -191,7 +196,7 @@ fun QuestionScreen(
             }
 
             is QuestionContent.Achievements -> {
-                val achState = state.achievementState ?: GameContract.ModeState.Achievement()
+                val achState = state.achievementState ?: Achievement()
                 AchievementQuestionView(
                     content = content,
                     achievementState = achState,
@@ -201,12 +206,25 @@ fun QuestionScreen(
             }
 
             is QuestionContent.Rankle -> {
-                val rankleState = state.rankleState ?: GameContract.ModeState.Rankle()
+                val rankleState = state.rankleState ?: Rankle()
                 RankleQuestionView(
                     content = content,
                     rankleState = rankleState,
                     isRevealed = isRevealed,
-                    onAnswerSubmit = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) }
+                    onAnswerSubmit = { onEvent(OnAnswerSubmitted(it)) }
+                )
+            }
+
+            is QuestionContent.BookByOrder -> {
+                val orderState = state.bookOrderState ?: BookByOrder()
+                BookByOrderQuestionView(
+                    state = orderState,
+                    onMove = { eventId, slotIndex ->
+                        onEvent(OnAnswerSubmitted("MOVE:$eventId:$slotIndex"))
+                    },
+                    onSubmit = {
+                        onEvent(OnAnswerSubmitted("SUBMIT"))
+                    }
                 )
             }
         }
@@ -214,6 +232,7 @@ fun QuestionScreen(
         Spacer(modifier = Modifier.height(spacing.spacing20))
 
         val isRankleMode = state.rankleState != null
+        val isOrderMode = state.bookOrderState != null
 
         if (isRevealed) {
             // Don't show AnswerFeedbackView for Rankle — it has its own result card
@@ -301,16 +320,18 @@ fun QuestionScreen(
                         .padding(bottom = spacing.spacing8)
                 )
             }
+            if(!isOrderMode){
+                AnswerInputView(
+                    userAnswer = state.userAnswer,
+                    onAnswerChanged = { onEvent(GameContract.Event.OnAnswerTextChanged(it)) },
+                    onSubmit = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) },
+                    searchResults = state.searchResults,
+                    isSearching = state.isSearching,
+                    onSuggestionSelected = { onEvent(GameContract.Event.OnSuggestionSelected(it)) },
+                    enabled = true
+                )
+            }
 
-            AnswerInputView(
-                userAnswer = state.userAnswer,
-                onAnswerChanged = { onEvent(GameContract.Event.OnAnswerTextChanged(it)) },
-                onSubmit = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) },
-                searchResults = state.searchResults,
-                isSearching = state.isSearching,
-                onSuggestionSelected = { onEvent(GameContract.Event.OnSuggestionSelected(it)) },
-                enabled = true
-            )
         }
 
         Spacer(modifier = Modifier.height(spacing.spacing24))
