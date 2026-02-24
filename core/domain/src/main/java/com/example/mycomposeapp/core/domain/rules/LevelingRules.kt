@@ -1,6 +1,5 @@
 package com.example.mycomposeapp.core.domain.rules
 
-import com.example.mycomposeapp.core.domain.model.LevelProgress
 
 object LevelingRules {
     fun xpToReachLevel(level: Int): Int {
