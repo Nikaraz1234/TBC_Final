@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="categories_header">CATEGORIES</string>
+    <string name="archive_title">Archive</string>
+    <string name="archive_subtitle">Play past daily puzzles</string>
+    <string name="btn_logout">Logout</string>
+    <string name="no_game_modes_available">No game modes available yet!</string>
+    <string name="daily_challenge_completed">You\'ve already completed today\'s challenge!</string>
+    <string name="game_mode_coming_soon">%s is coming soon!</string>
+    <string name="completed">Completed!</string>
+    <string name="guest">Guest</string>
+    <string name="btn_back_desc">Back</string>
+</resources>

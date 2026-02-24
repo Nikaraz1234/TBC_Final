@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notifications_title">Notifications</string>
+
+    <string name="no_older_notifications">No Older Notifications</string>
+
+    <string name="close">Close</string>
+
+
+</resources>

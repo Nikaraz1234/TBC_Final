@@ -1,0 +1,318 @@
+package com.example.mycomposeapp.feature.main.presentation
+
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.data.BuildConfig
+import com.example.mycomposeapp.core.ui.components.Loader
+import com.example.mycomposeapp.core.ui.components.cards.GlassCard
+import com.example.mycomposeapp.core.ui.theme.AppAnimation
+import com.example.mycomposeapp.core.ui.theme.AppTheme
+import com.example.mycomposeapp.feature.main.presentation.components.CategoryCard
+import com.example.mycomposeapp.feature.main.presentation.components.DailyChallengeCard
+import com.example.mycomposeapp.feature.main.presentation.components.GameModeSection
+import com.example.mycomposeapp.feature.main.presentation.components.QuickPlayButton
+import com.example.mycomposeapp.feature.main.presentation.components.TipsSection
+import com.example.mycomposeapp.feature.main.presentation.components.TodaysGoalsCard
+import com.example.mycomposeapp.feature.main.presentation.components.UserTopBar
+import com.example.mycomposeapp.core.ui.R as CoreUiR
+import com.example.mycomposeapp.feature.main.presentation.R as MainR
+
+@Composable
+fun MainScreen(
+    onNavigateToGame: (gameModeId: String, categoryType: String) -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onLogout: () -> Unit,
+    onNavigateToArchive: () -> Unit = {},
+    viewModel: MainViewModel = hiltViewModel(),
+    showSnackbar: (String) -> Unit
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.refreshDailyData()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is MainContract.SideEffect.NavigateToGame -> {
+                    onNavigateToGame(effect.gameModeId, effect.categoryType)
+                }
+
+                is MainContract.SideEffect.NavigateToProfile -> {
+                    onNavigateToProfile()
+                }
+
+                is MainContract.SideEffect.ShowSnackbar -> {
+                    showSnackbar(effect.message)
+                }
+
+                is MainContract.SideEffect.NavigateToWelcome -> {
+                    onLogout()
+                }
+
+                is MainContract.SideEffect.NavigateToArchive -> {
+                    onNavigateToArchive()
+                }
+            }
+        }
+    }
+
+    MainContent(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+private fun MainContent(
+    state: MainContract.State,
+    onEvent: (MainContract.Event) -> Unit
+) {
+    val colors = AppTheme.colors
+    val typography = AppTheme.typography
+    val spacing = AppTheme.spacing
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(state.selectedCategory) {
+        scrollState.scrollTo(0)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        if (state.isLoading) {
+            Loader()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(bottom = spacing.spacing16)
+            ) {
+                UserTopBar(
+                    user = state.user,
+                    onProfileClick = { onEvent(MainContract.Event.OnProfileClicked) }
+                )
+
+                if (BuildConfig.DEBUG) {
+                    IconButton(onClick = { onEvent(MainContract.Event.SeedEmojiPuzzles) }) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = "Seed emoji puzzles",
+                            tint = colors.goldenYellow
+                        )
+                    }
+                    IconButton(onClick = { onEvent(MainContract.Event.SeedStoryOrderPuzzles) }) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = "Seed story order puzzles",
+                            tint = colors.goldenYellow
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(spacing.spacing24))
+
+                AnimatedContent(
+                    targetState = state.selectedCategory,
+                    transitionSpec = {
+                        val isForward = targetState != null
+                        val slideDuration = AppAnimation.slideTransitionMs
+                        val fadeDuration = AppAnimation.fadeDurationMs
+
+                        val enterSlide = slideInHorizontally(
+                            animationSpec = tween(slideDuration),
+                            initialOffsetX = { fullWidth ->
+                                if (isForward) fullWidth / 3 else -fullWidth / 3
+                            }
+                        )
+                        val enterFade = fadeIn(animationSpec = tween(slideDuration))
+
+                        val exitSlide = slideOutHorizontally(
+                            animationSpec = tween(slideDuration),
+                            targetOffsetX = { fullWidth ->
+                                if (isForward) -fullWidth / 3 else fullWidth / 3
+                            }
+                        )
+                        val exitFade = fadeOut(animationSpec = tween(fadeDuration))
+
+                        (enterSlide + enterFade) togetherWith (exitSlide + exitFade) using
+                                SizeTransform(clip = false)
+                    },
+                    label = "CategoryTransition"
+                ) { selectedCategory ->
+                    if (selectedCategory == null) {
+                        Column {
+                            QuickPlayButton(
+                                onClick = { onEvent(MainContract.Event.OnQuickPlayClicked) }
+                            )
+
+                            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+                            if (state.dailyChallenge != null) {
+                                DailyChallengeCard(
+                                    challenge = state.dailyChallenge,
+                                    onClick = { onEvent(MainContract.Event.OnDailyChallengeClicked) }
+                                )
+                                Spacer(modifier = Modifier.height(spacing.spacing12))
+                            }
+
+                            ArchiveCard(
+                                onClick = { onEvent(MainContract.Event.OnArchiveClicked) }
+                            )
+                            Spacer(modifier = Modifier.height(spacing.spacing16))
+
+                            if (state.dailyGoals != null) {
+                                TodaysGoalsCard(goalsProgress = state.dailyGoals)
+                                Spacer(modifier = Modifier.height(spacing.spacing16))
+                            }
+
+                            CategoriesSection(
+                                categories = state.categories,
+                                onCategoryClick = { category ->
+                                    onEvent(MainContract.Event.OnCategoryClicked(category))
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(spacing.spacing24))
+                            TipsSection(startIndex = state.tipStartIndex)
+                            Spacer(modifier = Modifier.height(spacing.spacing24))
+                        }
+                    } else {
+                        GameModeSection(
+                            category = selectedCategory,
+                            onBackClick = { onEvent(MainContract.Event.OnBackFromGameModes) },
+                            onGameModeClick = { gameMode ->
+                                onEvent(MainContract.Event.OnGameModeClicked(gameMode))
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoriesSection(
+    categories: List<com.example.mycomposeapp.feature.main.presentation.model.Category>,
+    onCategoryClick: (com.example.mycomposeapp.feature.main.presentation.model.Category) -> Unit
+) {
+    val colors = AppTheme.colors
+    val typography = AppTheme.typography
+
+    val spacing = AppTheme.spacing
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(MainR.string.categories_header),
+            color = colors.textMuted,
+            style = typography.labelSmall,
+            modifier = Modifier.padding(horizontal = spacing.spacing16)
+        )
+
+        Spacer(modifier = Modifier.height(spacing.spacing12))
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = spacing.spacing16),
+            horizontalArrangement = Arrangement.spacedBy(spacing.spacing12)
+        ) {
+            items(categories) { category ->
+                CategoryCard(
+                    category = category,
+                    onClick = { onCategoryClick(category) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ArchiveCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = AppTheme.colors
+    val typography = AppTheme.typography
+
+    val spacing = AppTheme.spacing
+    GlassCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.spacing16)
+            .clickable(onClick = onClick)
+    ) {
+        androidx.compose.foundation.layout.Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "\uD83D\uDDC3\uFE0F",
+                style = typography.headlineMedium
+            )
+
+            Spacer(modifier = Modifier.width(spacing.spacing12))
+
+            Column {
+                Text(
+                    text = stringResource(MainR.string.archive_title),
+                    color = colors.textLight,
+                    style = typography.titleSmall
+                )
+                Text(
+                    text = stringResource(MainR.string.archive_subtitle),
+                    color = colors.textMuted,
+                    style = typography.bodySmall
+                )
+            }
+        }
+    }
+}

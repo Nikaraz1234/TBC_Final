@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="game_over">Game Over!</string>
+    <string name="game_complete">Game Complete!</string>
+    <string name="new_high_score">NEW HIGH SCORE!</string>
+    <string name="points_format">%d points</string>
+    <string name="btn_play_again">Play Again</string>
+    <string name="btn_back_to_menu">Back to Menu</string>
+    <string name="movies_guessed">Movies Guessed</string>
+    <string name="best_streak">Best Streak</string>
+    <string name="final_score">Final Score</string>
+    <string name="coins_label">Coins</string>
+    <string name="correct_answers_format">%1$d/%2$d</string>
+    <string name="accuracy_format">%d%%</string>
+    <string name="time_taken_format">%ds</string>
+    <string name="correct_answers">Correct Answers</string>
+    <string name="accuracy">Accuracy</string>
+    <string name="time_taken">Time Taken</string>
+    <string name="answer_summary">Answer Summary</string>
+    <string name="your_answer_format">Your answer: %s</string>
+    <string name="coins_reward">+15 coins!</string>
+    <string name="lives_remaining_format">%1$d %2$s remaining</string>
+    <string name="life_singular">life</string>
+    <string name="lives_plural">lives</string>
+    <string name="guess_singular">guess</string>
+    <string name="guesses_plural">guesses</string>
+    <string name="wrong_lives_format">Wrong! %1$d %2$s remaining</string>
+    <string name="wrong_guesses_format">Wrong! %1$d %2$s remaining</string>
+    <string name="btn_done">Done</string>
+    <string name="daily_already_completed">You\'ve already completed today\'s puzzle!</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="feedback_correct">Correct!</string>
+    <string name="feedback_wrong">Wrong!</string>
+    <string name="the_answer_was">The answer was:</string>
+    <string name="answer_placeholder">Type your answer…</string>
+    <string name="searching">Searching…</string>
+    <string name="error_title">Oops!</string>
+    <string name="btn_try_again">Try Again</string>
+    <string name="btn_go_back">Go Back</string>
+    <string name="btn_see_results">See Results</string>
+    <string name="btn_next_question">Next Question</string>
+    <string name="guess_plot_instruction">Guess the movie from its plot</string>
+    <string name="score_pts_format">%d pts</string>
+    <string name="mode_archive">Archive</string>
+    <string name="mode_daily_emoji">Daily Emoji</string>
+    <string name="daily_puzzle_header">DAILY PUZZLE</string>
+    <string name="archive_date_header">ARCHIVE \u2022 %s</string>
+    <string name="guess_emoji_instruction">Guess the movie from emojis</string>
+    <string name="guesses_remaining_format">%1$d %2$s remaining</string>
+    <string name="lead_actor_label">Lead actor:</string>
+    <string name="hint_cost_format">Hint \u2022 %d coins</string>
+    <string name="not_enough_coins">Not enough coins</string>
+    <string name="question_progress_format">Question %1$d/%2$d</string>
+    <string name="movie_poster_desc">Movie poster</string>
+    <string name="reveal_cost_format">Reveal (%d coins)</string>
+    <string name="games_guessed">Games Guessed</string>
+    <string name="Manga">Manga</string>
+<string name="achievement_count_format">Showing %1$d of %2$d achievements</string>
+<string name="achievement_unlock_format">%1$.1f%% of players</string>
+<string name="achievement_unlocked_format">Achievement unlocked: %s</string>
+<string name="no_more_achievement_questions">No more achievement questions available.</string>
+<string name="no_more_description_questions">No more description questions available.</string>
+<string name="unknown_studio">Unknown studio</string>
+<string name="unknown_genre">Unknown genre</string>
+<string name="unknown_year">Unknown year</string>
+
+    <!-- Book Synopsis mode -->
+    <string name="book_synopsis_instruction">Which synopsis belongs to this book?</string>
+    <string name="book_synopsis_hint_label">Hint (%d coins) — removes 2 wrong options</string>
+    <string name="book_synopsis_hint_used">Hint used</string>
+
+    <!-- Book Odd One Out mode -->
+    <string name="book_odd_one_out_instruction">Tap the odd one out!</string>
+    <string name="book_odd_one_out_hint_label">Hint (%d coins) — removes 2 shared books</string>
+    <string name="book_odd_one_out_hint_used">Hint used</string>
+    <string name="book_odd_one_out_shared_trait">The other books shared: %1$s — %2$s</string>
+    <string name="book_odd_one_out_category_hint_label">Category hint (%d coins) — reveals shared trait</string>
+    <string name="book_odd_one_out_category_hint_used">Category: %1$s — %2$s</string>
+</resources>

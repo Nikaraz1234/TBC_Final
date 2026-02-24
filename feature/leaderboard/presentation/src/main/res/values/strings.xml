@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="leaderboard_title">Leaderboards</string>
+    <string name="leaderboard_select_category">Select category</string>
+    <string name="leaderboard_other_rankings">Other Rankings</string>
+    <string name="leaderboard_points">Points</string>
+    <string name="leaderboard_back">Back</string>
+    <string name="leaderboard_info">Info</string>
+    <string name="leaderboard_level_prefix">LV. </string>
+    <string name="leaderboard_score_format">%d pts</string>
+</resources>

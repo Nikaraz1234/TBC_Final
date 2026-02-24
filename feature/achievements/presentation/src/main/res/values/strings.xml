@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="achievements_title">Achievements</string>
+    <string name="achievements_filter_all">All</string>
+    <string name="achievement_error_loading">Error loading achievements</string>
+    <string name="achievement_empty_state">No achievements here yet</string>
+    <string name="achievement_unlocked_format">Achievement unlocked: %s</string>
+    <string name="achievement_xp_reward_format">+%d XP</string>
+    <string name="achievement_completed_desc">Completed</string>
+    <string name="achievement_locked_desc">Locked</string>
+    <string name="achievement_unknown_error">Unknown error</string>
+</resources>

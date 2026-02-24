@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="btn_back_desc">Back</string>
+    <string name="archive_title">Archive</string>
+    <string name="emoji_puzzles_title">Emoji Puzzles</string>
+    <string name="emoji_puzzles_desc">Guess movies from emoji clues</string>
+    <string name="emoji_puzzles_desc_manga">Guess manga from emoji clues</string>
+    <string name="order_puzzles_desc_books">Order Events</string>
+    <string name="emoji_archive_title">Emoji Archive</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="no_past_puzzles">No past puzzles yet.\nCheck back tomorrow!</string>
+    <string name="btn_play">Play</string>
+</resources>
