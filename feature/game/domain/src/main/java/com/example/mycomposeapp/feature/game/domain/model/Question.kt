@@ -65,6 +65,7 @@ sealed interface QuestionContent {
         val isDaily: Boolean
     ) : QuestionContent
 }
+
 data class BookEvent(
     val eventId: Int,
     val text: String

@@ -1,7 +1,6 @@
 package com.example.mycomposeapp.feature.main.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.example.mycomposeapp.core.domain.model.GameModeInfo
 import com.example.mycomposeapp.core.domain.usecase.auth.LogoutUseCase
 import com.example.mycomposeapp.core.domain.usecase.daily.DailyGoalsManagerUseCase
 import com.example.mycomposeapp.core.domain.usecase.user.GetCurrentUserUseCase
@@ -72,7 +71,6 @@ class MainViewModel @Inject constructor(
                 val challenge = dailyGoalsManager.getDailyChallenge()
                 setState { copy(dailyChallenge = challenge) }
             } catch (e: Exception) {
-                // Handle error silently, daily challenge is optional
             }
         }
     }
@@ -83,7 +81,6 @@ class MainViewModel @Inject constructor(
                 val goals = dailyGoalsManager.getDailyGoals()
                 setState { copy(dailyGoals = goals) }
             } catch (e: Exception) {
-                // Handle error silently, daily goals are optional
             }
         }
     }
