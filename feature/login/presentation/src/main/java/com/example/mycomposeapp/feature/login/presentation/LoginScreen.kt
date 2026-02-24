@@ -101,7 +101,7 @@ fun LoginScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = AppTheme.colors.transparent
-    ) {
+    ) { _ ->
         LoginContent(
             state = state,
             onEvent = viewModel::onEvent
@@ -123,12 +123,6 @@ private fun LoginContent(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        AsyncImage(
-            model = CoreUiR.drawable.app_background,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
 
         Column(
             modifier = Modifier

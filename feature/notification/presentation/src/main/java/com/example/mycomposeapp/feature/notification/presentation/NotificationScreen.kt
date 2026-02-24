@@ -1,6 +1,6 @@
 package com.example.mycomposeapp.feature.notification.presentation
 
-import androidx.compose.foundation.Image
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,8 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +57,13 @@ import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.feature.notification.presentation.model.NotificationUi
 import com.example.mycomposeapp.feature.notification.presentation.R as NotificationR
 import com.example.mycomposeapp.core.ui.R as CoreUiR
+
+object NotificationTestTags {
+    const val SCREEN = "notification_screen"
+    const val SHEET = "notification_sheet"
+    const val OLDER_EMPTY_TEXT = "notification_older_empty"
+    fun item(id: String) = "notification_item_$id"
+}
 
 @Composable
 fun NotificationScreen(
@@ -75,9 +81,10 @@ fun NotificationScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun NotificationContent(
+@OptIn(ExperimentalMaterial3Api::class)
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun NotificationContent(
     state: NotificationContract.State,
     onEvent: (NotificationContract.Event) -> Unit,
     modifier: Modifier = Modifier,
@@ -85,7 +92,6 @@ private fun NotificationContent(
     val colors = AppTheme.colors
     val typography = AppTheme.typography
     val spacing = AppTheme.spacing
-    val radius = AppTheme.radius
 
     val allNotifications = remember(state.newNotifications, state.olderNotifications) {
         state.newNotifications + state.olderNotifications
@@ -95,7 +101,9 @@ private fun NotificationContent(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .testTag(NotificationTestTags.SCREEN)
+            .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
     ) {
         Column(
@@ -114,9 +122,7 @@ private fun NotificationContent(
 
                 NotificationsColumn(
                     notifications = state.newNotifications,
-                    onItemClick = { id ->
-                        opened = allNotifications.firstOrNull { it.id == id }
-                    }
+                    onItemClick = { id -> opened = allNotifications.firstOrNull { it.id == id } }
                 )
             }
 
@@ -127,14 +133,14 @@ private fun NotificationContent(
             if (state.olderNotifications.isNotEmpty()) {
                 NotificationsColumn(
                     notifications = state.olderNotifications,
-                    onItemClick = { id ->
-                        opened = allNotifications.firstOrNull { it.id == id }
-                    }
+                    onItemClick = { id -> opened = allNotifications.firstOrNull { it.id == id } }
                 )
             } else {
                 Text(
                     text = stringResource(NotificationR.string.no_older_notifications),
-                    modifier = Modifier.padding(horizontal = spacing.spacing16),
+                    modifier = Modifier
+                        .testTag(NotificationTestTags.OLDER_EMPTY_TEXT)
+                        .padding(horizontal = spacing.spacing16),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
                     style = typography.titleMedium
                 )
@@ -155,20 +161,21 @@ private fun NotificationContent(
             tonalElevation = 0.dp,
             scrimColor = colors.transparent
         ) {
-            NotificationBottomSheetContent(
-                title = current.title,
-                body = current.body,
-                date = current.date,
-                onClose = {
-                    if (!current.isRead) onEvent(NotificationContract.Event.MarkAsRead(current.id))
-                    opened = null
-                },
-                onDelete = {
-                    onEvent(NotificationContract.Event.Delete(current.id))
-                    opened = null
-                }
-
-            )
+            Box(Modifier.testTag(NotificationTestTags.SHEET)) {
+                NotificationBottomSheetContent(
+                    title = current.title,
+                    body = current.body,
+                    date = current.date,
+                    onClose = {
+                        if (!current.isRead) onEvent(NotificationContract.Event.MarkAsRead(current.id))
+                        opened = null
+                    },
+                    onDelete = {
+                        onEvent(NotificationContract.Event.Delete(current.id))
+                        opened = null
+                    }
+                )
+            }
         }
     }
 }
@@ -298,14 +305,11 @@ private fun NotificationItem(
 
     Box(
         modifier = Modifier
+            .testTag(NotificationTestTags.item(item.id))
             .fillMaxWidth()
             .clip(radius.radius20)
             .background(colors.glassGradient)
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = radius.radius20
-            )
+            .border(1.dp, borderColor, radius.radius20)
             .let { m ->
                 if (onClick != null) {
                     m.clickable(
@@ -317,7 +321,6 @@ private fun NotificationItem(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

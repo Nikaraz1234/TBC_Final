@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.mycomposeapp.core.ui.components.LoaderImage
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonLarge
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppTheme
@@ -58,15 +59,11 @@ fun ScreenshotQuestionView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AsyncImage(
-            model = content.imageUrl,
+        LoaderImage(
+            imageUrl = content.imageUrl,
             contentDescription = "Screenshot",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
                 .padding(horizontal = spacing.spacing16)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.height(spacing.spacing16))

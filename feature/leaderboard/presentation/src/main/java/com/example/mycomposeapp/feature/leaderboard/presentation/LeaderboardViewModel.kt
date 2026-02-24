@@ -89,6 +89,10 @@ class LeaderboardViewModel @Inject constructor(
         "Rating" -> GameModeIds.MANGA_RATING
         "Rankle" -> GameModeIds.RANKLE
 
+        "Order"     -> GameModeIds.BOOK_BY_ORDER
+        "Synopsis"  -> GameModeIds.BOOK_SYNOPSIS
+        "Odd one"   -> GameModeIds.BOOK_ODD_ONE_OUT
+
         else -> modeLabel.lowercase()
     }
 
@@ -105,7 +109,7 @@ class LeaderboardViewModel @Inject constructor(
             LeaderboardFilter.Movie -> listOf("Cover", "Emoji", "Plot")
             LeaderboardFilter.Game -> listOf("Screenshot", "Description", "Achievement")
             LeaderboardFilter.Comics -> listOf("Rankle", "Rating", "Emoji")
-            LeaderboardFilter.Books -> listOf("Order")
+            LeaderboardFilter.Books -> listOf("Order", "Odd one", "Synopsis" )
         }
     }
 

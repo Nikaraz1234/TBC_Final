@@ -13,7 +13,15 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.coreUi)
     implementation(projects.feature.profile.editProfile.domain)
+    implementation(projects.testUtils)
 
     implementation("androidx.compose.foundation:foundation")
     implementation(libs.datastore.preferences)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    testImplementation(libs.turbine)
 }

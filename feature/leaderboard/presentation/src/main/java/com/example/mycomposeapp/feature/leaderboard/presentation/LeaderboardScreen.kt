@@ -1,7 +1,5 @@
 package com.example.mycomposeapp.feature.leaderboard.presentation
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,35 +7,25 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,14 +39,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,11 +59,18 @@ import com.example.mycomposeapp.core.ui.components.buttons.ButtonMedium
 import com.example.mycomposeapp.core.ui.components.buttons.ButtonStyle
 import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.core.ui.theme.AppTheme.colors
-import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
-import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.core.ui.theme.MyComposeAppTheme
 import com.example.mycomposeapp.core.ui.R as CoreUiR
+
+object LeaderboardTestTags {
+    const val TITLE = "lb_title"
+    const val CATEGORY_DROPDOWN = "lb_category_dropdown"
+    const val MODES_ROW = "lb_modes_row"
+    const val TOP_PODIUM = "lb_top_podium"
+    const val USER_LIST = "lb_user_list"
+    fun mode(mode: String) = "lb_mode_$mode"
+    fun userRow(userId: String) = "lb_user_row_$userId"
+}
 
 @Composable
 fun LeaderboardScreen(
@@ -102,17 +95,15 @@ fun LeaderboardScreen(
     )
 }
 
+/** made internal so androidTest can call it */
 @Composable
-private fun LeaderboardContent(
+internal fun LeaderboardContent(
     state: LeaderboardContract.State,
     onEvent: (LeaderboardContract.Event) -> Unit
 ) {
-    val colors = AppTheme.colors
     val spacing = AppTheme.spacing
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxWidth()) {
             LeaderboardsTopBar()
 
@@ -127,7 +118,9 @@ private fun LeaderboardContent(
             Spacer(modifier = Modifier.height(spacing.spacing16))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(LeaderboardTestTags.MODES_ROW),
                 horizontalArrangement = Arrangement.Center
             ) {
                 ModeLayout(
@@ -162,14 +155,11 @@ private fun LeaderboardsTopBar(
     val spacing = AppTheme.spacing
     val typography = AppTheme.typography
 
-    val onBackground = colors.onBackground
-
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(spacing.spacing56)
     ) {
-
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -178,9 +168,8 @@ private fun LeaderboardsTopBar(
         ) {
             Text(
                 text = stringResource(R.string.leaderboard_title),
-                style = typography.titleLarge.copy(
-                    brush = colors.goldTextGradient
-                ),
+                modifier = Modifier.testTag(LeaderboardTestTags.TITLE),
+                style = typography.titleLarge.copy(brush = colors.goldTextGradient),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -212,7 +201,8 @@ fun LeaderboardCategories(
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
-                .padding(horizontal = spacing.spacing32),
+                .padding(horizontal = spacing.spacing32)
+                .testTag(LeaderboardTestTags.CATEGORY_DROPDOWN),
             value = selected?.name ?: stringResource(R.string.leaderboard_select_category),
             onValueChange = {},
             readOnly = true,
@@ -259,7 +249,7 @@ private fun ModeLayout(
         horizontalArrangement = Arrangement.spacedBy(spacing.spacing8),
         contentPadding = PaddingValues(horizontal = spacing.spacing16),
     ) {
-        items(modes) { mode ->
+        items(modes, key = { it }) { mode ->
             val isSelected = mode == selectedMode
             ButtonMedium(
                 text = mode,
@@ -268,6 +258,7 @@ private fun ModeLayout(
                 modifier = Modifier
                     .widthIn(min = AppDimensions.leaderboardModeMinWidth)
                     .padding(horizontal = spacing.spacing8)
+                    .testTag(LeaderboardTestTags.mode(mode))
             )
         }
     }
@@ -279,16 +270,12 @@ private fun TopLeaderboard(
     statsKey: String?
 ) {
     val top3 = remember(filteredUsers) { filteredUsers.take(3) }
-
-    val ranked = remember(top3) {
-        top3.mapIndexed { index, user -> user to (index + 1) }
-    }
-
+    val ranked = remember(top3) { top3.mapIndexed { index, user -> user to (index + 1) } }
     val podium = remember(ranked) {
-        val rank1 = ranked.firstOrNull { it.second == 1 }
-        val rank2 = ranked.firstOrNull { it.second == 2 }
-        val rank3 = ranked.firstOrNull { it.second == 3 }
-        listOfNotNull(rank2, rank1, rank3)
+        val r1 = ranked.firstOrNull { it.second == 1 }
+        val r2 = ranked.firstOrNull { it.second == 2 }
+        val r3 = ranked.firstOrNull { it.second == 3 }
+        listOfNotNull(r2, r1, r3)
     }
 
     if (podium.isEmpty()) return
@@ -299,6 +286,7 @@ private fun TopLeaderboard(
         modifier = Modifier
             .padding(horizontal = AppTheme.spacing.spacing16)
             .fillMaxWidth()
+            .testTag(LeaderboardTestTags.TOP_PODIUM)
     ) {
         items(items = podium, key = { (user, _) -> user.userId }) { (user, rank) ->
             LeaderboardAvatarCard(
@@ -327,7 +315,8 @@ private fun LeaderboardAvatarCard(
     Column(
         modifier = modifier
             .height(AppDimensions.leaderboardAvatarCardHeight)
-            .scale(scale),
+            .scale(scale)
+            .testTag(LeaderboardTestTags.userRow(user.userId)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -374,7 +363,10 @@ private fun LeaderboardAvatarCard(
             ) {
                 Text(
                     text = "#$rank",
-                    modifier = Modifier.padding(horizontal = spacing.spacing10, vertical = spacing.spacing4),
+                    modifier = Modifier.padding(
+                        horizontal = spacing.spacing10,
+                        vertical = spacing.spacing4
+                    ),
                     color = colors.onSurface
                 )
             }
@@ -385,7 +377,10 @@ private fun LeaderboardAvatarCard(
         Text(text = user.username, color = onSurface)
 
         val score = statsKey?.let { user.stats.highScore[it] ?: 0 } ?: user.stats.points
-        Text(text = stringResource(R.string.leaderboard_score_format, score), color = onSurface.copy(alpha = 0.85f))
+        Text(
+            text = stringResource(R.string.leaderboard_score_format, score),
+            color = onSurface.copy(alpha = 0.85f)
+        )
     }
 }
 
@@ -397,7 +392,6 @@ private fun Leaderboard(
     val spacing = AppTheme.spacing
     val colors = AppTheme.colors
     val onSurface = colors.onSurface
-    val muted = onSurface.copy(alpha = 0.70f)
 
     val restUsers = remember(users) { users.drop(3) }
     if (restUsers.isEmpty()) return
@@ -421,16 +415,16 @@ private fun Leaderboard(
     }
 
     Spacer(modifier = Modifier.height(spacing.spacing8))
-
     HorizontalDivider(color = onSurface.copy(alpha = 0.12f))
-
     Spacer(modifier = Modifier.height(spacing.spacing16))
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(LeaderboardTestTags.USER_LIST),
         verticalArrangement = Arrangement.spacedBy(spacing.spacing16)
     ) {
-        itemsIndexed(restUsers) { index, user ->
+        itemsIndexed(restUsers, key = { _, u -> u.userId }) { index, user ->
             LeaderboardUserCard(
                 user = user,
                 index = index + 4,
@@ -448,7 +442,6 @@ private fun LeaderboardUserCard(
 ) {
     val colors = AppTheme.colors
     val spacing = AppTheme.spacing
-    val radius = AppTheme.radius
     val onSurface = colors.onSurface
     val muted = onSurface.copy(alpha = 0.75f)
 
@@ -458,6 +451,7 @@ private fun LeaderboardUserCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = spacing.spacing32)
+            .testTag(LeaderboardTestTags.userRow(user.userId))
     ) {
         Text(
             text = index.toString(),
@@ -493,15 +487,16 @@ private fun LeaderboardUserCard(
 
             Column {
                 Text(text = user.username, color = onSurface)
-
                 Spacer(modifier = Modifier.height(spacing.spacing4))
-
                 LevelBadge(level = user.stats.level)
             }
         }
 
         val score = selectedStatsKey?.let { user.stats.highScore[it] ?: 0 } ?: user.stats.points
-        Text(text = stringResource(R.string.leaderboard_score_format, score), color = onSurface.copy(alpha = 0.9f))
+        Text(
+            text = stringResource(R.string.leaderboard_score_format, score),
+            color = onSurface.copy(alpha = 0.9f)
+        )
     }
 }
 
@@ -513,6 +508,7 @@ private fun LeaderboardContentPreview() {
             state = LeaderboardContract.State(
                 isLoading = false,
                 users = previewUsers(),
+                filteredUsers = previewUsers(),
                 modes = listOf("Daily", "Weekly", "All Time"),
             ),
             onEvent = {}
