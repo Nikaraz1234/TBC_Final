@@ -130,6 +130,12 @@ private fun MainContent(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        AsyncImage(
+            model = CoreUiR.drawable.app_background2,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         if (state.isLoading) {
             Loader()
         } else {

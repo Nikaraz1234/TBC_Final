@@ -1,17 +1,20 @@
 package com.example.mycomposeapp.feature.game.data.di
 
+import com.example.mycomposeapp.core.data.di.GoogleBooksRetrofit
 import com.example.mycomposeapp.core.data.di.IgdbRetrofit
 import com.example.mycomposeapp.core.data.di.MalRetrofit
 import com.example.mycomposeapp.core.data.di.SteamRetrofit
 import com.example.mycomposeapp.core.data.di.SteamStoreRetrofit
 import com.example.mycomposeapp.core.data.di.TmdbRetrofit
-import com.example.mycomposeapp.core.domain.model.CategoryType
+import com.example.mycomposeapp.feature.game.data.remote.books.GoogleBooksApiService
 import com.example.mycomposeapp.feature.game.data.remote.comics.MalApiService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.GamesService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamService
 import com.example.mycomposeapp.feature.game.data.remote.games.service.SteamStoreService
 import com.example.mycomposeapp.feature.game.data.remote.movies.TmdbApiService
 import com.example.mycomposeapp.feature.game.data.repository.books.BookByOrderRepositoryImpl
+import com.example.mycomposeapp.feature.game.data.repository.books.BookOddOneOutRepositoryImpl
+import com.example.mycomposeapp.feature.game.data.repository.books.BookSynopsisRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaEmojiRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaSearchRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.comics.MangaRatingRepositoryImpl
@@ -24,9 +27,10 @@ import com.example.mycomposeapp.feature.game.data.repository.movies.MovieDailyPu
 import com.example.mycomposeapp.feature.game.data.repository.movies.MoviePlotGameRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieQuestionRepositoryImpl
 import com.example.mycomposeapp.feature.game.data.repository.movies.MovieSearchRepositoryImpl
+import com.example.mycomposeapp.feature.game.domain.repository.books.BookOddOneOutRepository
+import com.example.mycomposeapp.feature.game.domain.repository.books.BookSynopsisRepository
 import com.example.mycomposeapp.feature.game.domain.repository.movies.CoverGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.DailyPuzzleRepository
-import com.example.mycomposeapp.feature.game.domain.repository.comics.MangaEmojiRepository
 import com.example.mycomposeapp.feature.game.domain.repository.comics.MangaRatingRepository
 import com.example.mycomposeapp.feature.game.domain.repository.movies.PlotGameRepository
 import com.example.mycomposeapp.feature.game.domain.repository.QuestionRepository
@@ -162,4 +166,22 @@ object GameDataModule {
     @IntoMap
     @StringKey("BOOKS")
     fun provideBooksDailyPuzzleRepository(repo: BookByOrderRepositoryImpl): DailyPuzzleRepository = repo
+    @Singleton
+    fun provideGoogleBooksApiService(@GoogleBooksRetrofit retrofit: Retrofit): GoogleBooksApiService {
+        return retrofit.create(GoogleBooksApiService::class.java)
+    }
+
+    @Provides
+    @IntoMap
+    @StringKey("BOOKS")
+    fun provideBookSynopsisRepository(
+        impl: BookSynopsisRepositoryImpl
+    ): BookSynopsisRepository = impl
+
+    @Provides
+    @IntoMap
+    @StringKey("BOOKS")
+    fun provideBookOddOneOutRepository(
+        impl: BookOddOneOutRepositoryImpl
+    ): BookOddOneOutRepository = impl
 }

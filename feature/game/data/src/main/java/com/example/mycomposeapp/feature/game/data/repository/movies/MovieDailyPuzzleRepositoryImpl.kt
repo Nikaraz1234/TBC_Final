@@ -77,7 +77,7 @@ class MovieDailyPuzzleRepositoryImpl @Inject constructor(
                 dto.toDailyPuzzle(isCompleted, isFromArchive = true)
             }
 
-            emit(Resource.Success(puzzles))
+            emit(Resource.Success(puzzles.distinctBy { it.date }))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Failed to load archive"))
         }

@@ -26,6 +26,10 @@ import com.example.mycomposeapp.feature.game.presentation.delegate.movies.MovieP
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.FetchMangaPairsUseCase
 import com.example.mycomposeapp.feature.game.domain.usecase.comics.GetRankleMangaUseCase
 import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookByOrderDelegate
+import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookSynopsisBatchUseCase
+import com.example.mycomposeapp.feature.game.domain.usecase.books.FetchBookOddOneOutBatchUseCase
+import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookSynopsisDelegate
+import com.example.mycomposeapp.feature.game.presentation.delegate.books.BookOddOneOutDelegate
 import com.example.mycomposeapp.feature.game.presentation.delegate.comics.RankleDelegate
 import javax.inject.Inject
 
@@ -45,7 +49,9 @@ class GameDelegateFactory @Inject constructor(
     private val getRankleMangaUseCase: GetRankleMangaUseCase,
     private val updateDailyGoalProgressUseCase: UpdateDailyGoalProgressUseCase,
     private val dailyGoalsManagerUseCase: DailyGoalsManagerUseCase,
-    private val updateUserStatsUseCase: UpdateUserStatsUseCase
+    private val updateUserStatsUseCase: UpdateUserStatsUseCase,
+    private val fetchBookSynopsisBatchUseCase: FetchBookSynopsisBatchUseCase,
+    private val fetchBookOddOneOutBatchUseCase: FetchBookOddOneOutBatchUseCase
 ) {
     fun create(gameModeId: String, categoryType: String, archiveDate: String?): GameModeDelegate {
         return when (categoryType) {
@@ -194,19 +200,35 @@ class GameDelegateFactory @Inject constructor(
             else -> throw IllegalArgumentException("Unknown game mode for $categoryType: $gameModeId")
         }
     }
+
     private fun createBooksDelegate(
         gameModeId: String,
-        categoryType: String,
-        archiveDate: String?
+        categoryType: String
     ): GameModeDelegate {
         return when (gameModeId) {
-            GameModeIds.BOOK_BY_ORDER -> BookByOrderDelegate(
+          GameModeIds.BOOK_BY_ORDER -> BookByOrderDelegate(
                 categoryType = categoryType,
                 gameModeId = gameModeId,
                 archiveDate = archiveDate,
                 getDailyPuzzleUseCase = getDailyPuzzleUseCase,
                 dailyPuzzleRepository = dailyPuzzleRepositories[categoryType]
-                    ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType"),
+                    ?: throw IllegalArgumentException("No daily puzzle repository for: $categoryType")
+          
+            GameModeIds.BOOK_SYNOPSIS -> BookSynopsisDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                fetchBookSynopsisBatchUseCase = fetchBookSynopsisBatchUseCase,
+                getCurrentUserUseCase = getCurrentUserUseCase,
+                updateCoinsUseCase = updateCoinsUseCase,
+                updateGameStatsUseCase = updateGameStatsUseCase,
+                updateDailyGoalProgressUseCase = updateDailyGoalProgressUseCase,
+                dailyGoalsManagerUseCase = dailyGoalsManagerUseCase,
+                updateUserStatsUseCase = updateUserStatsUseCase
+            )
+            GameModeIds.BOOK_ODD_ONE_OUT -> BookOddOneOutDelegate(
+                categoryType = categoryType,
+                gameModeId = gameModeId,
+                fetchBookOddOneOutBatchUseCase = fetchBookOddOneOutBatchUseCase,
                 getCurrentUserUseCase = getCurrentUserUseCase,
                 updateCoinsUseCase = updateCoinsUseCase,
                 updateGameStatsUseCase = updateGameStatsUseCase,

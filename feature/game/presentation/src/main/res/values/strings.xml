@@ -63,4 +63,17 @@
 <string name="unknown_studio">Unknown studio</string>
 <string name="unknown_genre">Unknown genre</string>
 <string name="unknown_year">Unknown year</string>
+
+    <!-- Book Synopsis mode -->
+    <string name="book_synopsis_instruction">Which synopsis belongs to this book?</string>
+    <string name="book_synopsis_hint_label">Hint (%d coins) — removes 2 wrong options</string>
+    <string name="book_synopsis_hint_used">Hint used</string>
+
+    <!-- Book Odd One Out mode -->
+    <string name="book_odd_one_out_instruction">Tap the odd one out!</string>
+    <string name="book_odd_one_out_hint_label">Hint (%d coins) — removes 2 shared books</string>
+    <string name="book_odd_one_out_hint_used">Hint used</string>
+    <string name="book_odd_one_out_shared_trait">The other books shared: %1$s — %2$s</string>
+    <string name="book_odd_one_out_category_hint_label">Category hint (%d coins) — reveals shared trait</string>
+    <string name="book_odd_one_out_category_hint_used">Category: %1$s — %2$s</string>
 </resources>

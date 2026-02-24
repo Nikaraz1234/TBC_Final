@@ -109,7 +109,7 @@ class MangaEmojiRepositoryImpl @Inject constructor(
                 )
             }
 
-            emit(Resource.Success(puzzles))
+            emit(Resource.Success(puzzles.distinctBy { it.date }))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Failed to load archive"))
         }

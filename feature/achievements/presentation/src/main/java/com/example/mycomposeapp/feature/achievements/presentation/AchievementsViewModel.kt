@@ -74,7 +74,8 @@ class AchievementsViewModel @Inject constructor(
                         isLoading = false,
                         achievements = result.allAchievements,
                         unlockedIds = result.unlockedIds,
-                        newlyUnlocked = result.newlyUnlocked
+                        newlyUnlocked = result.newlyUnlocked,
+                        userStats = user.stats
                     )
                 }
 

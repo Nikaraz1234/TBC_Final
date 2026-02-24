@@ -35,6 +35,10 @@ import com.example.mycomposeapp.feature.game.presentation.components.games.descr
 import com.example.mycomposeapp.feature.game.presentation.components.games.screenshot.ScreenshotQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotGameTopBar
 import com.example.mycomposeapp.feature.game.presentation.components.plot.PlotQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.books.OddOneOutGameTopBar
+import com.example.mycomposeapp.feature.game.presentation.components.books.OddOneOutQuestionView
+import com.example.mycomposeapp.feature.game.presentation.components.books.SynopsisGameTopBar
+import com.example.mycomposeapp.feature.game.presentation.components.books.SynopsisQuestionView
 import com.example.mycomposeapp.feature.game.presentation.components.rankle.RankleQuestionView
 import com.example.mycomposeapp.feature.game.presentation.R as GameR
 
@@ -119,6 +123,22 @@ fun QuestionScreen(
                 )
             }
             is GameContract.ModeState.BookByOrder -> {
+            }
+
+            is GameContract.ModeState.BookSynopsis -> {
+                SynopsisGameTopBar(
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
+            }
+
+            is GameContract.ModeState.BookOddOneOut -> {
+                OddOneOutGameTopBar(
+                    coins = mode.coins,
+                    score = mode.currentScore,
+                    streak = state.currentStreak
+                )
             }
 
             else -> Unit
@@ -227,16 +247,42 @@ fun QuestionScreen(
                     }
                 )
             }
+
+            is QuestionContent.BookSynopsis -> {
+                val bookState = state.bookSynopsisState ?: GameContract.ModeState.BookSynopsis()
+                SynopsisQuestionView(
+                    content = content,
+                    bookSynopsisState = bookState,
+                    correctAnswer = question.correctAnswer,
+                    isRevealed = isRevealed,
+                    onOptionSelected = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) },
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) }
+                )
+            }
+
+            is QuestionContent.BookOddOneOut -> {
+                val bookState = state.bookOddOneOutState ?: GameContract.ModeState.BookOddOneOut()
+                OddOneOutQuestionView(
+                    content = content,
+                    bookOddOneOutState = bookState,
+                    correctAnswer = question.correctAnswer,
+                    isRevealed = isRevealed,
+                    onBookSelected = { onEvent(GameContract.Event.OnAnswerSubmitted(it)) },
+                    onUseHint = { onEvent(GameContract.Event.OnUseHint) },
+                    onUseCategoryHint = { onEvent(GameContract.Event.OnUseCategoryHint) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(spacing.spacing20))
 
         val isRankleMode = state.rankleState != null
         val isOrderMode = state.bookOrderState != null
+        val isBookMode = state.isBookSynopsisMode || state.isBookOddOneOutMode
 
         if (isRevealed) {
-            // Don't show AnswerFeedbackView for Rankle — it has its own result card
-            if (!isRankleMode) {
+            // Don't show AnswerFeedbackView for Rankle or Book modes (they have their own UI)
+            if (!isRankleMode && !isBookMode) {
                 AnswerFeedbackView(
                     isCorrect = state.isAnswerCorrect,
                     correctAnswer = question.correctAnswer,
@@ -267,14 +313,15 @@ fun QuestionScreen(
                     state.descriptionState != null -> state.descriptionState?.livesRemaining == 0
                     isRankleMode -> state.rankleState?.livesRemaining == 0
                         || (!state.isAnswerCorrect && (state.rankleState?.livesRemaining ?: 0) <= 1)
+                    isBookMode -> !state.isAnswerCorrect
                     state.isEmojiMode -> true
                     else -> state.currentQuestionIndex >= state.questions.size - 1
                 },
                 buttonText = if (state.isEmojiMode) stringResource(GameR.string.btn_done) else null,
                 onClick = { onEvent(GameContract.Event.OnNextQuestion) }
             )
-        } else if (!isRankleMode) {
-            // Rankle has its own input — skip shared AnswerInputView
+        } else if (!isRankleMode && !isBookMode) {
+            // Rankle and Book modes have their own input — skip shared AnswerInputView
             val achievementMode = state.achievementState
             if (achievementMode != null &&
                 achievementMode.livesRemaining < GameConstants.ACHIEVEMENT_INITIAL_LIVES

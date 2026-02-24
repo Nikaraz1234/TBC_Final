@@ -1,10 +1,12 @@
 package com.example.mycomposeapp.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -23,7 +25,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mycomposeapp.core.ui.theme.AppDimensions
 import com.example.mycomposeapp.core.ui.theme.AppTheme
-import com.example.mycomposeapp.core.ui.theme.AppTheme.radius
 import com.example.mycomposeapp.core.ui.theme.AppTheme.spacing
 import com.example.mycomposeapp.feature.achievements.presentation.navigation.AchievementsRoute
 import com.example.mycomposeapp.feature.leaderboard.presentation.navigation.LeaderboardRoute
@@ -42,13 +43,12 @@ fun AppBottomBar(
 
 
     Surface(
-        modifier = modifier
-            .navigationBarsPadding()
-            .clip(radius.radius12),
+        modifier = modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
         color = AppTheme.colors.glassWhite,
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
+        Column(modifier = Modifier.navigationBarsPadding()) {
         HorizontalDivider(modifier = Modifier.height(spacing.spacing1),
             color = AppTheme.colors.onSurface)
         NavigationBar(
@@ -101,7 +101,7 @@ fun AppBottomBar(
             )
             BottomBarItem(
                 selected = currentRoute == AchievementsRoute::class.qualifiedName,
-                painter = painterResource(CoreUiR.drawable.ic_trophy),
+                painter = painterResource(CoreUiR.drawable.ic_achievement),
                 onClick = {
                     navController.navigate(AchievementsRoute) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -111,6 +111,7 @@ fun AppBottomBar(
                 }
             )
         }
+        } // Column
     }
 }
 

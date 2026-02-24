@@ -45,7 +45,7 @@ object Categories {
             id = GameModeIds.GAME_SCREENSHOT,
             name = "By Screenshot",
             description = "Identify game from screenshot",
-            iconRes = R.drawable.ic_cover,
+            iconRes = CoreUiR.drawable.ic_games_by_screenshot,
             isAvailable = true
         ),
         GameMode(
@@ -59,7 +59,7 @@ object Categories {
             id = GameModeIds.GAME_DESCRIPTION,
             name = "By Description",
             description = "Identify game from description",
-            iconRes = R.drawable.ic_cover,
+            iconRes = CoreUiR.drawable.ic_games_by_description,
             isAvailable = true
         )
 
@@ -70,7 +70,7 @@ object Categories {
             id = GameModeIds.MANGA_RATING,
             name = "Compare the Rating",
             description = "Guess which manga is rated higher",
-            iconRes = R.drawable.ic_cover,
+            iconRes = CoreUiR.drawable.ic_comics_compare_the_rating,
             isAvailable = true
         ),
         GameMode(
@@ -84,7 +84,7 @@ object Categories {
             id = GameModeIds.RANKLE,
             name = "Guess the rating",
             description = "Guess the close approximation of the rating",
-            iconRes = R.drawable.ic_cover,
+            iconRes = CoreUiR.drawable.ic_comics_guess_the_rating,
             isAvailable = true
         )
     )
@@ -95,6 +95,23 @@ object Categories {
             name = "Order Book Events",
             description = "Order Book Events",
             iconRes = R.drawable.ic_cover,
+            isAvailable = true
+        )
+    )
+
+    private val booksGameModes = listOf(
+        GameMode(
+            id = GameModeIds.BOOK_SYNOPSIS,
+            name = "Guess the Synopsis",
+            description = "Which synopsis belongs to this book cover?",
+            iconRes = CoreUiR.drawable.ic_books_guess_the_synopsis,
+            isAvailable = true
+        ),
+        GameMode(
+            id = GameModeIds.BOOK_ODD_ONE_OUT,
+            name = "Odd One Out",
+            description = "Find the book that doesn't fit with the others",
+            iconRes = CoreUiR.drawable.ic_books_odd_one_out,
             isAvailable = true
         )
     )
@@ -136,7 +153,7 @@ object Categories {
             type = CategoryType.BOOKS,
             name = "Books & Novels",
             gradientColors = listOf(Color(0xFF795548), Color(0xFF607D8B)),
-            gameModes = booksGameCategory,
+            gameModes = booksGameModes,
             backgroundImageRes = CoreUiR.drawable.books_cover
         ),
         Category(

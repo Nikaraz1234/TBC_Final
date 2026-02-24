@@ -19,17 +19,15 @@ class GetDailyChallengeMultiplierUseCase @Inject constructor(
         currentGameModeId: String
     ): Int {
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toString()
-        
-        // Check if daily challenge is already completed today
+
         val completedDate = dataStoreManager
             .getPreference(PreferenceKeys.DAILY_CHALLENGE_COMPLETED_DATE, "")
             .first()
         
         if (completedDate == today) {
-            return 1 // No bonus if already completed
+            return 1
         }
-        
-        // Get today's daily challenge (same logic as GetDailyChallengeUseCase)
+
         val availableGameModes = getAvailableGameModesUseCase()
         
         if (availableGameModes.isEmpty()) return 1
@@ -37,8 +35,7 @@ class GetDailyChallengeMultiplierUseCase @Inject constructor(
         val seed = abs(today.hashCode())
         val selectedIndex = seed % availableGameModes.size
         val todayChallenge = availableGameModes[selectedIndex]
-        
-        // Check if current game matches today's daily challenge
+
         return if (todayChallenge.categoryType == currentCategoryType && 
                    todayChallenge.gameModeId == currentGameModeId) {
             DailyGoalsConstants.DAILY_CHALLENGE_MULTIPLIER

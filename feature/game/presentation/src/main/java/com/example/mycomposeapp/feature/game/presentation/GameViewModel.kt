@@ -66,6 +66,7 @@ class GameViewModel @Inject constructor(
             is GameContract.Event.OnExitGame -> delegate.onExitGame()
             is GameContract.Event.OnRevealMore -> delegate.onRevealMore()
             is GameContract.Event.OnUseHint -> delegate.onUseHint()
+            is GameContract.Event.OnUseCategoryHint -> delegate.onUseCategoryHint()
         }
     }
 

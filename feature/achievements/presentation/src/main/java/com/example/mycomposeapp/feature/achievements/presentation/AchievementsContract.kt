@@ -1,5 +1,6 @@
 package com.example.mycomposeapp.feature.achievements.presentation
 
+import com.example.mycomposeapp.core.domain.model.UserStats
 import com.example.mycomposeapp.core.ui.util.UiText
 import com.example.mycomposeapp.feature.achievements.domain.model.AchievementCategory
 import com.example.mycomposeapp.feature.achievements.domain.model.AppAchievement
@@ -13,7 +14,8 @@ object AchievementsContract {
         val newlyUnlocked: List<AppAchievement> = emptyList(),
         val selectedCategory: AchievementCategory? = null,
         val completionFilter: CompletionFilter = CompletionFilter.ALL,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val userStats: UserStats? = null
     ) {
         val filteredAchievements: List<AppAchievement>
             get() {
